@@ -62,7 +62,7 @@
         <thead>
             <tr>
                 <th scope="col">Nombre</th>
-                <th scope="col">Alta</th>
+                <th scope="col">Estado</th>
                 <th scope="col">Acciones</th>
             </tr>
         </thead>
@@ -72,11 +72,11 @@
     
     <template id="crud-template">
         <tr>
-          <td class="name"></td>
-          <td class="status"></td>
+          <td class="nombre"></td>
+          <td class="estado"></td>
           <td>
             <button class="btn btn-success editar">Editar</button>
-            <button class="btn btn-success estado "> Activar</button>
+            <button class="botonEstado btn"></button>
             <button class="btn btn-primary ver">Ver</button>
           </td>
         </tr>
@@ -95,13 +95,12 @@
           
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
-
 <!--END Modal-->
+
 
 </body>
 
