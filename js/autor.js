@@ -1,4 +1,4 @@
-import { options, urlAutor,optionsGET,urlDesactivarAutor, urlActivarAutor } from "./constantes.js";
+import { options, urlAutor, optionsGET, urlDesactivarAutor, urlActivarAutor } from "./constantes.js";
 import { obtenerJson } from "./asincronico.js";
 
 const d = document,
@@ -19,24 +19,24 @@ function obtenerAutores() {
       $template.querySelector(".editar").dataset.nombre = autor.nombre;
       $template.querySelector(".ver").dataset.nombre = autor.nombre;
 
-      if(autor.alta === true){
+      if (autor.alta === true) {
         $template.querySelector(".estado").classList.remove("btn-danger")
         $template.querySelector(".estado").classList.add("btn-success")
         $template.querySelector(".name").classList.remove("tachado")
         $template.querySelector(".status").classList.remove("tachado")
         $template.querySelector(".editar").removeAttribute("disabled")
-      }else{
+      } else {
         $template.querySelector(".estado").classList.remove("btn-success")
         $template.querySelector(".estado").classList.add("btn-danger")
         $template.querySelector(".name").classList.add("tachado")
         $template.querySelector(".status").classList.add("tachado")
         $template.querySelector(".editar").setAttribute("disabled", '')
       }
-     
+
       $template.querySelector(".estado").dataset.estado = autor.alta;
       $template.querySelector(".estado").dataset.nombre = autor.nombre;
       $template.querySelector(".estado").dataset.id = autor.id;
-    
+
       let $clone = d.importNode($template, true);
 
       $fragment.appendChild($clone);
@@ -46,7 +46,7 @@ function obtenerAutores() {
 }
 
 function activarAutor(index) {
-  obtenerJson(urlActivarAutor + index,optionsGET).then((response) => {
+  obtenerJson(urlActivarAutor + index, optionsGET).then((response) => {
     {
       console.table(response);
     }
@@ -81,7 +81,7 @@ function modificarAutor(options) {
 d.addEventListener("DOMContentLoaded", obtenerAutores());
 
 d.addEventListener("click", async (e) => {
-   if (e.target.matches(".ver")) {
+  if (e.target.matches(".ver")) {
     Swal.fire({
       icon: 'info',
       title: 'Autor:',
@@ -111,35 +111,35 @@ d.addEventListener("click", async (e) => {
 
         let btn = e.target;
         console.log(btn)
-        
+
         if (btn.dataset.estado == 'true') {
-    
+
           desactivarAutor(btn.dataset.id);
-    
+
           btn.classList.remove("btn-success")
           btn.classList.add("btn-danger")
           btn.dataset.estado = "false";
-    
+
           btn.parentElement.children[0].setAttribute("disabled", '')
 
           btn.parentNode.parentNode.children[0].classList.add("tachado")
           btn.parentNode.parentNode.children[1].classList.add("tachado")
-          
-          d.getElementById("status_"+ btn.dataset.id).innerHTML = "false";
-    
+
+          d.getElementById("status_" + btn.dataset.id).innerHTML = "false";
+
         } else {
-    
+
           activarAutor(btn.dataset.id);
           btn.classList.remove("btn-danger")
           btn.classList.add("btn-success")
           btn.dataset.estado = "true";
 
           btn.parentElement.children[0].removeAttribute("disabled")
-    
+
           btn.parentNode.parentNode.children[0].classList.remove("tachado")
           btn.parentNode.parentNode.children[1].classList.remove("tachado")
-          
-          d.getElementById("status_"+ btn.dataset.id).innerHTML = "true";
+
+          d.getElementById("status_" + btn.dataset.id).innerHTML = "true";
         }
 
         Swal.fire(`El estado del autor <b>${btn.dataset.nombre}</b> ha sido modificado a <b>${btn.dataset.estado}</b>.`, '', 'success')
@@ -150,3 +150,29 @@ d.addEventListener("click", async (e) => {
   }
 
 });
+
+
+////para probar filtro
+let busqueda = document.getElementById('buscar');
+let table = document.getElementById("tabla").tBodies[0];
+let texto;
+
+function buscaTabla() {
+  texto = busqueda.value.toLowerCase();
+  var r = 0;
+  let row
+  while (row = table.rows[r++]) {
+    if (row.children[0].innerHTML.toLowerCase().indexOf(texto) !== -1)
+    row.style.display = null;
+  else
+    row.style.display = 'none';
+}
+
+  //   if (row.innerText.toLowerCase().indexOf(texto) !== -1)
+  //     row.style.display = null;
+  //   else
+  //     row.style.display = 'none';
+  // }
+}
+
+busqueda.addEventListener('keyup', buscaTabla);
