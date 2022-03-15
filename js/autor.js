@@ -1,185 +1,152 @@
-import {options, urlAutor ,activar ,desactivar,footerModal,footerModalFormulario} from "./constantes.js";
-import {obtenerJson } from "./asincronico.js";
-
+import { options, urlAutor,optionsGET,urlDesactivarAutor, urlActivarAutor } from "./constantes.js";
+import { obtenerJson } from "./asincronico.js";
 
 const d = document,
-$table = d.querySelector(".table"),
-$template = d.getElementById("crud-template").content,
-$fragment = d.createDocumentFragment(),
-$myModal = new bootstrap.Modal(d.getElementById('exampleModal'), options);
-
- function obtenerAutor(url,index){
-  obtenerJson(url+index).then(response => {
-    console.log("*** aqui devuelvo uno");
-    console.warn(response)});
-}
+  $table = d.querySelector(".table"),
+  $template = d.getElementById("crud-template").content,
+  $fragment = d.createDocumentFragment(),
+  $myModal = new bootstrap.Modal(d.getElementById("exampleModal"), options);
 
 
-function obtenerAutores(url){
-obtenerJson(url).then(autores => {
-  autores.forEach(autor => {
-    
-    $template.querySelector(".nombre").textContent = autor.nombre;
-    $template.querySelector(".nombre").id = `nombre_${autor.id}`;
+function obtenerAutores() {
+  obtenerJson(urlAutor).then((autores) => {
+    autores.forEach((autor) => {
 
-    $template.querySelector(".estado").textContent = autor.alta;
-    $template.querySelector(".estado").id = `estado_${autor.id}`;
+      $template.querySelector(".name").textContent = autor.nombre;
 
-    $template.querySelector(".ver").dataset.nombre = autor.nombre;
+      $template.querySelector(".status").textContent = autor.alta;
+      $template.querySelector(".status").id = "status_" + autor.id;
+      $template.querySelector(".editar").dataset.nombre = autor.nombre;
+      $template.querySelector(".ver").dataset.nombre = autor.nombre;
 
-
-    $template.querySelector(".botonEstado").id = `botonEstado_${autor.id}`;
-
-    $template.querySelector(".botonEstado").classList.remove('btn-success');
-    $template.querySelector(".botonEstado").classList.remove('btn-danger');
-
-    $template.querySelector(".botonEstado").dataset.id= autor.id;
-    $template.querySelector(".botonEstado").dataset.estado = autor.alta;
-
-
-
-    if(autor.alta){
-      $template.querySelector(".botonEstado").classList.add('btn-danger');
-      $template.querySelector(".botonEstado").textContent="Desactivar";
-    }else{
-      $template.querySelector(".botonEstado").classList.add('btn-success');
-      $template.querySelector(".botonEstado").textContent="Activar";
-    }
-
-    let $clone = d.importNode($template, true);
-     
-    $fragment.appendChild($clone);
-  });
-  $table.querySelector("tbody").appendChild($fragment);
-  
-});
-}
-
-function activarAutor(url,index){
-   obtenerJson(url+index).then(response => {
-    { 
-      d.querySelector(`#estado_${index}`).textContent = true;
-      d.querySelector(`#botonEstado_${index}`).dataset.estado = true;
-      d.querySelector(`#botonEstado_${index}`).classList.toggle("btn-success");
-      d.querySelector(`#botonEstado_${index}`).classList.toggle("btn-danger");
-      d.querySelector(`#botonEstado_${index}`).textContent="Desactivar";
-      d.querySelector(".modal-body").innerHTML= `${response.message}`;
-      $myModal.show();
-    
- }});
-}
-
- function desactivarAutor(url, index){
-  obtenerJson(url+index).then(response => {
-    { 
-     d.querySelector(`#estado_${index}`).textContent = false;
-     d.querySelector(`#botonEstado_${index}`).dataset.estado = false;
-     d.querySelector(`#botonEstado_${index}`).classList.toggle("btn-success");
-     d.querySelector(`#botonEstado_${index}`).classList.toggle("btn-danger");
-     d.querySelector(`#botonEstado_${index}`).textContent="Activar";
-     d.querySelector(".modal-body").innerHTML= `${response.message}`;
-     $myModal.show();
- }});
-}
-
-function crearAutor(url,options){
- obtenerJson(url,options).then(response => {
-   console.log("aqui se aplica la logica")
-    alert(`se creo el autor ${response.nombre}`);
- }).catch(error=>console.error(error));
-}
- function modificarAutor(url,options){
-  obtenerJson(url,options).then(response => {
-    console.log("aqui se aplica la logica")
-     alert(`se modifico el autor ${response.nombre}`);
-  }).catch(error=>console.error(error));
-    //obtenerJson(url,options).then(response => console.log(response));
-}
-options.method='PUT';
-options.body =JSON.stringify({
-  nombre: "Gabriel Garcia Marquez"
-});
-//modificarAutor(urlAutor+55,options)
-const form = document.querySelector("form");
-form.addEventListener("submit", function(e){
-  e.preventDefault();              
-  const data = new FormData(e.target);
-  const body = Object.fromEntries(data.entries());
-  options.method='POST';
-  options.body= JSON.stringify(body);
-  crearAutor(urlAutor,options);
-});
-
-
-  d.addEventListener("DOMContentLoaded", obtenerAutores(urlAutor));
-
-  d.addEventListener("click", async e => {
-    if (e.target.matches(".ver")) { 
-      d.querySelector(".modal-body").innerHTML= `Autor: ${e.target.dataset.nombre}`;
-      d.querySelector(".modal-footer").innerHTML= footerModal;
-      $myModal.show();
-    
-    }
-    
-    if (e.target.matches(".editar")) { 
-      d.querySelector(".modal-body").innerHTML =`<form>
-                 <div class="mb-3">
-                 <label for="recipient-name" class="col-form-label">Recipient:</label>
-                <input type="text" class="form-control" id="recipient-name">
-                </div>
-                <div class="mb-3">
-              <label for="message-text" class="col-form-label">Message:</label>
-              <textarea class="form-control" id="message-text"></textarea>
-              </div>
-            </form>`;
-
-      d.querySelector(".modal-footer").innerHTML= footerModalFormulario;
-      $myModal.show();
-    }
-    if (e.target.matches(".botonEstado")) { 
-      if(e.target.dataset.estado === "true"){
-       desactivarAutor(urlAutor+desactivar,e.target.dataset.id);
+      if(autor.alta === true){
+        $template.querySelector(".estado").classList.remove("btn-danger")
+        $template.querySelector(".estado").classList.add("btn-success")
+        $template.querySelector(".name").classList.remove("tachado")
+        $template.querySelector(".status").classList.remove("tachado")
+        $template.querySelector(".editar").removeAttribute("disabled")
       }else{
-        activarAutor(urlAutor+activar,e.target.dataset.id);
-      }  
-      
-      d.querySelector(".modal-footer").innerHTML= footerModal;
-      $myModal.show();
-    }
-
-  /*
-    if (e.target.matches(".delete")) {
-      let isDelete = confirm(`¿Estás seguro de eliminar el id ${e.target.dataset.id}?`);
-
-      if (isDelete) {
-        //Delete - DELETE
-        try {
-          let options = {
-            method: "DELETE",
-            headers: {
-              "Content-type": "application/json; charset=utf-8"
-            }
-          },
-            res = await fetch(`http://localhost:5555/santos/${e.target.dataset.id}`, options),
-            json = await res.json();
-
-          if (!res.ok) throw { status: res.status, statusText: res.statusText };
-
-          location.reload();
-        } catch (err) {
-          let message = err.statusText || "Ocurrió un error";
-          alert(`Error ${err.status}: ${message}`);
-        }
+        $template.querySelector(".estado").classList.remove("btn-success")
+        $template.querySelector(".estado").classList.add("btn-danger")
+        $template.querySelector(".name").classList.add("tachado")
+        $template.querySelector(".status").classList.add("tachado")
+        $template.querySelector(".editar").setAttribute("disabled", '')
       }
-    }*/
+     
+      $template.querySelector(".estado").dataset.estado = autor.alta;
+      $template.querySelector(".estado").dataset.nombre = autor.nombre;
+      $template.querySelector(".estado").dataset.id = autor.id;
+    
+      let $clone = d.importNode($template, true);
 
+      $fragment.appendChild($clone);
+    });
+    $table.querySelector("tbody").appendChild($fragment);
+  });
+}
 
+function activarAutor(index) {
+  obtenerJson(urlActivarAutor + index,optionsGET).then((response) => {
+    {
+      console.table(response);
+    }
+  });
+}
 
+function desactivarAutor(index) {
+  obtenerJson(urlDesactivarAutor + index, optionsGET).then((response) => {
+    {
+      console.table(response);
+    }
+  });
+}
 
+function crearAutor(options) {
+  obtenerJson(urlAutor, options)
+    .then((response) => {
+      console.log("aqui se aplica la logica");
+      alert(`se creo el autor ${response.nombre}`);
+    })
+    .catch((error) => console.error(error));
+}
+function modificarAutor(options) {
+  obtenerJson(urlAutor, options)
+    .then((response) => {
+      console.log("aqui se aplica la logica");
+      alert(`se modifico el autor ${response.nombre}`);
+    })
+    .catch((error) => console.error(error));
+}
 
-  })
+d.addEventListener("DOMContentLoaded", obtenerAutores());
 
+d.addEventListener("click", async (e) => {
+   if (e.target.matches(".ver")) {
+    Swal.fire({
+      icon: 'info',
+      title: 'Autor:',
+      text: e.target.dataset.nombre,
+    })
+  }
 
- 
+  if (e.target.matches(".editar")) {
+    d.querySelector(
+      ".modal-body"
+    ).innerHTML = `Autor: ${e.target.dataset.nombre}`;
+    $myModal.show();
+  }
 
+  if (e.target.matches(".estado")) {
+    Swal.fire({
+      title: '¿Deseas cambiar el estado del autor?',
+      showDenyButton: true,
+      icon: 'warning',
+      confirmButtonText: 'SI 😎',
+      denyButtonText: `NOOOOOO 🙏`,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+    }).then((result) => {
 
+      if (result.isConfirmed) {
+
+        let btn = e.target;
+        console.log(btn)
+        
+        if (btn.dataset.estado == 'true') {
+    
+          desactivarAutor(btn.dataset.id);
+    
+          btn.classList.remove("btn-success")
+          btn.classList.add("btn-danger")
+          btn.dataset.estado = "false";
+    
+          btn.parentElement.children[0].setAttribute("disabled", '')
+
+          btn.parentNode.parentNode.children[0].classList.add("tachado")
+          btn.parentNode.parentNode.children[1].classList.add("tachado")
+          
+          d.getElementById("status_"+ btn.dataset.id).innerHTML = "false";
+    
+        } else {
+    
+          activarAutor(btn.dataset.id);
+          btn.classList.remove("btn-danger")
+          btn.classList.add("btn-success")
+          btn.dataset.estado = "true";
+
+          btn.parentElement.children[0].removeAttribute("disabled")
+    
+          btn.parentNode.parentNode.children[0].classList.remove("tachado")
+          btn.parentNode.parentNode.children[1].classList.remove("tachado")
+          
+          d.getElementById("status_"+ btn.dataset.id).innerHTML = "true";
+        }
+
+        Swal.fire(`El estado del autor <b>${btn.dataset.nombre}</b> ha sido modificado a <b>${btn.dataset.estado}</b>.`, '', 'success')
+      } else if (result.isDenied) {
+        Swal.fire('No se han realizado cambios.', '', 'info')
+      }
+    })
+  }
+
+});
