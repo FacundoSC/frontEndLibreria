@@ -13,6 +13,6 @@ export const desactivar =  "desactivar/";
 
 
 export const footerModalFormulario = ` <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-<button type="button" class="btn btn-primary" id="updateAutor">Guardar</button>`;
+<button type="button" class="btn btn-primary" id="saveAutor">Guardar</button>`;
 export const footerModal = ` <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 `;

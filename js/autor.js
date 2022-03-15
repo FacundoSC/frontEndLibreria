@@ -72,10 +72,12 @@ function activarAutor(url,index){
 
 function crearAutor(url,options){
  obtenerJson(url,options).then(response => {
-   console.log("aqui se aplica la logica")
-    alert(`se creo el autor ${response.nombre}`);
+  d.querySelector(".modal-body").innerHTML= `se creo el Autor: ${response.nombre} `;
+  d.querySelector(".modal-footer").innerHTML= footerModal;
+  $myModal.show();
  }).catch(error=>console.error(error));
 }
+
  function modificarAutor(url,id,options){
   obtenerJson(url+id,options).then(response => {
   d.getElementById("nombre_"+id).innerHTML=response.nombre;
@@ -84,20 +86,7 @@ function crearAutor(url,options){
   $myModal.show();
   }).catch(error=>console.error(error));
 }
-options.method='PUT';
-options.body =JSON.stringify({
-  nombre: "Gabriel Garcia Marquez"
-});
-//modificarAutor(urlAutor+55,options)
-const form = document.querySelector("form");
-form.addEventListener("submit", function(e){
-  e.preventDefault();              
-  const data = new FormData(e.target);
-  const body = Object.fromEntries(data.entries());
-  options.method='POST';
-  options.body= JSON.stringify(body);
-  crearAutor(urlAutor,options);
-});
+
 
 
   d.addEventListener("DOMContentLoaded", obtenerAutores(urlAutor));
@@ -113,13 +102,17 @@ form.addEventListener("submit", function(e){
      </form>`;       
     d.querySelector(".modal-footer").innerHTML= footerModalFormulario;
     $myModal.show(); 
-    }
+    d.querySelector("#saveAutor").addEventListener("click", (e)=>{
+      let nombre = d.querySelector("#nombreAutor").value;
+      e.preventDefault();
+              $myModal.hide();
+              options.method='POST';
+              options.body = JSON.stringify({ nombre });
+              crearAutor(urlAutor,options);
 
-
-
-
-
+           });
     
+    }
     if (e.target.matches(".editar")) { 
       const id = e.target.dataset.id;
       let nombre = document.getElementById("nombre_"+id).textContent;
@@ -131,8 +124,8 @@ form.addEventListener("submit", function(e){
             </form>`;       
      d.querySelector(".modal-footer").innerHTML= footerModalFormulario;
      $myModal.show();
-     d.querySelector("#updateAutor").addEventListener("click", (e)=>{
-     e.preventDefault();
+     d.querySelector("#saveAutor").addEventListener("click", (e)=>{
+       e.preventDefault();
                $myModal.hide();
                nombre = d.querySelector("#nombreAutor").value;
                options.method='PUT';
@@ -141,7 +134,6 @@ form.addEventListener("submit", function(e){
 
             });
     }
-
     if (e.target.matches(".botonEstado")) { 
       if(e.target.dataset.estado === "true"){
        desactivarAutor(urlAutor+desactivar,e.target.dataset.id);
@@ -152,23 +144,12 @@ form.addEventListener("submit", function(e){
       d.querySelector(".modal-footer").innerHTML= footerModal;
       $myModal.show();
     }
-
     if (e.target.matches(".ver")) { 
       d.querySelector(".modal-body").innerHTML= `Autor: ${e.target.dataset.nombre}`;
       d.querySelector(".modal-footer").innerHTML= footerModal;
       $myModal.show();
     
     }
-
-
-
-
-
-
-
-
-
-
 
   });
 
