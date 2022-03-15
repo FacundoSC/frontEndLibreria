@@ -69,6 +69,7 @@ function crearAutor(options) {
     })
     .catch((error) => console.error(error));
 }
+
 function modificarAutor(options) {
   obtenerJson(urlAutor, options)
     .then((response) => {
@@ -106,51 +107,34 @@ d.addEventListener("click", async (e) => {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
     }).then((result) => {
-
       if (result.isConfirmed) {
-
         let btn = e.target;
-        console.log(btn)
-
         if (btn.dataset.estado == 'true') {
-
           desactivarAutor(btn.dataset.id);
-
           btn.classList.remove("btn-success")
           btn.classList.add("btn-danger")
           btn.dataset.estado = "false";
-
           btn.parentElement.children[0].setAttribute("disabled", '')
-
           btn.parentNode.parentNode.children[0].classList.add("tachado")
           btn.parentNode.parentNode.children[1].classList.add("tachado")
-
           d.getElementById("status_" + btn.dataset.id).innerHTML = "false";
-
         } else {
-
           activarAutor(btn.dataset.id);
           btn.classList.remove("btn-danger")
           btn.classList.add("btn-success")
           btn.dataset.estado = "true";
-
           btn.parentElement.children[0].removeAttribute("disabled")
-
           btn.parentNode.parentNode.children[0].classList.remove("tachado")
           btn.parentNode.parentNode.children[1].classList.remove("tachado")
-
           d.getElementById("status_" + btn.dataset.id).innerHTML = "true";
         }
-
         Swal.fire(`El estado del autor <b>${btn.dataset.nombre}</b> ha sido modificado a <b>${btn.dataset.estado}</b>.`, '', 'success')
       } else if (result.isDenied) {
         Swal.fire('No se han realizado cambios.', '', 'info')
       }
     })
   }
-
-});
-
+})
 
 ////para probar filtro
 let busqueda = document.getElementById('buscar');
@@ -166,13 +150,78 @@ function buscaTabla() {
     row.style.display = null;
   else
     row.style.display = 'none';
-}
-
-  //   if (row.innerText.toLowerCase().indexOf(texto) !== -1)
-  //     row.style.display = null;
-  //   else
-  //     row.style.display = 'none';
-  // }
+  }
 }
 
 busqueda.addEventListener('keyup', buscaTabla);
+///fin prueba filtro.
+
+//FACU PARA VER TEMA de creacion/edicion
+// d.addEventListener("click", async e => {
+
+//   if (e.target.matches(".crear")) {
+//     d.querySelector(".modal-body").innerHTML =`<form>
+//     <div class="mb-3">
+//     <label for="nombreAutor" class="col-form-label">Nombre Autor:</label>
+//    <input type="text" class="form-control" id="nombreAutor" value="">
+//    </div>
+//    </form>`;       
+//   d.querySelector(".modal-footer").innerHTML= footerModalFormulario;
+//   $myModal.show(); 
+//   }
+
+
+
+
+
+  
+//   if (e.target.matches(".editar")) { 
+//     const id = e.target.dataset.id;
+//     let nombre = document.getElementById("nombre_"+id).textContent;
+//     d.querySelector(".modal-body").innerHTML =`<form>
+//                <div class="mb-3">
+//                <label for="nombreAutor" class="col-form-label">Nombre Autor:</label>
+//               <input type="text" class="form-control" id="nombreAutor" value="${nombre}">
+//               </div>
+//           </form>`;       
+//    d.querySelector(".modal-footer").innerHTML= footerModalFormulario;
+//    $myModal.show();
+//    d.querySelector("#updateAutor").addEventListener("click", (e)=>{
+//    e.preventDefault();
+//              $myModal.hide();
+//              nombre = d.querySelector("#nombreAutor").value;
+//              options.method='PUT';
+//              options.body = JSON.stringify({ nombre });
+//              modificarAutor(urlAutor,id,options);
+
+//           });
+//   }
+
+// function crearAutor(url,options){
+//   obtenerJson(url,options).then(response => {
+//     console.log("aqui se aplica la logica")
+//      alert(`se creo el autor ${response.nombre}`);
+//   }).catch(error=>console.error(error));
+//  }
+//   function modificarAutor(url,id,options){
+//    obtenerJson(url+id,options).then(response => {
+//    d.getElementById("nombre_"+id).innerHTML=response.nombre;
+//    d.querySelector(".modal-body").innerHTML= `Autor: ${response.nombre} modificado`;
+//    d.querySelector(".modal-footer").innerHTML= footerModal;
+//    $myModal.show();
+//    }).catch(error=>console.error(error));
+//  }
+//  options.method='PUT';
+//  options.body =JSON.stringify({
+//    nombre: "Gabriel Garcia Marquez"
+//  });
+//  //modificarAutor(urlAutor+55,options)
+//  const form = document.querySelector("form");
+//  form.addEventListener("submit", function(e){
+//    e.preventDefault();              
+//    const data = new FormData(e.target);
+//    const body = Object.fromEntries(data.entries());
+//    options.method='POST';
+//    options.body= JSON.stringify(body);
+//    crearAutor(urlAutor,options);
+//  )}
