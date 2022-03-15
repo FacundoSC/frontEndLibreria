@@ -13,31 +13,22 @@ $myModal = new bootstrap.Modal(d.getElementById('exampleModal'), options);
     console.log("*** aqui devuelvo uno");
     console.warn(response)});
 }
-
-
 function obtenerAutores(url){
 obtenerJson(url).then(autores => {
   autores.forEach(autor => {
-    
     $template.querySelector(".nombre").textContent = autor.nombre;
     $template.querySelector(".nombre").id = `nombre_${autor.id}`;
-
     $template.querySelector(".estado").textContent = autor.alta;
     $template.querySelector(".estado").id = `estado_${autor.id}`;
 
+    $template.querySelector(".editar").dataset.id = `${autor.id}`;
+
     $template.querySelector(".ver").dataset.nombre = autor.nombre;
-
-
     $template.querySelector(".botonEstado").id = `botonEstado_${autor.id}`;
-
     $template.querySelector(".botonEstado").classList.remove('btn-success');
     $template.querySelector(".botonEstado").classList.remove('btn-danger');
-
     $template.querySelector(".botonEstado").dataset.id= autor.id;
     $template.querySelector(".botonEstado").dataset.estado = autor.alta;
-
-
-
     if(autor.alta){
       $template.querySelector(".botonEstado").classList.add('btn-danger');
       $template.querySelector(".botonEstado").textContent="Desactivar";
@@ -45,13 +36,10 @@ obtenerJson(url).then(autores => {
       $template.querySelector(".botonEstado").classList.add('btn-success');
       $template.querySelector(".botonEstado").textContent="Activar";
     }
-
     let $clone = d.importNode($template, true);
-     
     $fragment.appendChild($clone);
   });
   $table.querySelector("tbody").appendChild($fragment);
-  
 });
 }
 
@@ -88,12 +76,13 @@ function crearAutor(url,options){
     alert(`se creo el autor ${response.nombre}`);
  }).catch(error=>console.error(error));
 }
- function modificarAutor(url,options){
-  obtenerJson(url,options).then(response => {
-    console.log("aqui se aplica la logica")
-     alert(`se modifico el autor ${response.nombre}`);
+ function modificarAutor(url,id,options){
+  obtenerJson(url+id,options).then(response => {
+  d.getElementById("nombre_"+id).innerHTML=response.nombre;
+  d.querySelector(".modal-body").innerHTML= `Autor: ${response.nombre} modificado`;
+  d.querySelector(".modal-footer").innerHTML= footerModal;
+  $myModal.show();
   }).catch(error=>console.error(error));
-    //obtenerJson(url,options).then(response => console.log(response));
 }
 options.method='PUT';
 options.body =JSON.stringify({
@@ -114,28 +103,45 @@ form.addEventListener("submit", function(e){
   d.addEventListener("DOMContentLoaded", obtenerAutores(urlAutor));
 
   d.addEventListener("click", async e => {
-    if (e.target.matches(".ver")) { 
-      d.querySelector(".modal-body").innerHTML= `Autor: ${e.target.dataset.nombre}`;
-      d.querySelector(".modal-footer").innerHTML= footerModal;
-      $myModal.show();
-    
+
+    if (e.target.matches(".crear")) {
+      d.querySelector(".modal-body").innerHTML =`<form>
+      <div class="mb-3">
+      <label for="nombreAutor" class="col-form-label">Nombre Autor:</label>
+     <input type="text" class="form-control" id="nombreAutor" value="">
+     </div>
+     </form>`;       
+    d.querySelector(".modal-footer").innerHTML= footerModalFormulario;
+    $myModal.show(); 
     }
+
+
+
+
+
     
     if (e.target.matches(".editar")) { 
+      const id = e.target.dataset.id;
+      let nombre = document.getElementById("nombre_"+id).textContent;
       d.querySelector(".modal-body").innerHTML =`<form>
                  <div class="mb-3">
-                 <label for="recipient-name" class="col-form-label">Recipient:</label>
-                <input type="text" class="form-control" id="recipient-name">
+                 <label for="nombreAutor" class="col-form-label">Nombre Autor:</label>
+                <input type="text" class="form-control" id="nombreAutor" value="${nombre}">
                 </div>
-                <div class="mb-3">
-              <label for="message-text" class="col-form-label">Message:</label>
-              <textarea class="form-control" id="message-text"></textarea>
-              </div>
-            </form>`;
+            </form>`;       
+     d.querySelector(".modal-footer").innerHTML= footerModalFormulario;
+     $myModal.show();
+     d.querySelector("#updateAutor").addEventListener("click", (e)=>{
+     e.preventDefault();
+               $myModal.hide();
+               nombre = d.querySelector("#nombreAutor").value;
+               options.method='PUT';
+               options.body = JSON.stringify({ nombre });
+               modificarAutor(urlAutor,id,options);
 
-      d.querySelector(".modal-footer").innerHTML= footerModalFormulario;
-      $myModal.show();
+            });
     }
+
     if (e.target.matches(".botonEstado")) { 
       if(e.target.dataset.estado === "true"){
        desactivarAutor(urlAutor+desactivar,e.target.dataset.id);
@@ -147,37 +153,24 @@ form.addEventListener("submit", function(e){
       $myModal.show();
     }
 
-  /*
-    if (e.target.matches(".delete")) {
-      let isDelete = confirm(`¿Estás seguro de eliminar el id ${e.target.dataset.id}?`);
-
-      if (isDelete) {
-        //Delete - DELETE
-        try {
-          let options = {
-            method: "DELETE",
-            headers: {
-              "Content-type": "application/json; charset=utf-8"
-            }
-          },
-            res = await fetch(`http://localhost:5555/santos/${e.target.dataset.id}`, options),
-            json = await res.json();
-
-          if (!res.ok) throw { status: res.status, statusText: res.statusText };
-
-          location.reload();
-        } catch (err) {
-          let message = err.statusText || "Ocurrió un error";
-          alert(`Error ${err.status}: ${message}`);
-        }
-      }
-    }*/
+    if (e.target.matches(".ver")) { 
+      d.querySelector(".modal-body").innerHTML= `Autor: ${e.target.dataset.nombre}`;
+      d.querySelector(".modal-footer").innerHTML= footerModal;
+      $myModal.show();
+    
+    }
 
 
 
 
 
-  })
+
+
+
+
+
+
+  });
 
 
  
