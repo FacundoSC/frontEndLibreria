@@ -1,6 +1,5 @@
-import {options, urlAutor ,activar ,desactivar,footerModal,footerModalFormulario} from "./constantes.js";
-import {obtenerJson } from "./asincronico.js";
-
+import { options, urlAutor, optionsGET, urlDesactivarAutor, urlActivarAutor, footerModal,footerModalFormulario } from "./constantes.js";
+import { obtenerJson } from "./asincronico.js";
 
 const d = document,
 $table = d.querySelector(".table"),
@@ -8,14 +7,16 @@ $template = d.getElementById("crud-template").content,
 $fragment = d.createDocumentFragment(),
 $myModal = new bootstrap.Modal(d.getElementById('exampleModal'), options);
 
- function obtenerAutor(url,index){
-  obtenerJson(url+index).then(response => {
+ function obtenerAutor(urlAutor,index){
+  obtenerJson(urlAutor+index).then(response => {
     console.log("*** aqui devuelvo uno");
     console.warn(response)});
 }
-function obtenerAutores(url){
-obtenerJson(url).then(autores => {
+function obtenerAutores(urlAutor){
+obtenerJson(urlAutor).then(autores => {
   autores.forEach(autor => {
+    console.table(autores);
+
     $template.querySelector(".nombre").textContent = autor.nombre;
     $template.querySelector(".nombre").id = `nombre_${autor.id}`;
     $template.querySelector(".estado").textContent = autor.alta;
@@ -43,8 +44,8 @@ obtenerJson(url).then(autores => {
 });
 }
 
-function activarAutor(url,index){
-   obtenerJson(url+index).then(response => {
+function activarAutor(urlAutor,index){
+   obtenerJson(urlAutor+index).then(response => {
     { 
       d.querySelector(`#estado_${index}`).textContent = true;
       d.querySelector(`#botonEstado_${index}`).dataset.estado = true;
@@ -57,8 +58,8 @@ function activarAutor(url,index){
  }});
 }
 
- function desactivarAutor(url, index){
-  obtenerJson(url+index).then(response => {
+ function desactivarAutor(urlAutor, index){
+  obtenerJson(urlAutor+index).then(response => {
     { 
      d.querySelector(`#estado_${index}`).textContent = false;
      d.querySelector(`#botonEstado_${index}`).dataset.estado = false;
@@ -70,16 +71,16 @@ function activarAutor(url,index){
  }});
 }
 
-function crearAutor(url,options){
- obtenerJson(url,options).then(response => {
+function crearAutor(urlAutor,options){
+ obtenerJson(urlAutor,options).then(response => {
   d.querySelector(".modal-body").innerHTML= `se creo el Autor: ${response.nombre} `;
   d.querySelector(".modal-footer").innerHTML= footerModal;
   $myModal.show();
  }).catch(error=>console.error(error));
 }
 
- function modificarAutor(url,id,options){
-  obtenerJson(url+id,options).then(response => {
+ function modificarAutor(urlAutor,id,options){
+  obtenerJson(urlAutor+id,options).then(response => {
   d.getElementById("nombre_"+id).innerHTML=response.nombre;
   d.querySelector(".modal-body").innerHTML= `Autor: ${response.nombre} modificado`;
   d.querySelector(".modal-footer").innerHTML= footerModal;
@@ -92,8 +93,27 @@ function crearAutor(url,options){
   d.addEventListener("DOMContentLoaded", obtenerAutores(urlAutor));
 
   d.addEventListener("click", async e => {
-
+    
     if (e.target.matches(".crear")) {
+      d.querySelector(".modal-body").innerHTML =`<form>
+      <div class="mb-3">
+      <label for="nombreAutor" class="col-form-label">Nombre Autor:</label>
+     <input type="text" class="form-control" id="nombreAutor" value="">
+     </div>
+     </form>`;      
+    d.querySelector(".modal-footer").innerHTML= footerModalFormulario;
+    $myModal.show();
+    d.querySelector("#saveAutor").addEventListener("click", (e)=>{
+      let nombre = d.querySelector("#nombreAutor").value;
+      e.preventDefault();
+              $myModal.hide();
+              options.method='POST';
+              options.body = JSON.stringify({ nombre });
+              crearAutor(urlAutor,options);
+           });
+   
+    }
+    /* if (e.target.matches(".crear")) {
       d.querySelector(".modal-body").innerHTML =`<form>
       <div class="mb-3">
       <label for="nombreAutor" class="col-form-label">Nombre Autor:</label>
@@ -112,7 +132,7 @@ function crearAutor(url,options){
 
            });
     
-    }
+    } */
     if (e.target.matches(".editar")) { 
       const id = e.target.dataset.id;
       let nombre = document.getElementById("nombre_"+id).textContent;
@@ -136,9 +156,9 @@ function crearAutor(url,options){
     }
     if (e.target.matches(".botonEstado")) { 
       if(e.target.dataset.estado === "true"){
-       desactivarAutor(urlAutor+desactivar,e.target.dataset.id);
+       desactivarAutor(urlAutor+urlDesactivarAutor,e.target.dataset.id);
       }else{
-        activarAutor(urlAutor+activar,e.target.dataset.id);
+        activarAutor(urlAutor+urlActivarAutor,e.target.dataset.id);
       }  
       
       d.querySelector(".modal-footer").innerHTML= footerModal;
