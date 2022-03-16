@@ -224,7 +224,7 @@ d.addEventListener("click", async (e) => {
     Swal.fire({
       icon: 'info',
       title: 'Autor:',
-      text: e.target.dataset.nombre,
+      html: `<p class="nombreAutor">${e.target.dataset.nombre}</p>`
     })
   }
 
