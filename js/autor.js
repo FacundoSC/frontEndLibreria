@@ -1,11 +1,10 @@
-import { options, urlAutor, urlDesactivarAutor, urlActivarAutor, footerModal, footerModalFormulario } from "./constantes.js";
+import { options, urlAutor, urlDesactivar, urlActivar } from "./constantes.js";
 import { obtenerJson } from "./asincronico.js";
 
 const d = document,
   $table = d.querySelector(".table"),
   $template = d.getElementById("crud-template").content,
-  $fragment = d.createDocumentFragment(),
-  $myModal = new bootstrap.Modal(d.getElementById('exampleModal'), options);
+  $fragment = d.createDocumentFragment()
 
 function obtenerAutores(urlAutor) {
   obtenerJson(urlAutor).then(autores => {
@@ -104,7 +103,6 @@ function modificarAutor(urlAutor, id, options) {
   obtenerJson(urlAutor + id, options).then(response => {
     d.getElementById("nombre_" + id).innerHTML = response.nombre;
     let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
-    console.log(listadoBotones)
     listadoBotones.children[1].dataset.nombre = response.nombre;
     listadoBotones.children[2].dataset.nombre = response.nombre;
   }).catch(error => console.error(error));
@@ -211,10 +209,10 @@ d.addEventListener("click", async (e) => {
         let estadoFinal;
         if (btn.dataset.estado == 'true') {       
           estadoFinal = "false"   
-          desactivarAutor(urlAutor+urlDesactivarAutor, btn.dataset.id);
+          desactivarAutor(urlAutor+urlDesactivar, btn.dataset.id);
         } else {
           estadoFinal = "true"  
-          activarAutor(urlAutor+urlActivarAutor, btn.dataset.id);
+          activarAutor(urlAutor+urlActivar, btn.dataset.id);
         }
         Swal.fire(`El estado del autor <b>${btn.dataset.nombre}</b> ha sido modificado a <b>${estadoFinal}</b>.`, '', 'success')
       } else if (result.isDenied) {
