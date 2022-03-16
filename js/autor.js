@@ -89,6 +89,9 @@ function crearAutor(urlAutor, options) {
       $template.querySelector(".botonEstado").dataset.nombre = nombre;
       $template.querySelector(".botonEstado").dataset.id = id;
       $template.querySelector(".botonEstado").dataset.estado = alta;
+      $template.querySelector(".botonEstado").classList.remove('btn-danger');
+      $template.querySelector(".nombre").classList.remove('tachado');
+      $template.querySelector(".estado").classList.remove('tachado');
       $template.querySelector(".botonEstado").classList.add('btn-success');
       let $clone = d.importNode($template, true);
       $fragment.appendChild($clone);
