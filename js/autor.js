@@ -100,9 +100,6 @@ function crearAutor(urlAutor, options) {
 function modificarAutor(urlAutor, id, options) {
   obtenerJson(urlAutor + id, options).then(response => {
     d.getElementById("nombre_" + id).innerHTML = response.nombre;
-    d.querySelector(".modal-body").innerHTML = `Autor: ${response.nombre} modificado`;
-    d.querySelector(".modal-footer").innerHTML = footerModal;
-    $myModal.show();
   }).catch(error => console.error(error));
 }
 
@@ -118,13 +115,6 @@ d.addEventListener("DOMContentLoaded", function () {
 
 
 d.addEventListener("click", async (e) => {
-  // if (e.target.matches(".editar")) {
-  //   d.querySelector(
-  //     ".modal-body"
-  //   ).innerHTML = `Autor: ${e.target.dataset.nombre}`;
-  //   $myModal.show();
-  // }
-
   if (e.target.matches(".crear")) {
     Swal.fire({
       title: 'Ingrese nombre del autor:',
@@ -150,25 +140,32 @@ d.addEventListener("click", async (e) => {
 
   if (e.target.matches(".editar")) {
     const id = e.target.dataset.id;
-    let nombre = document.getElementById("nombre_" + id).textContent;
-    d.querySelector(".modal-body").innerHTML = `<form>
-                 <div class="mb-3">
-                 <label for="nombreAutor" class="col-form-label">Nombre Autor:</label>
-                <input type="text" class="form-control" id="nombreAutor" value="${nombre}">
-                </div>
-            </form>`;
-    d.querySelector(".modal-footer").innerHTML = footerModalFormulario;
-    $myModal.show();
-    d.querySelector("#saveAutor").addEventListener("click", (e) => {
-      e.preventDefault();
-      $myModal.hide();
-      nombre = d.querySelector("#nombreAutor").value;
-      options.method = 'PUT';
-      options.body = JSON.stringify({ nombre });
-      modificarAutor(urlAutor, id, options);
+    const nombreViejo = document.getElementById("nombre_" + id).textContent;
+    let nombre = nombreViejo;
 
-    });
-  }
+      Swal.fire({
+        title: 'Modificar nombre:',
+        input: 'text',
+        inputAttributes: {
+          autocapitalize: 'off'
+        },
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar ❌',
+        confirmButtonText: 'Guardar 💾',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          nombre = result.value
+          options.method = 'PUT';
+          options.body = JSON.stringify({ nombre });
+          modificarAutor(urlAutor, id, options);
+          Swal.fire(`Se ha modificado el nombre de <b>${nombreViejo}</b> a <b>${nombre}</b>!`, '', 'success')
+        } else {
+          Swal.fire('Se ha cancelado la operación', '', 'warning')
+        }
+      })
+
+    };
+
 
   if (e.target.matches(".botonEstado")) {
     Swal.fire({
