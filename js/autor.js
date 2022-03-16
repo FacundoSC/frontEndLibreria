@@ -18,6 +18,7 @@ function obtenerAutores() {
       $template.querySelector(".status").id = "status_" + autor.id;
       $template.querySelector(".editar").dataset.nombre = autor.nombre;
       $template.querySelector(".ver").dataset.nombre = autor.nombre;
+      $template.querySelector(".name").id = `nombre_${autor.id}`;
 
       if (autor.alta === true) {
         $template.querySelector(".estado").classList.remove("btn-danger")
