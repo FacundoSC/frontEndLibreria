@@ -157,18 +157,27 @@ busqueda.addEventListener('keyup', buscaTabla);
 ///fin prueba filtro.
 
 //FACU PARA VER TEMA de creacion/edicion
-// d.addEventListener("click", async e => {
+d.addEventListener("click", async e => {
 
-//   if (e.target.matches(".crear")) {
-//     d.querySelector(".modal-body").innerHTML =`<form>
-//     <div class="mb-3">
-//     <label for="nombreAutor" class="col-form-label">Nombre Autor:</label>
-//    <input type="text" class="form-control" id="nombreAutor" value="">
-//    </div>
-//    </form>`;       
-//   d.querySelector(".modal-footer").innerHTML= footerModalFormulario;
-//   $myModal.show(); 
-//   }
+  if (e.target.matches(".crear")) {
+    d.querySelector(".modal-body").innerHTML =`<form>
+    <div class="mb-3">
+    <label for="nombreAutor" class="col-form-label">Nombre Autor:</label>
+   <input type="text" class="form-control" id="nombreAutor" value="">
+   </div>
+   </form>`;       
+  d.querySelector(".modal-footer").innerHTML= footerModalFormulario;
+  $myModal.show(); 
+  }});
+
+
+
+d.addEventListener('scroll', ()=>{
+  let elemento =  document.querySelector("#crear");
+  elemento.classList.add("desaparecer")
+
+  setTimeout(()=>{elemento.classList.remove("desaparecer")}, 1000);
+})
 
 
 
