@@ -7,7 +7,7 @@ body{
   color: rgba(255, 255, 255, 0.7);
 }
 
-.estado::after {
+.botonEstado::after {
   content: url(../img/power-off-solid.svg);
 }
 
@@ -39,7 +39,7 @@ body{
   visibility: hidden;
 }
 
-.estado::after,
+.botonEstado::after,
 .editar::after,
 .ver::after {
   display: inline-block;
