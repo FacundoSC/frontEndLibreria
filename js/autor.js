@@ -7,44 +7,6 @@ $template = d.getElementById("crud-template").content,
 $fragment = d.createDocumentFragment(),
 $myModal = new bootstrap.Modal(d.getElementById('exampleModal'), options);
 
-// function obtenerAutores() {
-//   obtenerJson(urlAutor).then((autores) => {
-//     autores.forEach((autor) => {
-
-//       $template.querySelector(".name").textContent = autor.nombre;
-
-//       $template.querySelector(".status").textContent = autor.alta;
-//       $template.querySelector(".status").id = "status_" + autor.id;
-//       $template.querySelector(".editar").dataset.nombre = autor.nombre;
-//       $template.querySelector(".ver").dataset.nombre = autor.nombre;
-//       $template.querySelector(".name").id = `nombre_${autor.id}`;
-
-//       if (autor.alta === true) {
-//         $template.querySelector(".estado").classList.remove("btn-danger")
-//         $template.querySelector(".estado").classList.add("btn-success")
-//         $template.querySelector(".name").classList.remove("tachado")
-//         $template.querySelector(".status").classList.remove("tachado")
-//         $template.querySelector(".editar").removeAttribute("disabled")
-//       } else {
-//         $template.querySelector(".estado").classList.remove("btn-success")
-//         $template.querySelector(".estado").classList.add("btn-danger")
-//         $template.querySelector(".name").classList.add("tachado")
-//         $template.querySelector(".status").classList.add("tachado")
-//         $template.querySelector(".editar").setAttribute("disabled", '')
-//       }
-
-//       $template.querySelector(".estado").dataset.estado = autor.alta;
-//       $template.querySelector(".estado").dataset.nombre = autor.nombre;
-//       $template.querySelector(".estado").dataset.id = autor.id;
-
-//       let $clone = d.importNode($template, true);
-
-//       $fragment.appendChild($clone);
-//     });
-//     $table.querySelector("tbody").appendChild($fragment);
-//   });
-// }
-
 d.addEventListener("click", async (e) => {
   if (e.target.matches(".ver")) {
     Swal.fire({
