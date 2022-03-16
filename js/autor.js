@@ -140,7 +140,7 @@ d.addEventListener("click", async (e) => {
         let nombre = result.value
         options.method = 'POST';
         options.body = JSON.stringify({ nombre });
-        let respuesta = crearAutor(urlAutor, options);
+        crearAutor(urlAutor, options);
         Swal.fire(`Se ha creado exitosamente el autor: <b>${nombre}</b>!`, '', 'success')
       } else {
         Swal.fire('Se ha cancelado la operación', '', 'warning')
@@ -182,12 +182,15 @@ d.addEventListener("click", async (e) => {
     }).then((result) => {
       if (result.isConfirmed) {
         let btn = e.target;
-        if (btn.dataset.estado == 'true') {          
+        let estadoFinal;
+        if (btn.dataset.estado == 'true') {       
+          estadoFinal = "false"   
           desactivarAutor(urlAutor+urlDesactivarAutor, btn.dataset.id);
         } else {
+          estadoFinal = "true"  
           activarAutor(urlAutor+urlActivarAutor, btn.dataset.id);
         }
-        Swal.fire(`El estado del autor <b>${btn.dataset.nombre}</b> ha sido modificado a <b>${btn.dataset.estado}</b>.`, '', 'success')
+        Swal.fire(`El estado del autor <b>${btn.dataset.nombre}</b> ha sido modificado a <b>${estadoFinal}</b>.`, '', 'success')
       } else if (result.isDenied) {
         Swal.fire('No se han realizado cambios.', '', 'info')
       }
