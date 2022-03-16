@@ -100,6 +100,10 @@ function crearAutor(urlAutor, options) {
 function modificarAutor(urlAutor, id, options) {
   obtenerJson(urlAutor + id, options).then(response => {
     d.getElementById("nombre_" + id).innerHTML = response.nombre;
+    let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
+    console.log(listadoBotones)
+    listadoBotones.children[1].dataset.nombre = response.nombre;
+    listadoBotones.children[2].dataset.nombre = response.nombre;
   }).catch(error => console.error(error));
 }
 
@@ -186,7 +190,6 @@ d.addEventListener("click", async (e) => {
           Swal.fire('Se ha cancelado la operación', '', 'warning')
         }
       })
-
     };
 
 
