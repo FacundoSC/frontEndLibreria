@@ -1,4 +1,4 @@
-import { options, urlAutor, optionsGET, urlDesactivarAutor, urlActivarAutor, footerModal,footerModalFormulario } from "./constantes.js";
+import { options, urlAutor, urlDesactivarAutor, urlActivarAutor, footerModal,footerModalFormulario } from "./constantes.js";
 import { obtenerJson } from "./asincronico.js";
 
 const d = document,
@@ -15,7 +15,6 @@ $myModal = new bootstrap.Modal(d.getElementById('exampleModal'), options);
 function obtenerAutores(urlAutor){
 obtenerJson(urlAutor).then(autores => {
   autores.forEach(autor => {
-    console.table(autores);
 
     $template.querySelector(".nombre").textContent = autor.nombre;
     $template.querySelector(".nombre").id = `nombre_${autor.id}`;
@@ -88,9 +87,14 @@ function crearAutor(urlAutor,options){
   }).catch(error=>console.error(error));
 }
 
-
+  let autores = [];   
 
   d.addEventListener("DOMContentLoaded", obtenerAutores(urlAutor));
+
+  d.addEventListener("DOMContentLoaded", function(){
+    obtenerJson(urlAutor).then(autoresArray => {
+        autores = autoresArray;
+  });
 
   d.addEventListener("click", async e => {
     
@@ -113,26 +117,7 @@ function crearAutor(urlAutor,options){
            });
    
     }
-    /* if (e.target.matches(".crear")) {
-      d.querySelector(".modal-body").innerHTML =`<form>
-      <div class="mb-3">
-      <label for="nombreAutor" class="col-form-label">Nombre Autor:</label>
-     <input type="text" class="form-control" id="nombreAutor" value="">
-     </div>
-     </form>`;       
-    d.querySelector(".modal-footer").innerHTML= footerModalFormulario;
-    $myModal.show(); 
-    d.querySelector("#saveAutor").addEventListener("click", (e)=>{
-      let nombre = d.querySelector("#nombreAutor").value;
-      e.preventDefault();
-              $myModal.hide();
-              options.method='POST';
-              options.body = JSON.stringify({ nombre });
-              crearAutor(urlAutor,options);
-
-           });
-    
-    } */
+  
     if (e.target.matches(".editar")) { 
       const id = e.target.dataset.id;
       let nombre = document.getElementById("nombre_"+id).textContent;
@@ -173,7 +158,27 @@ function crearAutor(urlAutor,options){
 
   });
 
+  
+  let searchInput = document.getElementById('buscar');
+  let table = document.getElementById("tabla").tBodies[0];
+  let texto
 
+  searchInput.addEventListener('keyup', buscaTabla);
+  
+  function buscaTabla() {
+    texto = searchInput.value.toLowerCase();
+    var r = 0;
+    let row
+    while (row = table.rows[r++]) {
+      // console.log(row.children[0]);
+      if (row.children[0].innerText.toLowerCase().indexOf(texto) !== -1){
+        console.log(row.innerText.toLowerCase());
+        row.style.display = null;
+      }
+      else
+        row.style.display = 'none';
+    }
+  }
+  
  
-
-
+ });
