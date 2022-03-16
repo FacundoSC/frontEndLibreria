@@ -125,6 +125,16 @@ d.addEventListener("click", async (e) => {
       showCancelButton: true,
       cancelButtonText: 'Cancelar ❌',
       confirmButtonText: 'Guardar 💾',
+      customClass: {
+        validationMessage: 'my-validation-message'
+      },
+      preConfirm: (value) => {
+        if (!value) {
+          Swal.showValidationMessage(
+            '<i class="fa fa-info-circle"></i>El nombre es requerido.'
+          )
+        }
+      }
     }).then((result) => {
       if (result.isConfirmed) {
         let nombre = result.value
@@ -146,12 +156,25 @@ d.addEventListener("click", async (e) => {
       Swal.fire({
         title: 'Modificar nombre:',
         input: 'text',
+        inputValue: nombreViejo,
         inputAttributes: {
+          placeholder: "Indique nuevo nombre",
           autocapitalize: 'off'
         },
+        allowEnterKey: true,
         showCancelButton: true,
         cancelButtonText: 'Cancelar ❌',
         confirmButtonText: 'Guardar 💾',
+        customClass: {
+          validationMessage: 'my-validation-message'
+        },
+        preConfirm: (value) => {
+          if (!value) {
+            Swal.showValidationMessage(
+              '<i class="fa fa-info-circle"></i>El nombre es requerido.'
+            )
+          }
+        }
       }).then((result) => {
         if (result.isConfirmed) {
           nombre = result.value
