@@ -43,6 +43,7 @@ function obtenerEditoriales() {
         $template.querySelector(".asociados").appendChild(fragmentLibro);
       }
       //fin logica para adicion de libros en select
+
       $template.querySelector(".asociados").id = `asociados_${editorial.id}`;
 
       $template.querySelector(".editar").dataset.id = `${editorial.id}`;
@@ -112,45 +113,55 @@ d.addEventListener("click", async (e) => {
     })
   } //fin CREAR
 
-  // if (e.target.matches(".editar")) {
-  //   const id = e.target.dataset.id;
-  //   const nombreViejo = document.getElementById("nombre_" + id).textContent;
-  //   let nombre = nombreViejo;
+  //Fin EDITAR
+  if (e.target.matches(".editar")) {
+    const id = e.target.dataset.id;
+    const nombreViejo = document.getElementById("nombre_" + id).textContent;
+    let nombre = nombreViejo;
 
-  //     Swal.fire({
-  //       title: 'Modificar nombre:',
-  //       input: 'text',
-  //       inputValue: nombreViejo,
-  //       inputAttributes: {
-  //         placeholder: "Indique nuevo nombre",
-  //         autocapitalize: 'off'
-  //       },
-  //       allowEnterKey: true,
-  //       showCancelButton: true,
-  //       cancelButtonText: 'Cancelar ❌',
-  //       confirmButtonText: 'Guardar 💾',
-  //       customClass: {
-  //         validationMessage: 'my-validation-message'
-  //       },
-  //       preConfirm: (value) => {
-  //         if (!value) {
-  //           Swal.showValidationMessage(
-  //             '<i class="fa fa-info-circle"></i>El nombre es requerido.'
-  //           )
-  //         }
-  //       }
-  //     }).then((result) => {
-  //       if (result.isConfirmed) {
-  //         nombre = result.value
-  //         options.method = 'PUT';
-  //         options.body = JSON.stringify({ nombre });
-  //         modificarAutor(urlAutor, id, options);
-  //         Swal.fire(`Se ha modificado el nombre de <b>${nombreViejo}</b> a <b>${nombre}</b>!`, '', 'success')
-  //       } else {
-  //         Swal.fire('Se ha cancelado la operación', '', 'warning')
-  //       }
-  //     })
-  //   };
+      Swal.fire({
+        title: 'Modificar nombre:',
+        input: 'text',
+        inputValue: nombreViejo,
+        inputAttributes: {
+          placeholder: "Indique nuevo nombre",
+          autocapitalize: 'off'
+        },
+        allowEnterKey: true,
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar ❌',
+        confirmButtonText: 'Guardar 💾',
+        customClass: {
+          validationMessage: 'my-validation-message'
+        },
+        preConfirm: (value) => {
+          if (!value) {
+            Swal.showValidationMessage(
+              '<i class="fa fa-info-circle"></i>El nombre es requerido.'
+            )
+          }
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          nombre = result.value
+          if(nombreViejo != nombre){
+            options.method = 'PUT';
+            options.body = JSON.stringify({ nombre });
+            modificarEditorial(id, options);
+            Swal.fire(`Se ha modificado el nombre de <b>${nombreViejo}</b> a <b>${nombre}</b>!`, '', 'success')
+          } else{
+              Swal.fire({
+                icon: 'warning',
+                title: 'ERROR:',
+                html: `<p class="nombreAutor" style="font-size: 1.5rem;">No ha realizado modificaciones al nombre.</p>`
+              })
+          }
+        } else {
+          Swal.fire('Se ha cancelado la operación', '', 'warning')
+        }
+      })
+    };
+  //Fin EDITAR
 
   //Inicio cambio de estado
   if (e.target.matches(".botonEstado")) {
@@ -319,3 +330,14 @@ function desactivarAutor(url, index) {
   });
 }
 //Fin DESACTIVAR
+
+//Función EDITAR
+function modificarEditorial(id, options) {
+  obtenerJson(urlEditorial + id, options).then(response => {
+    d.getElementById("nombre_" + id).innerHTML = response.nombre;
+    let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
+    listadoBotones.children[1].dataset.nombre = response.nombre;
+    listadoBotones.children[2].dataset.nombre = response.nombre;
+  }).catch(error => console.error(error));
+}
+//Fin EDITAR
