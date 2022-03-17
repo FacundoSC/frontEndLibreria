@@ -190,13 +190,13 @@ d.addEventListener("click", async (e) => {
 
       switch (cantidadDeLibros) {
         case 1:
-          textoHTML=`<p><b>Posee solo un libro asociado:</b></p><p>${listado[0].value}</p>`;
+          textoHTML=`<p><b>Posee solo un libro asociado:</b></p><p>${listado[0].value}, <b>Autor:</b> ${listado[0].dataset.autor}</p>`;
           break;
         case 2: 
-        textoHTML=`<p><b>Posee dos libros asociados:</b></p><p>${listado[0].value}</p><p>${listado[1].value}</p>`;
+        textoHTML=`<p><b>Posee dos libros asociados:</b></p><p>${listado[0].value}, <b>Autor:</b> ${listado[0].dataset.autor}</p><p>${listado[1].value}, <b>Autor:</b> ${listado[1].dataset.autor}</p>`;
         break;
         case 3: 
-        textoHTML=`<p><b>Posee tres libros asociados:</b></p><p>${listado[0].value}</p><p>${listado[1].value}</p><p>${listado[2].value}</p>`
+        textoHTML=`<p><b>Posee tres libros asociados:</b></p><p>${listado[0].value}, <b>Autor:</b> ${listado[0].dataset.autor}</p><p>${listado[1].value}, <b>Autor:</b> ${listado[1].dataset.autor}</p><p>${listado[2].value}, <b>Autor:</b> ${listado[2].dataset.autor}</p>`
           break;
         default:
           let librosSeleccionados = []; //variable aux para guardar los indices a mostrar
@@ -212,7 +212,7 @@ d.addEventListener("click", async (e) => {
           let libroTres = librosSeleccionados[2]
           //fin recupero de nombres 
 
-          textoHTML=`<p><b>Posee ${cantidadDeLibros} libros asociados, algunos de ellos son:</b></p><p>${listado[libroUno].value}</p><p>${listado[libroDos].value}</p><p>${listado[libroTres].value}</p>`;
+          textoHTML=`<p><b>Posee ${cantidadDeLibros} libros asociados, algunos de ellos son:</b></p><p>${listado[libroUno].value}, <b>Autor:</b> ${listado[libroUno].dataset.autor}</p><p>${listado[libroDos].value}, <b>Autor:</b> ${listado[libroDos].dataset.autor}</p><p>${listado[libroTres].value}, <b>Autor:</b> ${listado[libroTres].dataset.autor}</p>`;
       }
     }
 
