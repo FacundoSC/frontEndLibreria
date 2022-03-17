@@ -15,7 +15,7 @@ function obtenerEditoriales() {
       $template.querySelector(".nombre").textContent = editorial.nombre;
       $template.querySelector(".nombre").id = `nombre_${editorial.id}`;
       $template.querySelector(".nombre").classList.remove('tachado');
-      
+
       $template.querySelector(".estado").id = `estado_${editorial.id}`;
       $template.querySelector(".estado").classList.remove('tachado');
 
@@ -31,7 +31,7 @@ function obtenerEditoriales() {
       }
       else {
         let selector = document.createElement('select')
-        selector.setAttribute("id", "select_"+editorial.id)
+        selector.setAttribute("id", "select_" + editorial.id)
         let fragmentLibro = document.createDocumentFragment();
         editorial.libros.forEach((libro) => {
           let elemento = document.createElement('option');
@@ -78,38 +78,39 @@ function obtenerEditoriales() {
 
 //funciones de click de botones
 d.addEventListener("click", async (e) => {
-  // if (e.target.matches(".crear")) {
-  //   Swal.fire({
-  //     title: 'Ingrese nombre del autor:',
-  //     input: 'text',
-  //     inputAttributes: {
-  //       autocapitalize: 'off'
-  //     },
-  //     showCancelButton: true,
-  //     cancelButtonText: 'Cancelar ❌',
-  //     confirmButtonText: 'Guardar 💾',
-  //     customClass: {
-  //       validationMessage: 'my-validation-message'
-  //     },
-  //     preConfirm: (value) => {
-  //       if (!value) {
-  //         Swal.showValidationMessage(
-  //           '<i class="fa fa-info-circle"></i>El nombre es requerido.'
-  //         )
-  //       }
-  //     }
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       let nombre = result.value
-  //       options.method = 'POST';
-  //       options.body = JSON.stringify({ nombre });
-  //       crearAutor(urlAutor, options);
-  //       Swal.fire(`Se ha creado exitosamente el autor: <b>${nombre}</b>!`, '', 'success')
-  //     } else {
-  //       Swal.fire('Se ha cancelado la operación', '', 'warning')
-  //     }
-  //   })
-  // }
+  //Inicio CREAR
+  if (e.target.matches(".crear")) {
+    Swal.fire({
+      title: 'Ingrese nombre de la editorial:',
+      input: 'text',
+      inputAttributes: {
+        autocapitalize: 'off'
+      },
+      showCancelButton: true,
+      cancelButtonText: 'Cancelar ❌',
+      confirmButtonText: 'Guardar 💾',
+      customClass: {
+        validationMessage: 'my-validation-message'
+      },
+      preConfirm: (value) => {
+        if (!value) {
+          Swal.showValidationMessage(
+            '<i class="fa fa-info-circle"></i>El nombre es requerido.'
+          )
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let nombre = result.value
+        options.method = 'POST';
+        options.body = JSON.stringify({ nombre });
+        crearEditorial(urlEditorial, options);
+        Swal.fire(`Se ha creado exitosamente la editorial: <b>${nombre}</b>!`, '', 'success')
+      } else {
+        Swal.fire('Se ha cancelado la operación', '', 'warning')
+      }
+    })
+  } //fin CREAR
 
   // if (e.target.matches(".editar")) {
   //   const id = e.target.dataset.id;
@@ -179,41 +180,42 @@ d.addEventListener("click", async (e) => {
   //   });
   // }
 
+  //Inicio VER
   if (e.target.matches(".ver")) {
     let id = e.target.id.split("_")[1]
     let textoHTML = ''
 
-    if(d.getElementById("asociados_"+id).firstChild.localName == "p"){
-      textoHTML=`<p><b>Actualmente no posee libros asociados</b></p>`
-    } else{
-      let cantidadDeLibros = d.getElementById("asociados_"+id).firstChild.length
-      let listado = d.getElementById("asociados_"+id).firstChild.children
+    if (d.getElementById("asociados_" + id).firstChild.localName == "p") {
+      textoHTML = `<p><b>Actualmente no posee libros asociados</b></p>`
+    } else {
+      let cantidadDeLibros = d.getElementById("asociados_" + id).firstChild.length
+      let listado = d.getElementById("asociados_" + id).firstChild.children
 
       switch (cantidadDeLibros) {
         case 1:
-          textoHTML=`<p><b>Posee solo un libro asociado:</b></p><p>${listado[0].value}, <b>Autor:</b> ${listado[0].dataset.autor}</p>`;
+          textoHTML = `<p><b>Posee solo un libro asociado:</b></p><p>${listado[0].value}, <b>Autor:</b> ${listado[0].dataset.autor}</p>`;
           break;
-        case 2: 
-        textoHTML=`<p><b>Posee dos libros asociados:</b></p><p>${listado[0].value}, <b>Autor:</b> ${listado[0].dataset.autor}</p><p>${listado[1].value}, <b>Autor:</b> ${listado[1].dataset.autor}</p>`;
-        break;
-        case 3: 
-        textoHTML=`<p><b>Posee tres libros asociados:</b></p><p>${listado[0].value}, <b>Autor:</b> ${listado[0].dataset.autor}</p><p>${listado[1].value}, <b>Autor:</b> ${listado[1].dataset.autor}</p><p>${listado[2].value}, <b>Autor:</b> ${listado[2].dataset.autor}</p>`
+        case 2:
+          textoHTML = `<p><b>Posee dos libros asociados:</b></p><p>${listado[0].value}, <b>Autor:</b> ${listado[0].dataset.autor}</p><p>${listado[1].value}, <b>Autor:</b> ${listado[1].dataset.autor}</p>`;
+          break;
+        case 3:
+          textoHTML = `<p><b>Posee tres libros asociados:</b></p><p>${listado[0].value}, <b>Autor:</b> ${listado[0].dataset.autor}</p><p>${listado[1].value}, <b>Autor:</b> ${listado[1].dataset.autor}</p><p>${listado[2].value}, <b>Autor:</b> ${listado[2].dataset.autor}</p>`
           break;
         default:
           let librosSeleccionados = []; //variable aux para guardar los indices a mostrar
-          while(librosSeleccionados.length < 3){
+          while (librosSeleccionados.length < 3) {
             let numeroElegido = Math.random() * (cantidadDeLibros - 0);
-            if(!librosSeleccionados.includes(numeroElegido)){
+            if (!librosSeleccionados.includes(numeroElegido)) {
               librosSeleccionados.push(numeroElegido)
             }
           }
           //recupera de la variable aux los libros
-          let libroUno = librosSeleccionados[0] 
-          let libroDos = librosSeleccionados[1] 
+          let libroUno = librosSeleccionados[0]
+          let libroDos = librosSeleccionados[1]
           let libroTres = librosSeleccionados[2]
           //fin recupero de nombres 
 
-          textoHTML=`<p><b>Posee ${cantidadDeLibros} libros asociados, algunos de ellos son:</b></p><p>${listado[libroUno].value}, <b>Autor:</b> ${listado[libroUno].dataset.autor}</p><p>${listado[libroDos].value}, <b>Autor:</b> ${listado[libroDos].dataset.autor}</p><p>${listado[libroTres].value}, <b>Autor:</b> ${listado[libroTres].dataset.autor}</p>`;
+          textoHTML = `<p><b>Posee ${cantidadDeLibros} libros asociados, algunos de ellos son:</b></p><p>${listado[libroUno].value}, <b>Autor:</b> ${listado[libroUno].dataset.autor}</p><p>${listado[libroDos].value}, <b>Autor:</b> ${listado[libroDos].dataset.autor}</p><p>${listado[libroTres].value}, <b>Autor:</b> ${listado[libroTres].dataset.autor}</p>`;
       }
     }
 
@@ -224,6 +226,7 @@ d.addEventListener("click", async (e) => {
       ${textoHTML}`
     })
   }
+  //Fin VER
 
 });
 //fin funciones
@@ -235,3 +238,49 @@ d.addEventListener('scroll', () => {
 
   setTimeout(() => { elemento.classList.remove("desaparecer") }, 1000);
 })
+
+///Función CREAR EDITORIAL
+function crearEditorial(url, options) {
+  obtenerJson(url, options).then(response => {
+    let id = response.id
+    let nombre = response.nombre
+    let alta = response.alta
+
+    $template.querySelector(".nombre").textContent = nombre;
+    $template.querySelector(".nombre").id = `nombre_${id}`;
+    $template.querySelector(".nombre").classList.remove('tachado');
+
+    $template.querySelector(".estado").classList.remove('tachado');
+    $template.querySelector(".estado").textContent = "Activado";
+    $template.querySelector(".estado").id = `estado_${id}`;
+
+    //logica para adicion de libros en select
+    while ($template.querySelector(".asociados").firstChild) {
+      $template.querySelector(".asociados").removeChild($template.querySelector(".asociados").firstChild);
+    }
+
+    let elemento = document.createElement('p')
+    elemento.textContent = "NO EXISTEN LIBROS ASOCIADOS";
+    $template.querySelector(".asociados").appendChild(elemento)
+    
+    $template.querySelector(".editar").dataset.id = `${id}`;
+    $template.querySelector(".editar").id = `editar_${id}`; 
+
+    $template.querySelector(".botonEstado").id = `botonEstado_${id}`;
+    $template.querySelector(".botonEstado").dataset.nombre = nombre;
+    $template.querySelector(".botonEstado").dataset.id = id;
+    $template.querySelector(".botonEstado").dataset.estado = alta;
+    $template.querySelector(".botonEstado").classList.remove('btn-danger');
+    $template.querySelector(".botonEstado").classList.add('btn-success');
+
+    $template.querySelector(".ver").dataset.nombre = nombre;
+    $template.querySelector(".ver").id = `ver_${id}`;
+
+    let $clone = d.importNode($template, true);
+    $fragment.appendChild($clone);
+    $table.querySelector("tbody").appendChild($fragment);
+
+  }).catch(error => console.error(error));
+}
+
+//Fin CREAR EDITORIAL
