@@ -152,33 +152,34 @@ d.addEventListener("click", async (e) => {
   //     })
   //   };
 
-
-  // if (e.target.matches(".botonEstado")) {
-  //   Swal.fire({
-  //     title: '¿Deseas cambiar el estado del autor?',
-  //     showDenyButton: true,
-  //     icon: 'question',
-  //     confirmButtonText: 'SI 😎',
-  //     denyButtonText: `NO 🙏`,
-  //     confirmButtonColor: '#3085d6',
-  //     cancelButtonColor: '#d33',
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       let btn = e.target;
-  //       let estadoFinal;
-  //       if (btn.dataset.estado == 'true') {       
-  //         estadoFinal = "false"   
-  //         desactivarAutor(urlAutor+urlDesactivar, btn.dataset.id);
-  //       } else {
-  //         estadoFinal = "true"  
-  //         activarAutor(urlAutor+urlActivar, btn.dataset.id);
-  //       }
-  //       Swal.fire(`El estado del autor <b>${btn.dataset.nombre}</b> ha sido modificado a <b>${estadoFinal}</b>.`, '', 'success')
-  //     } else if (result.isDenied) {
-  //       Swal.fire('No se han realizado cambios.', '', 'info')
-  //     }
-  //   });
-  // }
+  //Inicio cambio de estado
+  if (e.target.matches(".botonEstado")) {
+    Swal.fire({
+      title: '¿Deseas cambiar el estado del autor?',
+      showDenyButton: true,
+      icon: 'question',
+      confirmButtonText: 'SI 😎',
+      denyButtonText: `NO 🙏`,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let btn = e.target;
+        let estadoFinal;
+        if (btn.dataset.estado == 'true') {       
+          estadoFinal = "Desactivado"   
+          desactivarAutor(urlEditorial+urlDesactivar, btn.dataset.id);
+        } else {
+          estadoFinal = "Activado"  
+          activarAutor(urlEditorial+urlActivar, btn.dataset.id);
+        }
+        Swal.fire(`El estado de la editorial <b>${btn.dataset.nombre}</b> ha sido modificado a <b>${estadoFinal}</b>.`, '', 'success')
+      } else if (result.isDenied) {
+        Swal.fire('No se han realizado cambios.', '', 'info')
+      }
+    });
+  }
+  //FIN cambio de estado
 
   //Inicio VER
   if (e.target.matches(".ver")) {
@@ -283,5 +284,38 @@ function crearEditorial(url, options) {
 
   }).catch(error => console.error(error));
 }
-
 //Fin CREAR EDITORIAL
+
+//Función ACTIVAR
+function activarAutor(url, index) {
+  obtenerJson(url + index).then(response => {
+    {
+      let btn = d.querySelector("#botonEstado_"+index)
+      btn.classList.remove("btn-danger")
+      btn.classList.add("btn-success")
+      btn.dataset.estado = "true";
+      btn.parentElement.children[0].removeAttribute("disabled")
+      btn.parentNode.parentNode.children[0].classList.remove("tachado")
+      btn.parentNode.parentNode.children[1].classList.remove("tachado")
+      d.getElementById("estado_" + index).innerHTML = "Activado";
+    }
+  });
+}
+//Fin ACTIVAR
+
+//Función DESACTIVAR
+function desactivarAutor(url, index) {
+  obtenerJson(url + index).then(response => {
+    {
+      let btn = d.querySelector("#botonEstado_"+index)
+      btn.classList.remove("btn-success")
+      btn.classList.add("btn-danger")
+      btn.dataset.estado = "false";
+      btn.parentElement.children[0].setAttribute("disabled", '')
+      btn.parentNode.parentNode.children[0].classList.add("tachado")
+      btn.parentNode.parentNode.children[1].classList.add("tachado")
+      d.getElementById("estado_" + index).innerHTML = "Desactivado";
+    }
+  });
+}
+//Fin DESACTIVAR
