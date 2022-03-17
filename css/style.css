@@ -52,3 +52,7 @@ body{
   font-weight: bold;
   color: darkcyan;
 }
+
+.asociados select{
+  width: 15rem;
+}

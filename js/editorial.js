@@ -1,4 +1,4 @@
-import { options, urlEditorial, urlDesactivar, urlActivar} from "./constantes.js";
+import { options, urlEditorial, urlDesactivar, urlActivar } from "./constantes.js";
 import { obtenerJson } from "./asincronico.js";
 
 const d = document,
@@ -8,10 +8,10 @@ const d = document,
 
 d.addEventListener("DOMContentLoaded", obtenerEditoriales(urlEditorial));
 
-function obtenerEditoriales(url) {
-  obtenerJson(url).then(editoriales => {
+function obtenerEditoriales() {
+  obtenerJson(urlEditorial).then(editoriales => {
+    console.log(editoriales)
     editoriales.forEach(editorial => {
-        // console.log(editorial.nombre+"-"+editorial.id+"-"+editorial.alta+"-")
 
       $template.querySelector(".nombre").textContent = editorial.nombre;
       $template.querySelector(".nombre").id = `nombre_${editorial.id}`;
@@ -20,6 +20,31 @@ function obtenerEditoriales(url) {
       $template.querySelector(".estado").textContent = editorial.alta;
       $template.querySelector(".estado").id = `estado_${editorial.id}`;
       $template.querySelector(".estado").classList.remove('tachado');
+
+      //logica para adicion de libros en select
+      while ($template.querySelector(".asociados").firstChild) {
+        $template.querySelector(".asociados").removeChild($template.querySelector(".asociados").firstChild);
+      }
+
+      if (editorial.libros.length == 0) {
+        let elemento = document.createElement('p')
+        elemento.textContent = "NO EXISTEN LIBROS ASOCIADOS";
+        $template.querySelector(".asociados").appendChild(elemento)
+      }
+      else {
+        let selector = document.createElement('select')
+        selector.setAttribute("id", editorial.id)
+        let fragmentLibro = document.createDocumentFragment();
+        editorial.libros.forEach((libro) => {
+          let elemento = document.createElement('option');
+          elemento.textContent = libro.titulo;
+          selector.appendChild(elemento);
+        });
+        fragmentLibro.appendChild(selector);
+        $template.querySelector(".asociados").appendChild(fragmentLibro);
+      }
+      //fin logica para adicion de libros en select
+
 
       $template.querySelector(".editar").dataset.id = `${editorial.id}`;
       $template.querySelector(".editar").id = `editar_${editorial.id}`;
@@ -34,6 +59,7 @@ function obtenerEditoriales(url) {
       $template.querySelector(".botonEstado").dataset.nombre = editorial.nombre;
       $template.querySelector(".botonEstado").dataset.id = editorial.id;
       $template.querySelector(".botonEstado").dataset.estado = editorial.alta;
+
       if (editorial.alta) {
         $template.querySelector(".botonEstado").classList.add('btn-success');
       } else {
