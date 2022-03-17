@@ -15,8 +15,7 @@ function obtenerEditoriales() {
       $template.querySelector(".nombre").textContent = editorial.nombre;
       $template.querySelector(".nombre").id = `nombre_${editorial.id}`;
       $template.querySelector(".nombre").classList.remove('tachado');
-
-      $template.querySelector(".estado").textContent = editorial.alta;
+      
       $template.querySelector(".estado").id = `estado_${editorial.id}`;
       $template.querySelector(".estado").classList.remove('tachado');
 
@@ -61,8 +60,10 @@ function obtenerEditoriales() {
       $template.querySelector(".botonEstado").dataset.estado = editorial.alta;
 
       if (editorial.alta) {
+        $template.querySelector(".estado").textContent = "Activado";
         $template.querySelector(".botonEstado").classList.add('btn-success');
       } else {
+        $template.querySelector(".estado").textContent = "Desactivado";
         $template.querySelector(".botonEstado").classList.add('btn-danger');
         $template.querySelector(".nombre").classList.add('tachado');
         $template.querySelector(".estado").classList.add('tachado');
