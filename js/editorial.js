@@ -15,18 +15,23 @@ function obtenerEditoriales(url) {
 
       $template.querySelector(".nombre").textContent = editorial.nombre;
       $template.querySelector(".nombre").id = `nombre_${editorial.id}`;
+      $template.querySelector(".nombre").classList.remove('tachado');
+
       $template.querySelector(".estado").textContent = editorial.alta;
       $template.querySelector(".estado").id = `estado_${editorial.id}`;
+      $template.querySelector(".estado").classList.remove('tachado');
+
       $template.querySelector(".editar").dataset.id = `${editorial.id}`;
       $template.querySelector(".editar").id = `editar_${editorial.id}`;
+      $template.querySelector(".editar").removeAttribute("disabled")
+
       $template.querySelector(".ver").dataset.nombre = editorial.nombre;
+      $template.querySelector(".ver").id = `ver_${editorial.id}`;
+
       $template.querySelector(".botonEstado").id = `botonEstado_${editorial.id}`;
       $template.querySelector(".botonEstado").classList.remove('btn-success');
       $template.querySelector(".botonEstado").classList.remove('btn-danger');
       $template.querySelector(".botonEstado").dataset.nombre = editorial.nombre;
-      $template.querySelector(".nombre").classList.remove('tachado');
-      $template.querySelector(".estado").classList.remove('tachado');
-      $template.querySelector(".editar").removeAttribute("disabled")
       $template.querySelector(".botonEstado").dataset.id = editorial.id;
       $template.querySelector(".botonEstado").dataset.estado = editorial.alta;
       if (editorial.alta) {
