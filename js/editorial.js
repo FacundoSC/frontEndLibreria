@@ -262,6 +262,7 @@ function crearEditorial(url, options) {
     let elemento = document.createElement('p')
     elemento.textContent = "NO EXISTEN LIBROS ASOCIADOS";
     $template.querySelector(".asociados").appendChild(elemento)
+    $template.querySelector(".asociados").id=`asociados_${id}`
     
     $template.querySelector(".editar").dataset.id = `${id}`;
     $template.querySelector(".editar").id = `editar_${id}`; 
