@@ -16,7 +16,7 @@
       integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
       crossorigin="anonymous"
     ></script>
-    <script src="/js/libro.js" type="module"></script>
+    <script src="../js/libro.js" type="module"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="../css/style.css" />
     <link rel="shortcut icon" href="../img/libro.jpg" type="image/x-icon" />
@@ -50,15 +50,21 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="libro.html">Libro</a>
                     </li>
-
+                  
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="prestamo.html">Prestamo</a>
                     </li>
                 </ul>
-                <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
+                <div class="d-flex">
+                    <input
+                      class="form-control me-2"
+                      type="search"
+                      placeholder="Search"
+                      aria-label="Search"
+                      id="buscar"
+                       value=""
+                    />
+                  </div>
             </div>
         </div>
     </nav>

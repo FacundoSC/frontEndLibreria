@@ -6,6 +6,8 @@ const d = document,
   $template = d.getElementById("crud-template").content,
   $fragment = d.createDocumentFragment(),
   $myModal = new bootstrap.Modal(d.getElementById('exampleModal'), options);
+  
+
 
 function obtenerAutores(urlAutor) {
   obtenerJson(urlAutor).then(autores => {
@@ -114,11 +116,13 @@ let autores = [];
 
 d.addEventListener("DOMContentLoaded", obtenerAutores(urlAutor));
 
-d.addEventListener("DOMContentLoaded", function () {
+d.addEventListener("DOMContentLoaded", obtenerUnAutor)
+
+ function obtenerArrayAutor() {
   obtenerJson(urlAutor).then(autoresArray => {
     autores = autoresArray;
   })
-});
+};
 
 
 d.addEventListener("click", async (e) => {
