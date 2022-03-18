@@ -21,3 +21,7 @@ export const footerModalFormulario = ` <button type="button" class="btn btn-seco
 <button type="button" class="btn btn-primary" id="saveAutor">Guardar</button>`;
 export const footerModal = ` <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 `;
+//cliente
+export const urlCliente = "https://libreria-rest.herokuapp.com/api/v1/cliente/";
+export const urlActivarCliente = "activar/";
+export const urlDesactivarCliente = "desactivar/";
