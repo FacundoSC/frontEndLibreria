@@ -216,7 +216,7 @@ d.addEventListener("click", async (e) => {
         default:
           let librosSeleccionados = []; //variable aux para guardar los indices a mostrar
           while (librosSeleccionados.length < 3) {
-            let numeroElegido = Math.random() * (cantidadDeLibros - 0);
+            let numeroElegido = Math.floor(Math.random() * (cantidadDeLibros - 0));
             if (!librosSeleccionados.includes(numeroElegido)) {
               librosSeleccionados.push(numeroElegido)
             }
