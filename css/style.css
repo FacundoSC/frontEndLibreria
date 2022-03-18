@@ -1,0 +1,58 @@
+body{
+  background-color: lightblue;
+}
+.tachado {
+  text-decoration: line-through;
+  color: red;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.botonEstado::after {
+  content: url(../img/power-off-solid.svg);
+}
+
+.editar::after {
+  content: url(../img/pencil-solid.svg);
+}
+
+.ver::after {
+  content: url(../img/eye-solid.svg);
+}
+
+.crear{
+  width: 7rem;
+  height: 7rem;
+  border-color: rgb(7, 7, 95);
+  border-radius: 50%;
+  border-width: 4px;
+  position: fixed;
+  bottom: 5%;
+  right: 2%;
+  transition: all 0.2s ease;
+}
+
+.crear:hover{
+  scale: 1.1;
+}
+
+.desaparecer{
+  visibility: hidden;
+}
+
+.botonEstado::after,
+.editar::after,
+.ver::after {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+}
+
+.nombreAutor{
+  font-size: 2rem;
+  font-weight: bold;
+  color: darkcyan;
+}
+
+.asociados select{
+  width: 15rem;
+}

@@ -1,16 +1,22 @@
-export const options = {method: '',
-							 body: '',
-               headers: {
-               'Content-type': 'application/json; charset=UTF-8',
-               },
-              }
-export const urlAutor =  "https://libreria-rest.herokuapp.com/api/v1/autor/"; 
-export const activar =  "activar/"; 
-export const desactivar =  "desactivar/"; 
+export const options = {
+  method: "",
+  body: "",
+  headers: {
+    "Content-type": "application/json; charset=UTF-8",
+  },
+};
 
+export const optionsGET = {
+  method: "GET",
+  headers: {
+    "Content-type": "application/json; charset=UTF-8",
+  },
+};
 
-
-
+export const urlAutor = "https://libreria-rest.herokuapp.com/api/v1/autor/";
+export const urlActivar = "activar/";
+export const urlDesactivar = "desactivar/";
+export const urlEditorial = "https://libreria-rest.herokuapp.com/api/v1/editorial/";
 
 export const footerModalFormulario = ` <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 <button type="button" class="btn btn-primary" id="saveAutor">Guardar</button>`;
