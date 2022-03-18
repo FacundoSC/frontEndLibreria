@@ -1,11 +1,10 @@
-import { options, urlAutor, urlDesactivarAutor, urlActivarAutor, footerModal, footerModalFormulario } from "./constantes.js";
+import { options, urlAutor, urlDesactivar, urlActivar } from "./constantes.js";
 import { obtenerJson } from "./asincronico.js";
 
 const d = document,
   $table = d.querySelector(".table"),
   $template = d.getElementById("crud-template").content,
-  $fragment = d.createDocumentFragment(),
-  $myModal = new bootstrap.Modal(d.getElementById('exampleModal'), options);
+  $fragment = d.createDocumentFragment()
 
 function obtenerAutores(urlAutor) {
   obtenerJson(urlAutor).then(autores => {
@@ -89,6 +88,9 @@ function crearAutor(urlAutor, options) {
       $template.querySelector(".botonEstado").dataset.nombre = nombre;
       $template.querySelector(".botonEstado").dataset.id = id;
       $template.querySelector(".botonEstado").dataset.estado = alta;
+      $template.querySelector(".botonEstado").classList.remove('btn-danger');
+      $template.querySelector(".nombre").classList.remove('tachado');
+      $template.querySelector(".estado").classList.remove('tachado');
       $template.querySelector(".botonEstado").classList.add('btn-success');
       let $clone = d.importNode($template, true);
       $fragment.appendChild($clone);
@@ -100,9 +102,9 @@ function crearAutor(urlAutor, options) {
 function modificarAutor(urlAutor, id, options) {
   obtenerJson(urlAutor + id, options).then(response => {
     d.getElementById("nombre_" + id).innerHTML = response.nombre;
-    d.querySelector(".modal-body").innerHTML = `Autor: ${response.nombre} modificado`;
-    d.querySelector(".modal-footer").innerHTML = footerModal;
-    $myModal.show();
+    let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
+    listadoBotones.children[1].dataset.nombre = response.nombre;
+    listadoBotones.children[2].dataset.nombre = response.nombre;
   }).catch(error => console.error(error));
 }
 
@@ -118,13 +120,6 @@ d.addEventListener("DOMContentLoaded", function () {
 
 
 d.addEventListener("click", async (e) => {
-  // if (e.target.matches(".editar")) {
-  //   d.querySelector(
-  //     ".modal-body"
-  //   ).innerHTML = `Autor: ${e.target.dataset.nombre}`;
-  //   $myModal.show();
-  // }
-
   if (e.target.matches(".crear")) {
     Swal.fire({
       title: 'Ingrese nombre del autor:',
@@ -135,6 +130,16 @@ d.addEventListener("click", async (e) => {
       showCancelButton: true,
       cancelButtonText: 'Cancelar ❌',
       confirmButtonText: 'Guardar 💾',
+      customClass: {
+        validationMessage: 'my-validation-message'
+      },
+      preConfirm: (value) => {
+        if (!value) {
+          Swal.showValidationMessage(
+            '<i class="fa fa-info-circle"></i>El nombre es requerido.'
+          )
+        }
+      }
     }).then((result) => {
       if (result.isConfirmed) {
         let nombre = result.value
@@ -150,25 +155,44 @@ d.addEventListener("click", async (e) => {
 
   if (e.target.matches(".editar")) {
     const id = e.target.dataset.id;
-    let nombre = document.getElementById("nombre_" + id).textContent;
-    d.querySelector(".modal-body").innerHTML = `<form>
-                 <div class="mb-3">
-                 <label for="nombreAutor" class="col-form-label">Nombre Autor:</label>
-                <input type="text" class="form-control" id="nombreAutor" value="${nombre}">
-                </div>
-            </form>`;
-    d.querySelector(".modal-footer").innerHTML = footerModalFormulario;
-    $myModal.show();
-    d.querySelector("#saveAutor").addEventListener("click", (e) => {
-      e.preventDefault();
-      $myModal.hide();
-      nombre = d.querySelector("#nombreAutor").value;
-      options.method = 'PUT';
-      options.body = JSON.stringify({ nombre });
-      modificarAutor(urlAutor, id, options);
+    const nombreViejo = document.getElementById("nombre_" + id).textContent;
+    let nombre = nombreViejo;
 
-    });
-  }
+      Swal.fire({
+        title: 'Modificar nombre:',
+        input: 'text',
+        inputValue: nombreViejo,
+        inputAttributes: {
+          placeholder: "Indique nuevo nombre",
+          autocapitalize: 'off'
+        },
+        allowEnterKey: true,
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar ❌',
+        confirmButtonText: 'Guardar 💾',
+        customClass: {
+          validationMessage: 'my-validation-message'
+        },
+        preConfirm: (value) => {
+          if (!value) {
+            Swal.showValidationMessage(
+              '<i class="fa fa-info-circle"></i>El nombre es requerido.'
+            )
+          }
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          nombre = result.value
+          options.method = 'PUT';
+          options.body = JSON.stringify({ nombre });
+          modificarAutor(urlAutor, id, options);
+          Swal.fire(`Se ha modificado el nombre de <b>${nombreViejo}</b> a <b>${nombre}</b>!`, '', 'success')
+        } else {
+          Swal.fire('Se ha cancelado la operación', '', 'warning')
+        }
+      })
+    };
+
 
   if (e.target.matches(".botonEstado")) {
     Swal.fire({
@@ -185,10 +209,10 @@ d.addEventListener("click", async (e) => {
         let estadoFinal;
         if (btn.dataset.estado == 'true') {       
           estadoFinal = "false"   
-          desactivarAutor(urlAutor+urlDesactivarAutor, btn.dataset.id);
+          desactivarAutor(urlAutor+urlDesactivar, btn.dataset.id);
         } else {
           estadoFinal = "true"  
-          activarAutor(urlAutor+urlActivarAutor, btn.dataset.id);
+          activarAutor(urlAutor+urlActivar, btn.dataset.id);
         }
         Swal.fire(`El estado del autor <b>${btn.dataset.nombre}</b> ha sido modificado a <b>${estadoFinal}</b>.`, '', 'success')
       } else if (result.isDenied) {
@@ -201,7 +225,7 @@ d.addEventListener("click", async (e) => {
     Swal.fire({
       icon: 'info',
       title: 'Autor:',
-      text: e.target.dataset.nombre,
+      html: `<p class="nombreAutor">${e.target.dataset.nombre}</p>`
     })
   }
 

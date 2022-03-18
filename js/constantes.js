@@ -14,8 +14,9 @@ export const optionsGET = {
 };
 
 export const urlAutor = "https://libreria-rest.herokuapp.com/api/v1/autor/";
-export const urlActivarAutor = "activar/";
-export const urlDesactivarAutor = "desactivar/";
+export const urlActivar = "activar/";
+export const urlDesactivar = "desactivar/";
+export const urlEditorial = "https://libreria-rest.herokuapp.com/api/v1/editorial/";
 
 export const footerModalFormulario = ` <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 <button type="button" class="btn btn-primary" id="saveAutor">Guardar</button>`;
