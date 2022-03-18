@@ -11,6 +11,8 @@ function obtenerAutores(urlAutor) {
   obtenerJson(urlAutor).then(autores => {
     autores.forEach(autor => {
 
+      
+
       $template.querySelector(".nombre").textContent = autor.nombre;
       $template.querySelector(".nombre").id = `nombre_${autor.id}`;
       $template.querySelector(".estado").textContent = autor.alta;
