@@ -27,3 +27,4 @@ export const urlLibro = "https://libreria-rest.herokuapp.com/api/v1/libro/";
 export const urlActivar = "activar/";
 export const urlDesactivar = "desactivar/";
 
+export const urlEditorial = "https://libreria-rest.herokuapp.com/api/v1/editorial/";

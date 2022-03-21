@@ -107,7 +107,7 @@ function modificarAutor(urlAutor, id, options) {
     d.getElementById("nombre_" + id).innerHTML = response.nombre;
     let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
     console.log(listadoBotones)
-    listadoBotones.children[1].dataset.nombre = response.nombre;
+    listadoBotones.children[1].dataset.titulo = response.nombre;
     listadoBotones.children[2].dataset.nombre = response.nombre;
   }).catch(error => console.error(error));
 }
@@ -116,13 +116,8 @@ let autores = [];
 
 d.addEventListener("DOMContentLoaded", obtenerAutores(urlAutor));
 
-d.addEventListener("DOMContentLoaded", obtenerUnAutor)
+//d.addEventListener("DOMContentLoaded", obtenerUnAutor)
 
- function obtenerArrayAutor() {
-  obtenerJson(urlAutor).then(autoresArray => {
-    autores = autoresArray;
-  })
-};
 
 
 d.addEventListener("click", async (e) => {
