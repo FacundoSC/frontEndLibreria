@@ -22,9 +22,7 @@
     <title>Prestamo</title>
   </head>
 
-
-
-  <body class="container ">
+  <body class="container">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">Libreria Rest</a>
@@ -93,83 +91,94 @@
     </nav>
 
     <div>
-      <button class="btn btn-primary crear" id="crear">Crear nuevo prestamo</button>
+      <button class="btn btn-primary crear" id="crear">
+        Crear nuevo prestamo
+      </button>
     </div>
     <table class="table table-dark table-striped" id="tablaPrestamos">
-        <thead>
-            <tr>
-                <th scope="col">Nombre del cliente</th>
-                <th scope="col">Documento del cliente</th>
-                <th scope="col">Libro tomado</th>
-                <th scope="col">Fecha de prestamo</th>
-                <th scope="col">Fecha de devolución</th>
-                <!-- <th scope="col">Estado</th>  -->       
-                <th scope="col">Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="tablePrestamos">
-        </tbody>
-    </table>
-   
-    <template id="crud-template-prestamo">
-        <tr class="rowTable">
-          <td class="nombreCliente"></td>
-          <td class="documentoCliente"></td>
-          <td class="libroTomado"></td>
-          <td class="fechaPrestamo"></td>
-          <td class="fechaDevolucion"></td>
-          <!-- <td class="estado"></td> -->
-          <td class="botoncito">
-          </td>
+      <thead>
+        <tr>
+          <th scope="col">Nombre del cliente</th>
+          <th scope="col">Documento del cliente</th>
+          <th scope="col">Libro tomado</th>
+          <th scope="col">Fecha de prestamo</th>
+          <th scope="col">Fecha de devolución</th>
+          <!-- <th scope="col">Estado</th>  -->
+          <th scope="col">Acciones</th>
+          <th scope="col"></th>
         </tr>
-      </template>
-  
-      <!-- Modal -->
-      <div
-        class="modal fade"
-        id="exampleModal"
-        data-bs-backdrop="static"
-        data-bs-keyboard="false"
-        tabindex="-1"
-        aria-labelledby="staticBackdropLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="staticBackdropLabel">Libreria Rest</h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body"></div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Cerrar
-              </button>
-            </div>
+      </thead>
+      <tbody id="tablePrestamos"></tbody>
+    </table>
+
+    <template id="crud-template-prestamo">
+      <tr class="rowTable">
+        <td class="nombreCliente"></td>
+        <td class="documentoCliente"></td>
+        <td class="libroTomado"></td>
+        <td class="fechaPrestamo"></td>
+        <td class="fechaDevolucion"></td>
+        <!-- <td class="estado"></td> -->
+        <td class="botoncitoCancelar"></td>
+        <td class="botoncitoEditar"></td>
+      </tr>
+    </template>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+      tabindex="-1"
+      aria-labelledby="staticBackdropLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Libreria Rest</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cerrar
+            </button>
           </div>
         </div>
       </div>
-  
-      <!--END Modal-->
+    </div>
 
-      <!-- Data lists -->
+    <!--END Modal-->
 
-      <div hidden id="divLibros">
-        <select required id="selectLibros" class="swal2-input" style="width: 150px;"></select>
-      </div>
+    <!-- Data lists -->
 
-      <div hidden id="divClientes">
-        <select required id="selectClientes" class="swal2-input" style="width: 150px;"></select>
-      </div>
+    <div hidden id="divLibros">
+      <select
+        required
+        id="selectLibros"
+        class="swal2-input"
+        style="width: 150px"
+      ></select>
+    </div>
 
-    </body>
-  </html>
+    <div hidden id="divClientes">
+      <select
+        required
+        id="selectClientes"
+        class="swal2-input"
+        style="width: 150px"
+      ></select>
+    </div>
+  </body>
+</html>
