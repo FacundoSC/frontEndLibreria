@@ -1,10 +1,3 @@
-export async function obtenerJson(url,options){
-   return await fetch(url,options).then(function(response){
-     if(response.ok){
-       return response.json();
-     }else{
-       throw new Error("mensaje de error");
-     }
-    
-    });
-  }
+export async function obtenerJson(url, options) {
+  return await fetch(url, options).then(response => response.json()).catch(error => { console.error(error) })
+}
