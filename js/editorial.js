@@ -106,7 +106,6 @@ d.addEventListener("click", async (e) => {
         options.method = 'POST';
         options.body = JSON.stringify({ nombre });
         crearEditorial(urlEditorial, options);
-        Swal.fire(`Se ha creado exitosamente la editorial: <b>${nombre}</b>!`, '', 'success')
       } else {
         Swal.fire('Se ha cancelado la operación', '', 'warning')
       }
@@ -119,48 +118,47 @@ d.addEventListener("click", async (e) => {
     const nombreViejo = document.getElementById("nombre_" + id).textContent;
     let nombre = nombreViejo;
 
-      Swal.fire({
-        title: 'Modificar nombre:',
-        input: 'text',
-        inputValue: nombreViejo,
-        inputAttributes: {
-          placeholder: "Indique nuevo nombre",
-          autocapitalize: 'off'
-        },
-        allowEnterKey: true,
-        showCancelButton: true,
-        cancelButtonText: 'Cancelar ❌',
-        confirmButtonText: 'Guardar 💾',
-        customClass: {
-          validationMessage: 'my-validation-message'
-        },
-        preConfirm: (value) => {
-          if (!value) {
-            Swal.showValidationMessage(
-              '<i class="fa fa-info-circle"></i>El nombre es requerido.'
-            )
-          }
+    Swal.fire({
+      title: 'Modificar nombre:',
+      input: 'text',
+      inputValue: nombreViejo,
+      inputAttributes: {
+        placeholder: "Indique nuevo nombre",
+        autocapitalize: 'off'
+      },
+      allowEnterKey: true,
+      showCancelButton: true,
+      cancelButtonText: 'Cancelar ❌',
+      confirmButtonText: 'Guardar 💾',
+      customClass: {
+        validationMessage: 'my-validation-message'
+      },
+      preConfirm: (value) => {
+        if (!value) {
+          Swal.showValidationMessage(
+            '<i class="fa fa-info-circle"></i>El nombre es requerido.'
+          )
         }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          nombre = result.value
-          if(nombreViejo != nombre){
-            options.method = 'PUT';
-            options.body = JSON.stringify({ nombre });
-            modificarEditorial(id, options);
-            Swal.fire(`Se ha modificado el nombre de <b>${nombreViejo}</b> a <b>${nombre}</b>!`, '', 'success')
-          } else{
-              Swal.fire({
-                icon: 'warning',
-                title: 'ERROR:',
-                html: `<p class="nombreAutor" style="font-size: 1.5rem;">No ha realizado modificaciones al nombre.</p>`
-              })
-          }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        nombre = result.value
+        if (nombreViejo != nombre) {
+          options.method = 'PUT';
+          options.body = JSON.stringify({ nombre });
+          modificarEditorial(id, options);
         } else {
-          Swal.fire('Se ha cancelado la operación', '', 'warning')
+          Swal.fire({
+            icon: 'warning',
+            title: 'ERROR:',
+            html: `<p class="nombreAutor" style="font-size: 1.5rem;">No ha realizado modificaciones al nombre.</p>`
+          })
         }
-      })
-    };
+      } else {
+        Swal.fire('Se ha cancelado la operación', '', 'warning')
+      }
+    })
+  };
   //Fin EDITAR
 
   //Inicio cambio de estado
@@ -177,12 +175,12 @@ d.addEventListener("click", async (e) => {
       if (result.isConfirmed) {
         let btn = e.target;
         let estadoFinal;
-        if (btn.dataset.estado == 'true') {       
-          estadoFinal = "Desactivado"   
-          desactivarAutor(urlEditorial+urlDesactivar, btn.dataset.id);
+        if (btn.dataset.estado == 'true') {
+          estadoFinal = "Desactivado"
+          desactivarAutor(urlEditorial + urlDesactivar, btn.dataset.id);
         } else {
-          estadoFinal = "Activado"  
-          activarAutor(urlEditorial+urlActivar, btn.dataset.id);
+          estadoFinal = "Activado"
+          activarAutor(urlEditorial + urlActivar, btn.dataset.id);
         }
         Swal.fire(`El estado de la editorial <b>${btn.dataset.nombre}</b> ha sido modificado a <b>${estadoFinal}</b>.`, '', 'success')
       } else if (result.isDenied) {
@@ -216,7 +214,7 @@ d.addEventListener("click", async (e) => {
         default:
           let librosSeleccionados = []; //variable aux para guardar los indices a mostrar
           while (librosSeleccionados.length < 3) {
-            let numeroElegido = Math.random() * (cantidadDeLibros - 0);
+            let numeroElegido = Math.floor(Math.random() * (cantidadDeLibros - 0));
             if (!librosSeleccionados.includes(numeroElegido)) {
               librosSeleccionados.push(numeroElegido)
             }
@@ -254,46 +252,54 @@ d.addEventListener('scroll', () => {
 ///Función CREAR EDITORIAL
 function crearEditorial(url, options) {
   obtenerJson(url, options).then(response => {
-    let id = response.id
-    let nombre = response.nombre
-    let alta = response.alta
+    if (!response.message) {
+      let id = response.id
+      let nombre = response.nombre
+      let alta = response.alta
 
-    $template.querySelector(".nombre").textContent = nombre;
-    $template.querySelector(".nombre").id = `nombre_${id}`;
-    $template.querySelector(".nombre").classList.remove('tachado');
+      $template.querySelector(".nombre").textContent = nombre;
+      $template.querySelector(".nombre").id = `nombre_${id}`;
+      $template.querySelector(".nombre").classList.remove('tachado');
 
-    $template.querySelector(".estado").classList.remove('tachado');
-    $template.querySelector(".estado").textContent = "Activado";
-    $template.querySelector(".estado").id = `estado_${id}`;
+      $template.querySelector(".estado").classList.remove('tachado');
+      $template.querySelector(".estado").textContent = "Activado";
+      $template.querySelector(".estado").id = `estado_${id}`;
 
-    //logica para adicion de libros en select
-    while ($template.querySelector(".asociados").firstChild) {
-      $template.querySelector(".asociados").removeChild($template.querySelector(".asociados").firstChild);
+      //logica para adicion de libros en select
+      while ($template.querySelector(".asociados").firstChild) {
+        $template.querySelector(".asociados").removeChild($template.querySelector(".asociados").firstChild);
+      }
+
+      let elemento = document.createElement('p')
+      elemento.textContent = "NO EXISTEN LIBROS ASOCIADOS";
+      $template.querySelector(".asociados").appendChild(elemento)
+      $template.querySelector(".asociados").id = `asociados_${id}`
+
+      $template.querySelector(".editar").dataset.id = `${id}`;
+      $template.querySelector(".editar").id = `editar_${id}`;
+
+      $template.querySelector(".botonEstado").id = `botonEstado_${id}`;
+      $template.querySelector(".botonEstado").dataset.nombre = nombre;
+      $template.querySelector(".botonEstado").dataset.id = id;
+      $template.querySelector(".botonEstado").dataset.estado = alta;
+      $template.querySelector(".botonEstado").classList.remove('btn-danger');
+      $template.querySelector(".botonEstado").classList.add('btn-success');
+
+      $template.querySelector(".ver").dataset.nombre = nombre;
+      $template.querySelector(".ver").id = `ver_${id}`;
+
+      let $clone = d.importNode($template, true);
+      $fragment.appendChild($clone);
+      $table.querySelector("tbody").appendChild($fragment);
+
+      Swal.fire(`Se ha creado exitosamente la editorial: <b>${nombre}</b>!`, '', 'success')
     }
-
-    let elemento = document.createElement('p')
-    elemento.textContent = "NO EXISTEN LIBROS ASOCIADOS";
-    $template.querySelector(".asociados").appendChild(elemento)
-    $template.querySelector(".asociados").id=`asociados_${id}`
-    
-    $template.querySelector(".editar").dataset.id = `${id}`;
-    $template.querySelector(".editar").id = `editar_${id}`; 
-
-    $template.querySelector(".botonEstado").id = `botonEstado_${id}`;
-    $template.querySelector(".botonEstado").dataset.nombre = nombre;
-    $template.querySelector(".botonEstado").dataset.id = id;
-    $template.querySelector(".botonEstado").dataset.estado = alta;
-    $template.querySelector(".botonEstado").classList.remove('btn-danger');
-    $template.querySelector(".botonEstado").classList.add('btn-success');
-
-    $template.querySelector(".ver").dataset.nombre = nombre;
-    $template.querySelector(".ver").id = `ver_${id}`;
-
-    let $clone = d.importNode($template, true);
-    $fragment.appendChild($clone);
-    $table.querySelector("tbody").appendChild($fragment);
-
-  }).catch(error => console.error(error));
+    else {
+      return Promise.reject(response);
+    }
+  }).catch(badResponse => {
+    Swal.fire(badResponse.message, '', 'error')
+  });
 }
 //Fin CREAR EDITORIAL
 
@@ -301,7 +307,7 @@ function crearEditorial(url, options) {
 function activarAutor(url, index) {
   obtenerJson(url + index).then(response => {
     {
-      let btn = d.querySelector("#botonEstado_"+index)
+      let btn = d.querySelector("#botonEstado_" + index)
       btn.classList.remove("btn-danger")
       btn.classList.add("btn-success")
       btn.dataset.estado = "true";
@@ -318,7 +324,7 @@ function activarAutor(url, index) {
 function desactivarAutor(url, index) {
   obtenerJson(url + index).then(response => {
     {
-      let btn = d.querySelector("#botonEstado_"+index)
+      let btn = d.querySelector("#botonEstado_" + index)
       btn.classList.remove("btn-success")
       btn.classList.add("btn-danger")
       btn.dataset.estado = "false";
@@ -334,11 +340,21 @@ function desactivarAutor(url, index) {
 //Función EDITAR
 function modificarEditorial(id, options) {
   obtenerJson(urlEditorial + id, options).then(response => {
-    d.getElementById("nombre_" + id).innerHTML = response.nombre;
-    let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
-    listadoBotones.children[1].dataset.nombre = response.nombre;
-    listadoBotones.children[2].dataset.nombre = response.nombre;
-  }).catch(error => console.error(error));
+    if (!response.message) {
+      let nombreViejo = d.getElementById("nombre_" + id).textContent
+      let nombreNuevo = response.nombre
+      d.getElementById("nombre_" + id).innerHTML = nombreNuevo;
+      let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
+      listadoBotones.children[1].dataset.nombre = nombreNuevo;
+      listadoBotones.children[2].dataset.nombre = nombreNuevo
+      Swal.fire(`Se ha modificado el nombre de <b>${nombreViejo}</b> a <b>${nombreNuevo}</b>!`, '', 'success')
+    }
+    else {
+      return Promise.reject(response);
+    }
+  }).catch(badResponse => {
+    Swal.fire(badResponse.message, '', 'error')
+  });
 }
 //Fin EDITAR
 
