@@ -1,4 +1,4 @@
-body{
+body {
   background-color: lightblue;
 }
 .tachado {
@@ -19,7 +19,7 @@ body{
   content: url(../img/eye-solid.svg);
 }
 
-.crear{
+.crear {
   width: 6rem;
   height: 6rem;
   border-color: rgb(7, 7, 95);
@@ -31,11 +31,11 @@ body{
   transition: all 0.2s ease;
 }
 
-.crear:hover{
+.crear:hover {
   scale: 1.1;
 }
 
-.desaparecer{
+.desaparecer {
   visibility: hidden;
 }
 

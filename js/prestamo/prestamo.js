@@ -5,13 +5,17 @@ import {
   urlDesactivarPrestamo,
   urlPrestamoLocal,
 } from "./PrestamoUris.js";
-import { urlCliente, urlLibro, options, optionsGET } from "../constantes.js";
+import {
+  urlCliente,
+  urlLibro,
+  options,
+  optionsGET,
+} from "../constantes.js";
 
 const d = document,
   $table = d.querySelector("#tablaPrestamos"),
   $template = d.getElementById("crud-template-prestamo").content,
   $fragment = d.createDocumentFragment();
-/*   $myModal = new bootstrap.Modal(d.getElementById('exampleModal'), options); */
 
 let libros = [];
 let clientes = [];
@@ -27,20 +31,44 @@ function pintarTabla() {
       if (prestamo.alta) {
         $template.querySelector(".nombreCliente").textContent =
           prestamo.cliente.nombre + " " + prestamo.cliente.apellido;
+
+        $template.querySelector(
+          ".nombreCliente"
+        ).id = `nombreCliente_${prestamo.id}`;
+
         $template.querySelector(".documentoCliente").textContent =
           prestamo.cliente.documento;
+
+        $template.querySelector(
+          ".documentoCliente"
+        ).id = `documentoCliente_${prestamo.id}`;
+
         $template.querySelector(".libroTomado").textContent =
           prestamo.libro.titulo;
-        $template.querySelector(".fechaPrestamo").textContent = formatDate(
-          prestamo.fechaPrestamo, true
-        );
-        $template.querySelector(".fechaDevolucion").textContent = formatDate(
-          prestamo.fechaDevolucion, true
-        );
-        /*$template.querySelector(".estado").textContent = prestamo.alta;
-         $template.querySelector(".estado").id = "estado_" + prestamo.id; */
 
-        $template.querySelector(".rowTable").id = "row_" + prestamo.id;
+        $template.querySelector(
+          ".libroTomado"
+        ).id = `libroTomado_${prestamo.id}`;
+
+        $template.querySelector(".fechaPrestamo").textContent = formatDate(
+          prestamo.fechaPrestamo,
+          true
+        );
+
+        $template.querySelector(
+          ".fechaPrestamo"
+        ).id = `fechaPrestamo_${prestamo.id}`;
+
+        $template.querySelector(".fechaDevolucion").textContent = formatDate(
+          prestamo.fechaDevolucion,
+          true
+        );
+
+        $template.querySelector(
+          ".fechaDevolucion"
+        ).id = `fechaDevolucion_${prestamo.id}`;
+
+        $template.querySelector(".rowTable").id = `row_${prestamo.id}`;
 
         $template.querySelector(
           ".botoncitoCancelar"
@@ -53,14 +81,13 @@ function pintarTabla() {
         let $clone = d.importNode($template, true);
         $fragment.appendChild($clone);
       }
-      
     });
 
     $table.querySelector("tbody").appendChild($fragment);
   });
 }
 
-function formatDate(date,isReversed) {
+function formatDate(date, isReversed) {
   // (Ejemplo)
   //Date inicial : 2022-03-30T00:00:00.000+00:00
 
@@ -68,13 +95,12 @@ function formatDate(date,isReversed) {
   // Se crea este array de 2 elementos: [2022-03-30] , [T00:00:00.000+00:00]
 
   formatDate = formatDate[0].split("-");
-  // Se crea este array de 3 elementos: [30] , [03] , [2022
-  
-  if (isReversed){
-    formatDate = formatDate.reverse();
+  // Se crea este array de 3 elementos: [2022] , [03] , [30]
+
+  if (isReversed) {
+    formatDate = formatDate.reverse(); //Invierte el array previo
   }
-  
-  
+
   formatDate = formatDate.toString().replaceAll(",", "-");
   //Se crea este String 30-03-2022
 
@@ -82,29 +108,68 @@ function formatDate(date,isReversed) {
 }
 
 function crearPrestamo(options) {
-  obtenerJson("http://localhost:8080/api/v1/prestamo/", options)
-    .then((response) => {
-      console.log(response);
-      $template.querySelector(".nombreCliente").textContent =
-        response.cliente.nombre;
-      $template.querySelector(".documentoCliente").textContent =
-        response.cliente.documento;
-      $template.querySelector(".libroTomado").textContent =
-        response.libro.titulo;
-      $template.querySelector(".fechaPrestamo").textContent = formatDate(
-        response.fechaPrestamo
-      );
-      $template.querySelector(".fechaDevolucion").textContent = formatDate(
-        response.fechaDevolucion
-      );
-      $template.querySelector(".estado").textContent = response.alta;
-      $template.querySelector(".estado").id = "estado_" + response.id;
+  obtenerJson("http://localhost:8080/api/v1/prestamo/", options).then(
+    (response) => {
+      if (response.alta) {
+        $template.querySelector(".nombreCliente").textContent =
+          response.cliente.nombre + " " + response.cliente.apellido;
 
-      let $clone = d.importNode($template, true);
-      $fragment.appendChild($clone);
-      $table.querySelector("tbody").appendChild($fragment);
+        $template.querySelector(".documentoCliente").textContent =
+          response.cliente.documento;
+
+        $template.querySelector(".libroTomado").textContent =
+          response.libro.titulo;
+
+        $template.querySelector(".fechaPrestamo").textContent = formatDate(
+          response.fechaPrestamo,
+          true
+        );
+
+        $template.querySelector(".fechaDevolucion").textContent = formatDate(
+          response.fechaDevolucion,
+          true
+        );
+
+        let $clone = d.importNode($template, true);
+        $fragment.appendChild($clone);
+        $table.querySelector("tbody").appendChild($fragment);
+
+        return true;
+      } else {
+        return false;
+      }
+    }
+  );
+}
+
+function modificarPrestamo(id, options) {
+  console.log("URL : " + urlPrestamo + id);
+  console.table(options.body);
+
+  obtenerJson(urlPrestamo + id, options)
+    .then((response) => {
+      if (response.alta) {
+        d.getElementById("nombreCliente_" + id).innerHTML =
+          response.cliente.nombre + " " + response.cliente.apellido;
+        d.getElementById("documentoCliente_" + id).innerHTML =
+          response.cliente.documento;
+        d.getElementById("libroTomado_" + id).innerHTML = response.libro.titulo;
+        d.getElementById("fechaPrestamo_" + id).innerHTML = formatDate(
+          response.fechaPrestamo,
+          true
+        );
+        d.getElementById("fechaDevolucion_" + id).innerHTML = formatDate(
+          response.fechaDevolucion,
+          true
+        );
+
+        return true;
+
+      } else {
+        return false;
+      }
     })
-    .catch((error) => console.log(error));
+    .catch((error) => console.error(error));
 }
 
 function getLibroByTitulo(titulo) {
@@ -118,9 +183,9 @@ function getClienteByName(name) {
 }
 
 d.addEventListener("click", async (e) => {
-  let buttonCancel = e.target;
+  let buttonPressed = e.target;
 
-  if (buttonCancel.matches(".btn-cancelar-prestamo")) {
+  if (buttonPressed.matches(".btn-cancelar-prestamo")) {
     Swal.fire({
       title: "¿Deseas cancelar el prestamo?",
       showDenyButton: true,
@@ -131,19 +196,21 @@ d.addEventListener("click", async (e) => {
       cancelButtonColor: "#d33",
     }).then((result) => {
       if (result.isConfirmed) {
-        cancelarPrestamo(buttonCancel.dataset.id);
+        cancelarPrestamo(buttonPressed.dataset.id);
 
-        d.querySelector("#row_" + buttonCancel.dataset.id).remove();
+        Swal.fire(`Se ha eliminado exitosamente el prestamo `, "", "success");
+
+        d.querySelector("#row_" + buttonPressed.dataset.id).remove();
       } else Swal.fire("No se han realizado cambios.", "", "info");
     });
   }
 
-  if (e.target.matches(".crear")) {
+  if (buttonPressed.matches(".crear")) {
     Swal.fire({
       title: "Crear nuevo prestamo ",
       html:
-        `Elige un libro ${d.querySelector("#divLibros").innerHTML} </br>` +
         `Elige un cliente ${d.querySelector("#divClientes").innerHTML} </br>` +
+        `Elige un libro ${d.querySelector("#divLibros").innerHTML} </br>` +
         `Fecha inicio <input required type=date id="swal-input3" class="swal2-input"> </br>` +
         `Fecha fin <input required type=date id="swal-input4" class="swal2-input"> </br>`,
 
@@ -182,107 +249,113 @@ d.addEventListener("click", async (e) => {
         `Se ha creado exitosamente el prestamo del libro: <b>${
           libro.titulo
         }</b> </br>
-          A cargo del cliente: <b>${
-            cliente.nombre + " " + cliente.apellido
-          }</b> `,
+            A cargo del cliente: <b>${
+              cliente.nombre + " " + cliente.apellido
+            }</b> `,
         "",
         "success"
       );
     });
   }
 
-  if (e.target.matches(".btn-editar-prestamo")) {
+  if (buttonPressed.matches(".btn-editar-prestamo")) {
+    let prestamoEditado = prestamos.find(
+      (prestamito) => "edit_" + prestamito.id == buttonPressed.dataset.id
+    );
 
-    /* Obtengo el prestamo a editar desde el Array de prestamos*/
-
-    let prestamoEditado = prestamos.find(prestamito => ("edit_" + prestamito.id) == e.target.dataset.id);
-
-    /* Obtengo las fechas del prestamo en su formato correcto para asignarlas al value del input*/
-    let fechaInicActual = formatDate(prestamoEditado.fechaPrestamo,false);
+    let fechaInicActual = formatDate(prestamoEditado.fechaPrestamo, false);
     let fechaDevActual = formatDate(prestamoEditado.fechaDevolucion, false);
 
-    /* Obtengo el select de Cliente, uno para mostrar en el pop-up y otro para setear el index por default*/
+    let selectClientes = d.querySelector("#selectClientes");
+    let selectLibros = d.querySelector("#selectLibros");
 
-    let selectClientes = d.querySelector("#divClientes").innerHTML;
-    //let selectClientes2 = d.getElementById("selectClientes")//d.querySelector("#selectClientes");
+    let posLibro = libros
+      .map(function (librito) {
+        return librito.titulo;
+      })
+      .indexOf(prestamoEditado.libro.titulo);
 
-    let selectLibros = d.querySelector("#divLibros").innerHTML;
-    //let selectLibros2 = d.getElementById("selectLibros")//d.querySelector("#selectLibros");
+    let posCliente = clientes
+      .map(function (clientito) {
+        return clientito.nombre;
+      })
+      .indexOf(prestamoEditado.cliente.nombre);
 
-    /* Lógica para obtener la posición dentro del Select. La posición en el Array es la misma que en los select*/ 
-
-    var posLibro = libros.map(function(librito) {
-      return librito.titulo;
-    }).indexOf(prestamoEditado.libro.titulo);
-
-    var posCliente = clientes.map(function(clientito) {
-      return clientito.nombre;
-    }).indexOf(prestamoEditado.cliente.nombre);
-
-    console.log("Cliente:" + clientes[posCliente].nombre + " " + clientes[posCliente].apellido );
-    console.log("Cliente pos dentro de su array: " + posCliente);
-
-    console.log("Libro:" + libros[posLibro].titulo);
-    console.log("Libro pos dentro de su array: " + posLibro);
-
-    //console.log(d.querySelector("#divClientes").firstElementChild.item(4))
-
-    /* Asigno por default los index dentro de los Select de Clientes y de Libros */
-
-    //Version 1
-    //selectClientes2.selectedIndex = posCliente;
-    //selectLibros2.selectedIndex = posLibro;
-
-    //Version 2
-    let defaultOpCliente = d.querySelector("#divClientes").firstElementChild.item(posCliente);
-    defaultOpCliente.setAttribute("selected","selected")
-
-    console.log(defaultOpCliente)
-      
+    selectClientes.childNodes[posCliente].setAttribute("selected", "");
+    selectLibros.childNodes[posLibro].setAttribute("selected", "");
 
     /* Pop - up */
 
     Swal.fire({
       title: "Datos del prestamo actuales",
+      showDenyButton: true,
+      denyButtonText: `No, volver atrás`,
       html:
-        `Cliente a cargo: ${selectClientes} </br>` +
-        `Libro elegido: ${selectLibros} </br>`+
+        `Libro elegido: ${selectLibros.outerHTML} </br>` +
+        `Cliente a cargo: ${selectClientes.outerHTML} </br>` +
         `Fecha de inicio: <input value=${fechaInicActual} id="swal-input3" type=date class="swal2-input"> </br>` +
         `Fecha de devolución: <input value=${fechaDevActual} id="swal-input4" type=date class="swal2-input"> </br>`,
 
-        preConfirm: () => {
-          const nombreCliente = Swal.getPopup().querySelector("#selectClientes").value;
-          const nombreLibro = Swal.getPopup().querySelector("#selectLibros").value;
-          const fechaPrestamo = Swal.getPopup().querySelector("#swal-input3").value;
-          const fechaDevolucion = Swal.getPopup().querysSelector("#swal-input4").value;
-  
-          return {
-            nombreLibro: nombreLibro,
-            nombreCliente: nombreCliente,
-            fechaPrestamo: fechaPrestamo,
-            fechaDevolucion: fechaDevolucion,
-          };
-        },
-        
-    }).then((result) => {
-      console.log(result.nombreLibro.value);
-      console.log(result.nombreCliente.value);
-      console.log(result.fechaPrestamo.value);
-      console.log(result.fechaDevolucion.value);
+      preConfirm: () => {
+        const nombreCliente =
+          Swal.getPopup().querySelector("#selectClientes").value;
+        const nombreLibro =
+          Swal.getPopup().querySelector("#selectLibros").value;
+        const fechaPrestamo =
+          Swal.getPopup().querySelector("#swal-input3").value;
+        const fechaDevolucion =
+          Swal.getPopup().querySelector("#swal-input4").value;
 
+        return {
+          nombreLibro: nombreLibro,
+          nombreCliente: nombreCliente,
+          fechaPrestamo: fechaPrestamo,
+          fechaDevolucion: fechaDevolucion,
+        };
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let libro = getLibroByTitulo(result.value.nombreLibro);
+        let cliente = getClienteByName(result.value.nombreCliente);
+
+        options.method = "PUT";
+
+        options.body = JSON.stringify({
+          dniCliente: cliente.documento,
+          fechaPrestamo: result.value.fechaPrestamo,
+          fechaDevolucion: result.value.fechaDevolucion,
+          tituloLibro: libro.titulo,
+          isbn: libro.isbn,
+        });
+
+        modificarPrestamo(prestamoEditado.id, options);
+        Swal.fire(
+          `Se ha modificado exitosamente el prestamo del libro: <b>${
+            libro.titulo
+          }</b> </br>
+              A cargo del cliente: <b>${
+                cliente.nombre + " " + cliente.apellido
+              }</b> `,
+          "",
+          "success"
+        );
+      } else Swal.fire("No se han realizado cambios.", "", "info");
     });
 
-    defaultOpCliente.removeAttribute("selected")
+    selectClientes.childNodes[posCliente].removeAttribute("selected", "");
+    selectLibros.childNodes[posLibro].removeAttribute("selected", "");
   }
 });
 
 d.addEventListener("DOMContentLoaded", async function () {
   /** Llenar select de cliente */
 
-  clientes = await obtenerJson(urlCliente);
+  let clientesNoFilter = await obtenerJson(urlCliente);
 
-  clientes.forEach((cliente) => {
+  clientesNoFilter.forEach((cliente) => {
     if (cliente.alta) {
+      clientes.push(cliente);
+
       let optionCliente = d.createElement("option");
       optionCliente.value = cliente.nombre + " " + cliente.apellido;
       optionCliente.innerHTML = cliente.nombre + " " + cliente.apellido;
@@ -293,10 +366,12 @@ d.addEventListener("DOMContentLoaded", async function () {
 
   /** Llenar select de libro */
 
-  libros = await obtenerJson(urlLibro);
+  let librosNoFilter = await obtenerJson(urlLibro);
 
-  libros.forEach((libro) => {
+  librosNoFilter.forEach((libro) => {
     if (libro.alta && libro.ejemplaresRestantes > 0) {
+      libros.push(libro);
+
       let optionLibro = d.createElement("option");
       optionLibro.value = libro.titulo;
       optionLibro.innerHTML = libro.titulo;
@@ -307,9 +382,38 @@ d.addEventListener("DOMContentLoaded", async function () {
 });
 
 function cancelarPrestamo(index) {
-  /** urlActivarPrestamo
-   * urlDesactivarPrestamo*/
   obtenerJson(urlDesactivarPrestamo + index).then((response) => {
     console.log(response);
+    if (response.status == 200) {
+      return true;
+    } else {
+      return false;
+    }
   });
 }
+
+let searchInput = document.getElementById("buscar");
+searchInput.addEventListener("keyup", buscaTabla);
+
+function buscaTabla() {
+  let table = document.getElementById("tablaPrestamos").tBodies[0];
+  let texto;
+
+  texto = searchInput.value.toLowerCase();
+  var r = 0;
+  let row;
+  while ((row = table.rows[r++])) {
+    if (row.children[0].innerText.toLowerCase().indexOf(texto) !== -1) {
+      row.style.display = null;
+    } else row.style.display = "none";
+  }
+}
+
+d.addEventListener("scroll", () => {
+  let elemento = document.querySelector("#crear");
+  elemento.classList.add("desaparecer");
+
+  setTimeout(() => {
+    elemento.classList.remove("desaparecer");
+  }, 1000);
+});
