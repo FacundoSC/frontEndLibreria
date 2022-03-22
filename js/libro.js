@@ -352,7 +352,7 @@ d.addEventListener("click", async (e) => {
     Swal.fire({
       icon: 'info',
       title: 'Datos Libro:',
-      html: `<p class="swal2" >
+      html: `<p class="swal2"     >
       Titulo: ${e.target.dataset.titulo}
       <br>
       Isbn: ${e.target.dataset.isbn}
