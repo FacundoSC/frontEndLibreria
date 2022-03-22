@@ -241,14 +241,6 @@ d.addEventListener("click", async (e) => {
 });
 //fin funciones
 
-
-d.addEventListener('scroll', () => {
-  let elemento = document.querySelector("#crear");
-  elemento.classList.add("desaparecer")
-
-  setTimeout(() => { elemento.classList.remove("desaparecer") }, 1000);
-})
-
 ///Función CREAR EDITORIAL
 function crearEditorial(url, options) {
   obtenerJson(url, options).then(response => {
@@ -357,21 +349,3 @@ function modificarEditorial(id, options) {
   });
 }
 //Fin EDITAR
-
-let searchInput = document.getElementById('buscar');
-let table = document.getElementById("tabla").tBodies[0];
-let texto
-
-searchInput.addEventListener('keyup', buscaTabla);
-
-function buscaTabla() {
-  texto = searchInput.value.toLowerCase();
-  var r = 0;
-  let row
-  while (row = table.rows[r++]) {
-    if (row.children[0].innerText.toLowerCase().indexOf(texto) !== -1) {
-      row.style.display = null;
-    } else
-      row.style.display = 'none';
-  }
-}
