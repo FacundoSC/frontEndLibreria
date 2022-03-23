@@ -108,8 +108,9 @@ function formatDate(date, isReversed) {
 }
 
 function crearPrestamo(options) {
-  obtenerJson("http://localhost:8080/api/v1/prestamo/", options).then(
+  obtenerJson(urlPrestamoLocal, options).then(
     (response) => {
+
       if (response.alta) {
         $template.querySelector(".nombreCliente").textContent =
           response.cliente.nombre + " " + response.cliente.apellido;
@@ -143,11 +144,9 @@ function crearPrestamo(options) {
 }
 
 function modificarPrestamo(id, options) {
-  console.log("URL : " + urlPrestamo + id);
-  console.table(options.body);
-
-  obtenerJson(urlPrestamo + id, options)
+  obtenerJson(urlPrestamoLocal + id, options)
     .then((response) => {
+
       if (response.alta) {
         d.getElementById("nombreCliente_" + id).innerHTML =
           response.cliente.nombre + " " + response.cliente.apellido;
