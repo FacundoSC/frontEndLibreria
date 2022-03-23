@@ -169,11 +169,35 @@ function main() {
 };
 
 function obtenerEditoriales() {
+  Swal.fire({
+    title: 'CARGANDO DATOS',
+    html: "<h3>Aguarde por favor 🐱‍👓</h3>",
+    backdrop: `rgba(0,0,40,0.4)`,
+    didOpen: () => {
+      Swal.showLoading()
+    }
+  })
+
   let $table = document.querySelector(".table");
   let $template = document.getElementById("crud-template").content;
   let $fragment = document.createDocumentFragment();
 
   obtenerJson(urlEditorial).then(editoriales => {
+
+    if (editoriales) {
+      Swal.fire({
+        html: "<h3 style='margin: 0; padding: 1rem'>Petición exitosa! 🥳</h3>",
+        showConfirmButton: false,
+        timer: 1000
+      })
+    } else{
+      Swal.fire({
+        html: "<h3 style='margin: 0; padding: 1rem'>Algo ha fallado 😭</h3>",
+        showConfirmButton: false,
+        timer: 1000
+      })
+    }
+
     editoriales.forEach(editorial => {
 
       $template.querySelector(".nombre").textContent = editorial.nombre;
@@ -238,7 +262,8 @@ function obtenerEditoriales() {
       $fragment.appendChild($clone);
     });
     $table.querySelector("tbody").appendChild($fragment);
-  });
+  })
+
 }//fin funcion obtener editoriales
 
 //Función ACTIVAR
