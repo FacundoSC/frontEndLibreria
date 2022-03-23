@@ -17,6 +17,7 @@ function obtenerClientes() {
       $template.querySelector(".apellido").id = `apellido_${cliente.id}`;
       $template.querySelector(".telefono").textContent = cliente.telefono;
       $template.querySelector(".telefono").id = `telefono_${cliente.id}`;
+     
       $template.querySelector(".estado").textContent = cliente.alta;
       $template.querySelector(".estado").id = `estado_${cliente.id}`;
       $template.querySelector(".editar").dataset.id = `${cliente.id}`;
@@ -26,7 +27,7 @@ function obtenerClientes() {
       $template.querySelector(".ver").dataset.nombre = cliente.nombre;
       $template.querySelector(".ver").dataset.apellido = cliente.apellido;
       $template.querySelector(".ver").dataset.telefono = cliente.telefono;
-
+   
       $template.querySelector(".botonEstado").id = `botonEstado_${cliente.id}`;
       $template.querySelector(".botonEstado").classList.remove('btn-success');
       $template.querySelector(".botonEstado").classList.remove('btn-danger');
@@ -36,6 +37,7 @@ function obtenerClientes() {
       $template.querySelector(".nombre").classList.remove('tachado');
       $template.querySelector(".apellido").classList.remove('tachado');
       $template.querySelector(".telefono").classList.remove('tachado');
+     
       $template.querySelector(".estado").classList.remove('tachado');
 
       $template.querySelector(".editar").removeAttribute("disabled")
@@ -46,7 +48,7 @@ function obtenerClientes() {
         $template.querySelector(".botonEstado").classList.add('btn-success');
         $template.querySelector(".estado").textContent = "Activado";
       } else {
-        $template.querySelector(".estado").textContent = "Desactivo";
+        $template.querySelector(".estado").textContent = "Desactivado";
         $template.querySelector(".botonEstado").classList.add('btn-danger');
         $template.querySelector(".nombre").classList.add('tachado');
         $template.querySelector(".estado").classList.add('tachado');
@@ -109,12 +111,51 @@ d.addEventListener("click", async (e) => {
 });
 
 async function crearCliente(urlCliente, options) {
-  return await obtenerJson(urlCliente, options);
-}
 
+  return await obtenerJson(urlCliente, options).then(response => {
+    let id = response.id
+    let nombre = response.nombre
+    let alta = response.alta
+
+    $template.querySelector(".documento").textContent = response.documento;
+    $template.querySelector(".documento").id = `documento_${id}`;
+    $template.querySelector(".nombre").textContent = nombre;
+    $template.querySelector(".nombre").id = `nombre_${id}`;
+    $template.querySelector(".apellido").textContent = response.apellido;
+    $template.querySelector(".apellido").id = `apellido_${id}`;
+    $template.querySelector(".telefono").textContent = response.telefono;
+    $template.querySelector(".telefono").id = `telefono_${id}`;
+    $template.querySelector(".username").textContent = response.username;
+    $template.querySelector(".username").id = `username_${id}`;
+    $template.querySelector(".password").textContent = response.password;
+    $template.querySelector(".password").id = `password_${id}`;
+
+
+    $template.querySelector(".estado").textContent = alta;
+    $template.querySelector(".estado").id = `estado_${id}`;
+    $template.querySelector(".editar").dataset.id = `${id}`;
+    $template.querySelector(".editar").id = `editar_${id}`;
+    $template.querySelector(".ver").dataset.nombre = nombre;
+    $template.querySelector(".botonEstado").id = `botonEstado_${id}`;
+    $template.querySelector(".botonEstado").dataset.nombre = nombre;
+    $template.querySelector(".botonEstado").dataset.id = id;
+    $template.querySelector(".botonEstado").dataset.estado = alta;
+    $template.querySelector(".botonEstado").classList.remove('btn-danger');
+    $template.querySelector(".nombre").classList.remove('tachado');
+    $template.querySelector(".estado").classList.remove('tachado');
+    $template.querySelector(".botonEstado").classList.add('btn-success');
+
+    let $clone = d.importNode($template, true);
+    $fragment.appendChild($clone);
+    $table.querySelector("tbody").appendChild($fragment);
+  }).catch(error => console.error(error));
+
+  // return await obtenerJson(urlCliente, options);
+}
 
 d.addEventListener("click", async (e) => {
   if (e.target.matches(".crear")) {
+    let nombreFormularioCliente = "";
 
     Swal.fire({
       title: 'Ingrese sus Datos de Cliente: ',
@@ -125,6 +166,7 @@ d.addEventListener("click", async (e) => {
         'Telefono<input id="telefono" class="swal2-input">' +
         'Username<input id="username" class="swal2-input" type ="email">' +
         'Password<input id="password" class="swal2-input" type ="password">',
+        maxlength: 10,
       showCancelButton: true,
       cancelButtonText: 'Cancelar ❌',
       confirmButtonText: 'Guardar 💾',
@@ -133,6 +175,7 @@ d.addEventListener("click", async (e) => {
         let documento, nombre, apellido, telefono, username, password, roleId;
         documento = Swal.getPopup().querySelector('#documento').value;
         nombre = Swal.getPopup().querySelector(`#nombre`).value;
+        nombreFormularioCliente = nombre;
         apellido = Swal.getPopup().querySelector('#apellido').value;
         telefono = Swal.getPopup().querySelector(`#telefono`).value;
         username = Swal.getPopup().querySelector(`#username`).value;
@@ -146,11 +189,12 @@ d.addEventListener("click", async (e) => {
 
           options.method = 'POST';
           options.body = JSON.stringify(result.value);
-          let urlLocal = "http://localhost:8080/api/v1/cliente/";
+          let urlLocal = "http://localhost:8085/api/v1/cliente/";
           crearCliente(urlLocal, options)
-            .then(response => {
-              Swal.fire(`Se ha creado exitosamente el cliente: <b>${response.nombre}</b>!`, '', 'success')
+            .then(() => {
+              Swal.fire(`Se ha creado exitosamente el cliente ${nombreFormularioCliente}`, '', 'success')
             }).catch(error => {
+              console.log(error);
               Swal.fire('Contactese con el admin.', '', 'warning')
             })
 
@@ -167,3 +211,72 @@ d.addEventListener("click", async (e) => {
 
 });
 
+
+function modificarCliente(urlCliente, id, options) {
+  obtenerJson(urlCliente + id, options).then(response => {
+    d.getElementById("documento_" + id).innerHTML = response.documento;
+    d.getElementById("nombre_" + id).innerHTML = response.nombre;
+    d.getElementById("apellido_" + id).innerHTML = response.apellido;
+    d.getElementById("telefono_" + id).innerHTML = response.telefono;
+   
+    let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
+    listadoBotones.children[1].dataset.nombre = response.nombre;
+    listadoBotones.children[2].dataset.nombre = response.nombre;
+  }).catch(error => console.error(error));
+}
+
+
+d.addEventListener("click", async (e) => {
+  if (e.target.matches(".editar")) {
+
+    let id = e.target.dataset.id
+
+    let documento = d.getElementById("documento_"+id).textContent;
+    let nombre = d.getElementById("nombre_"+ id).textContent;
+    let apellido = d.getElementById("apellido_"+id).textContent;
+    let telefono = d.getElementById("telefono_"+id).textContent;
+    
+    Swal.fire({
+      title: 'Ingrese los datos a modificar : ',
+      html:
+        `Documento<input id="documento" class="swal2-input" value = "${documento}">` +
+        `Nombre<input id="nombre" class="swal2-input" value = "${nombre}">` +
+        `Apellido<input id="apellido" class="swal2-input" value = "${apellido}">`+
+        `Telefono<input id="telefono" class="swal2-input" value = "${telefono}">`,
+       
+      showCancelButton: true,
+      cancelButtonText: 'Cancelar ❌',
+      confirmButtonText: 'Guardar 💾',
+      focusConfirm: false,
+      preConfirm: () => {
+        let documento, nombre, apellido, telefono, username, password, roleId;
+        documento = Swal.getPopup().querySelector('#documento').value;
+        nombre = Swal.getPopup().querySelector(`#nombre`).value;
+        apellido = Swal.getPopup().querySelector('#apellido').value;
+        telefono = Swal.getPopup().querySelector(`#telefono`).value;
+      
+        roleId=2;
+        return { documento, nombre, apellido, telefono, username, password, roleId };
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (result.value) {
+
+          let id = e.target.dataset.id;
+          options.method = 'PUT';
+          options.body = JSON.stringify(result.value);
+          let urlLocal = "http://localhost:8085/api/v1/cliente/";
+          modificarCliente(urlLocal, id, options)
+
+        } else {
+          Swal.fire('Se ha cancelado la operación', '', 'warning')
+        }
+
+      } else {
+        Swal.fire('Se ha cancelado la operación', '', 'warning')
+      }
+    });
+
+  }
+
+});

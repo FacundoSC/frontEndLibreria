@@ -15,7 +15,7 @@ export const optionsGET = {
 
 export const urlAutor = "https://libreria-rest.herokuapp.com/api/v1/autor/";
 export const urlEditorial = "https://libreria-rest.herokuapp.com/api/v1/editorial/";
-export const urlCliente = "https://libreria-rest.herokuapp.com/api/v1/cliente/";
+export const urlCliente = "http://localhost:8085/api/v1/cliente/";
 
 export const urlActivar = "activar/";
 export const urlDesactivar = "desactivar/";
