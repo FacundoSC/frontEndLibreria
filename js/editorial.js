@@ -175,14 +175,9 @@ function obtenerEditoriales() {
 
   Swal.fire({
     title: 'CARGANDO DATOS',
-    html: "<h3>Aguarde por favor</h3>",
-    backdrop: `rgba(0,0,40,0.4)
-    url("../img/nyan-cat.gif")
-    left top
-    no-repeat`,
-    didOpen: () => {
-      Swal.showLoading()
-    }
+    html: "<h3>Aguarde por favor</h3><p><img src='../img/nyan-cat.gif'><p>",
+    backdrop: `rgba(0,0,40,0.4)`,
+    showConfirmButton: false
   })
 
   obtenerJson(urlEditorial).then(editoriales => {
