@@ -105,9 +105,9 @@ function main() {
         if (result.isConfirmed) {
           let btn = e.target;
           if (btn.dataset.estado == 'true') {
-            desactivarAutor(urlEditorial + urlDesactivar, btn.dataset.id);
+            desactivarEditorial(urlEditorial + urlDesactivar, btn.dataset.id);
           } else {
-            activarAutor(urlEditorial + urlActivar, btn.dataset.id);
+            activarEditorial(urlEditorial + urlActivar, btn.dataset.id);
           }
         } else if (result.isDenied) {
           Swal.fire('No se han realizado cambios.', '', 'info')
@@ -242,7 +242,7 @@ function obtenerEditoriales() {
 }//fin funcion obtener editoriales
 
 //Función ACTIVAR
-function activarAutor(url, index) {
+function activarEditorial(url, index) {
   obtenerJson(url + index).then(response => {
     if (response.status == 200) {
       let btn = document.querySelector("#botonEstado_" + index)
@@ -264,7 +264,7 @@ function activarAutor(url, index) {
 //Fin ACTIVAR
 
 //Función DESACTIVAR
-function desactivarAutor(url, index) {
+function desactivarEditorial(url, index) {
   obtenerJson(url + index).then(response => {
     if (response.status == 200) {
       let btn = document.querySelector("#botonEstado_" + index)
