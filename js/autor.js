@@ -61,11 +61,6 @@ async function obtenerAutoresPaginados() {
   var response = await fetch(urlAutor + `paged?page=${current_page}&size=10`);
   objJson = await response.json();
 
-  console.log(objJson);
-  console.log(urlAutor);
-  /* 	console.log(content)
-   */
-
   objJson.content.forEach((autor) => {
     $template.querySelector(".nombre").textContent = autor.nombre;
     $template.querySelector(".nombre").id = `nombre_${autor.id}`;
@@ -170,7 +165,7 @@ function modificarAutor(urlAutor, id, options) {
 
 let autores = [];
 
-d.addEventListener("DOMContentLoaded", obtenerAutores(urlAutor));
+d.addEventListener("DOMContentLoaded", obtenerAutoresPaginados());
 
 d.addEventListener("DOMContentLoaded", function () {
   obtenerJson(urlAutor).then((autoresArray) => {
@@ -274,20 +269,19 @@ d.addEventListener("click", async (e) => {
   }
 
   if (e.target.matches("#btn_next")) {
-    current_page++;
-
-    obtenerAutoresPaginados();
-    /* if (objJson.pageable.pageNumber < objJson.totalPages - 1) {
-      
-    } */
+    if (objJson.pageable.pageNumber < objJson.totalPages - 1) {
+      current_page++;
+      $table.querySelector("tbody").innerHTML = "";
+      obtenerAutoresPaginados();
+    }
   }
 
   if (e.target.matches("#btn_prev")) {
-    current_page--;
-    obtenerAutoresPaginados();
-    /* if (objJson.pageable.pageNumber > 0) {
-      
-    } */
+    if (objJson.pageable.pageNumber > 0) {
+      current_page--;
+      $table.querySelector("tbody").innerHTML = "";
+      obtenerAutoresPaginados();
+    }
   }
 });
 

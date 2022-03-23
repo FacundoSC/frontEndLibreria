@@ -1,6 +1,20 @@
 body {
   background-color: lightblue;
 }
+
+.button-56:hover:after {
+  transform: translate(0, 0)!important;
+}
+
+.button-56:active {
+  background-color: #ffdeda!important;
+  outline: 0;
+}
+
+.button-56:hover {
+  outline: 0!important;
+}
+
 .tachado {
   text-decoration: line-through;
   color: red;
@@ -46,3 +60,4 @@ body {
   width: 1rem;
   height: 1rem;
 }
+
