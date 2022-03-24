@@ -145,14 +145,6 @@ function main() {
             }
           }
     });
-
-    document.addEventListener('keyup', buscaTabla);
-
-    document.addEventListener('scroll', () => {
-        let elemento = document.querySelector("#crear");
-        elemento.classList.add("desaparecer")
-        setTimeout(() => { elemento.classList.remove("desaparecer") }, 1000);
-    })
 };
 
 function obtenerAutoresPaginados() {
