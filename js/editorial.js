@@ -1,11 +1,20 @@
 import { options, urlEditorial, urlDesactivar, urlActivar } from "./constantes.js";
 import { obtenerJson } from "./asincronico.js";
 
+//Variables globales para funcionamiento de programa
+let autores;
+let current_page = 0;
+let totalPages
+let $table = document.querySelector(".table");
+let $template = document.getElementById("crud-template").content;
+let $fragment = document.createDocumentFragment();
+//Fin variables globales
+
 main();
 
 function main() {
 
-  document.addEventListener("DOMContentLoaded", obtenerEditoriales(urlEditorial));
+  document.addEventListener("DOMContentLoaded", obtenerEditorialesPaginada());
 
   //funciones de click de botones
   document.addEventListener("click", async (e) => {
@@ -164,17 +173,46 @@ function main() {
     }
     //Fin VER
 
+    if (e.target.matches("#btn_next")) {
+      if (current_page < (totalPages - 1)) {
+        current_page++;
+        $table.querySelector("tbody").innerHTML = "";
+        obtenerEditorialesPaginada();
+      }
+    }
+  
+    if (e.target.matches("#btn_prev")) {
+      if (current_page > 0) {
+        current_page--;
+        $table.querySelector("tbody").innerHTML = "";
+        obtenerEditorialesPaginada();
+      }
+    }
+
+
   });
   //fin funciones
 };
 
-function obtenerEditoriales() {
+function obtenerEditorialesPaginada() {
   let $table = document.querySelector(".table");
   let $template = document.getElementById("crud-template").content;
   let $fragment = document.createDocumentFragment();
 
-  obtenerJson(urlEditorial).then(editoriales => {
-    editoriales.forEach(editorial => {
+  obtenerJson(urlEditorial+ `paged?page=${current_page}&size=10`).then(response => {
+    totalPages = response.totalPages;
+    current_page = response.pageable.pageNumber
+
+    document.querySelector("#pagActual").textContent = (current_page+1);
+    document.querySelector("#pagTotales").textContent = totalPages;
+
+    let btnPrevio = document.querySelector("#btn_prev");
+    let btnSiguiente = document.querySelector("#btn_next");
+
+    (current_page == 0) ? btnPrevio.setAttribute("disabled", '') : btnPrevio.removeAttribute("disabled");
+    (totalPages == (current_page+1)) ? btnSiguiente.setAttribute("disabled", '') : btnSiguiente.removeAttribute("disabled");
+
+    response.content.forEach(editorial => {
 
       $template.querySelector(".nombre").textContent = editorial.nombre;
       $template.querySelector(".nombre").id = `nombre_${editorial.id}`;
