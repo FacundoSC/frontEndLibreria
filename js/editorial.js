@@ -199,7 +199,27 @@ function obtenerEditorialesPaginada() {
   let $template = document.getElementById("crud-template").content;
   let $fragment = document.createDocumentFragment();
 
+  Swal.fire({
+    title: 'CARGANDO DATOS',
+    html: "<h3>Aguarde por favor</h3><p><img src='../img/nyan-cat.gif'><p>",
+    backdrop: `rgba(0,0,40,0.4)`,
+    showConfirmButton: false
+  })
+
   obtenerJson(urlEditorial+ `paged?page=${current_page}&size=10`).then(response => {
+    let msj
+    if (response.content) {
+      msj = "<h3 style='margin: 0; padding: 1rem'>Petición exitosa! 🥳</h3>"
+    } else {
+      msj = "<h3 style='margin: 0; padding: 1rem'>Algo ha fallado 😭</h3>"
+    }
+    Swal.fire({
+      html: msj,
+      backdrop: `rgba(0,0,40,0.4)`,
+      showConfirmButton: false,
+      timer: 1500
+    })
+
     totalPages = response.totalPages;
     current_page = response.pageable.pageNumber
 
@@ -225,7 +245,6 @@ function obtenerEditorialesPaginada() {
       while ($template.querySelector(".asociados").firstChild) {
         $template.querySelector(".asociados").removeChild($template.querySelector(".asociados").firstChild);
       }
-
       if (editorial.libros.length == 0) {
         let elemento = document.createElement('p')
         elemento.textContent = "NO EXISTEN LIBROS ASOCIADOS";
@@ -276,7 +295,8 @@ function obtenerEditorialesPaginada() {
       $fragment.appendChild($clone);
     });
     $table.querySelector("tbody").appendChild($fragment);
-  });
+  })
+
 }//fin funcion obtener editoriales
 
 //Función ACTIVAR
