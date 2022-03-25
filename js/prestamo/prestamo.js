@@ -5,12 +5,7 @@ import {
   urlDesactivarPrestamo,
   urlPrestamoLocal,
 } from "./PrestamoUris.js";
-import {
-  urlCliente,
-  urlLibro,
-  options,
-  optionsGET,
-} from "../constantes.js";
+import { urlCliente, urlLibro, options, optionsGET } from "../constantes.js";
 
 const d = document,
   $table = d.querySelector("#tablaPrestamos"),
@@ -19,11 +14,13 @@ const d = document,
 
 let libros = [];
 let clientes = [];
-let prestamos = [];
 
-d.addEventListener("DOMContentLoaded", pintarTabla());
+var current_page = 0;
+var prestamosAsPag;
 
-function pintarTabla() {
+d.addEventListener("DOMContentLoaded", pintarTablaPaginada());
+
+/* function pintarTabla() {
   obtenerJson(urlPrestamoLocal).then((prestamoList) => {
     prestamos = prestamoList;
 
@@ -76,7 +73,7 @@ function pintarTabla() {
 
         $template.querySelector(
           ".botoncitoEditar"
-        ).innerHTML = `<button class="btn btn-warning btn-editar-prestamo" data-id="edit_${prestamo.id}"}>Editar</button>`;
+        ).innerHTML = `<button class="btn btn-warning btn-editar-prestamo"  data-id="edit_${prestamo.id}">Editar</button>`;
 
         let $clone = d.importNode($template, true);
         $fragment.appendChild($clone);
@@ -85,6 +82,75 @@ function pintarTabla() {
 
     $table.querySelector("tbody").appendChild($fragment);
   });
+} */
+
+async function pintarTablaPaginada() {
+
+  prestamosAsPag = await obtenerJson(
+    urlPrestamoLocal + `paged?page=${current_page}&size=10`
+  );
+
+  prestamosAsPag.content.forEach((prestamo) => {
+    if (prestamo.alta) {
+      $template.querySelector(".nombreCliente").textContent =
+        prestamo.cliente.nombre + " " + prestamo.cliente.apellido;
+
+      $template.querySelector(
+        ".nombreCliente"
+      ).id = `nombreCliente_${prestamo.id}`;
+
+      $template.querySelector(".documentoCliente").textContent =
+        prestamo.cliente.documento;
+
+      $template.querySelector(
+        ".documentoCliente"
+      ).id = `documentoCliente_${prestamo.id}`;
+
+      $template.querySelector(".libroTomado").textContent =
+        prestamo.libro.titulo;
+
+      $template.querySelector(".libroTomado").id = `libroTomado_${prestamo.id}`;
+
+      $template.querySelector(".fechaPrestamo").textContent = formatDate(
+        prestamo.fechaPrestamo,
+        true
+      );
+
+      $template.querySelector(
+        ".fechaPrestamo"
+      ).id = `fechaPrestamo_${prestamo.id}`;
+
+      $template.querySelector(".fechaDevolucion").textContent = formatDate(
+        prestamo.fechaDevolucion,
+        true
+      );
+
+      $template.querySelector(
+        ".fechaDevolucion"
+      ).id = `fechaDevolucion_${prestamo.id}`;
+
+      $template.querySelector(".rowTable").id = `row_${prestamo.id}`;
+
+      $template.querySelector(
+        ".botoncitoCancelar"
+      ).innerHTML = `<button class="btn btn-danger btn-cancelar-prestamo" data-id="${prestamo.id}"}>Dar de baja</button>`;
+
+      $template.querySelector(
+        ".botoncitoEditar"
+      ).innerHTML = `<button class="btn btn-warning btn-editar-prestamo"  data-id="edit_${prestamo.id}"}>Editar</button>`;
+
+      d.getElementById("pageNumber").innerHTML =
+        "Página número: " +
+        prestamosAsPag.pageable.pageNumber +
+        "/" +
+        prestamosAsPag.totalPages;
+
+      let $clone = d.importNode($template, true);
+      $fragment.appendChild($clone);
+    }
+  });
+
+  $table.querySelector("tbody").appendChild($fragment);
 }
 
 function formatDate(date, isReversed) {
@@ -108,45 +174,41 @@ function formatDate(date, isReversed) {
 }
 
 function crearPrestamo(options) {
-  obtenerJson(urlPrestamoLocal, options).then(
-    (response) => {
+  obtenerJson(urlPrestamoLocal, options).then((response) => {
+    if (response.alta) {
+      $template.querySelector(".nombreCliente").textContent =
+        response.cliente.nombre + " " + response.cliente.apellido;
 
-      if (response.alta) {
-        $template.querySelector(".nombreCliente").textContent =
-          response.cliente.nombre + " " + response.cliente.apellido;
+      $template.querySelector(".documentoCliente").textContent =
+        response.cliente.documento;
 
-        $template.querySelector(".documentoCliente").textContent =
-          response.cliente.documento;
+      $template.querySelector(".libroTomado").textContent =
+        response.libro.titulo;
 
-        $template.querySelector(".libroTomado").textContent =
-          response.libro.titulo;
+      $template.querySelector(".fechaPrestamo").textContent = formatDate(
+        response.fechaPrestamo,
+        true
+      );
 
-        $template.querySelector(".fechaPrestamo").textContent = formatDate(
-          response.fechaPrestamo,
-          true
-        );
+      $template.querySelector(".fechaDevolucion").textContent = formatDate(
+        response.fechaDevolucion,
+        true
+      );
 
-        $template.querySelector(".fechaDevolucion").textContent = formatDate(
-          response.fechaDevolucion,
-          true
-        );
+      let $clone = d.importNode($template, true);
+      $fragment.appendChild($clone);
+      $table.querySelector("tbody").appendChild($fragment);
 
-        let $clone = d.importNode($template, true);
-        $fragment.appendChild($clone);
-        $table.querySelector("tbody").appendChild($fragment);
-
-        return true;
-      } else {
-        return false;
-      }
+      return true;
+    } else {
+      return false;
     }
-  );
+  });
 }
 
 function modificarPrestamo(id, options) {
   obtenerJson(urlPrestamoLocal + id, options)
     .then((response) => {
-
       if (response.alta) {
         d.getElementById("nombreCliente_" + id).innerHTML =
           response.cliente.nombre + " " + response.cliente.apellido;
@@ -163,7 +225,6 @@ function modificarPrestamo(id, options) {
         );
 
         return true;
-
       } else {
         return false;
       }
@@ -258,9 +319,8 @@ d.addEventListener("click", async (e) => {
   }
 
   if (buttonPressed.matches(".btn-editar-prestamo")) {
-    let prestamoEditado = prestamos.find(
-      (prestamito) => "edit_" + prestamito.id == buttonPressed.dataset.id
-    );
+
+    let prestamoEditado = await getPrestamoById(e.target.dataset.id);
 
     let fechaInicActual = formatDate(prestamoEditado.fechaPrestamo, false);
     let fechaDevActual = formatDate(prestamoEditado.fechaDevolucion, false);
@@ -344,14 +404,36 @@ d.addEventListener("click", async (e) => {
     selectClientes.childNodes[posCliente].removeAttribute("selected", "");
     selectLibros.childNodes[posLibro].removeAttribute("selected", "");
   }
+
+  if (e.target.matches("#btn_next")) {
+    if (prestamosAsPag.pageable.pageNumber < prestamosAsPag.totalPages - 1) {
+      current_page++;
+      $table.querySelector("tbody").innerHTML = "";
+      d.getElementById("pageNumber").innerHTML = "";
+      pintarTablaPaginada();
+    }
+  }
+
+  if (e.target.matches("#btn_prev")) {
+    if (prestamosAsPag.pageable.pageNumber > 0) {
+      current_page--;
+      d.getElementById("pageNumber").innerHTML = "";
+      $table.querySelector("tbody").innerHTML = "";
+      pintarTablaPaginada();
+    }
+  }
 });
 
 d.addEventListener("DOMContentLoaded", async function () {
   /** Llenar select de cliente */
 
-  let clientesNoFilter = await obtenerJson(urlCliente);
+  let clientesNoFilter = await obtenerJson(
+    `http://localhost:8085/api/v1/cliente/paged?page=0&size=1000`
+  );
 
-  clientesNoFilter.forEach((cliente) => {
+  console.log(clientesNoFilter);
+
+  clientesNoFilter.content.forEach((cliente) => {
     if (cliente.alta) {
       clientes.push(cliente);
 
@@ -365,9 +447,13 @@ d.addEventListener("DOMContentLoaded", async function () {
 
   /** Llenar select de libro */
 
-  let librosNoFilter = await obtenerJson(urlLibro);
+  let librosNoFilter = await obtenerJson(
+    `http://localhost:8085/api/v1/libro/paged?page=0&size=1000`
+  );
 
-  librosNoFilter.forEach((libro) => {
+  console.log(librosNoFilter);
+
+  librosNoFilter.content.forEach((libro) => {
     if (libro.alta && libro.ejemplaresRestantes > 0) {
       libros.push(libro);
 
@@ -416,3 +502,14 @@ d.addEventListener("scroll", () => {
     elemento.classList.remove("desaparecer");
   }, 1000);
 });
+
+async function getPrestamoById(id){
+
+  let idSplitted = id.split("_");
+
+  let response = await fetch(urlPrestamoLocal + idSplitted[1]);
+  let prestamo = await response.json();
+
+  return prestamo;
+
+}
