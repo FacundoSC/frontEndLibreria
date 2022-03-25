@@ -202,6 +202,7 @@ function obtenerEditorialesPaginada() {
   Swal.fire({
     title: 'CARGANDO DATOS',
     html: "<h3>Aguarde por favor</h3><p><img src='../img/nyan-cat.gif'><p>",
+    width: 500,
     backdrop: `rgba(0,0,40,0.4)`,
     showConfirmButton: false
   })
@@ -209,14 +210,15 @@ function obtenerEditorialesPaginada() {
   obtenerJson(urlEditorial+ `paged?page=${current_page}&size=10`).then(response => {
     let msj
     if (response.content) {
-      msj = "<h3 style='margin: 0; padding: 1rem'>Petición exitosa! 🥳</h3>"
+      msj = "<h3 style='margin: 0; padding: 3rem'>Petición exitosa! 🥳</h3>"
     } else {
-      msj = "<h3 style='margin: 0; padding: 1rem'>Algo ha fallado 😭</h3>"
+      msj = "<h3 style='margin: 0; padding: 3rem'>Algo ha fallado 😭</h3>"
     }
     Swal.fire({
       html: msj,
       backdrop: `rgba(0,0,40,0.4)`,
       showConfirmButton: false,
+      width: 500,
       timer: 1500
     })
 
