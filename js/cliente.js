@@ -280,7 +280,7 @@ function obtenerClientesPaginados() {
         $template.querySelector(".apellido").classList.remove('tachado');
         $template.querySelector(".telefono").classList.remove('tachado');
        
-        $template.querySelector(".estado").classList.remove('tachado');
+       // $template.querySelector(".estado").classList.remove('tachado');
   
         $template.querySelector(".editar").removeAttribute("disabled")
         $template.querySelector(".botonEstado").dataset.id = cliente.id;
@@ -292,8 +292,12 @@ function obtenerClientesPaginados() {
         } else {
           $template.querySelector(".estado").textContent = "Desactivado";
           $template.querySelector(".botonEstado").classList.add('btn-danger');
+          $template.querySelector(".documento").classList.add('tachado');
           $template.querySelector(".nombre").classList.add('tachado');
-          $template.querySelector(".estado").classList.add('tachado');
+          $template.querySelector(".apellido").classList.add('tachado');
+          $template.querySelector(".telefono").classList.add('tachado');
+
+         // $template.querySelector(".estado").classList.add('tachado');
           $template.querySelector(".editar").setAttribute("disabled", '')
         }
           let $clone = document.importNode($template, true);
