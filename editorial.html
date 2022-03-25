@@ -1,58 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-    <link rel="shortcut icon" href="#" type="image/x-icon" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+    <script src="../js/editorial.js" type="module"></script>
+    <script src="../js/utilidades.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="shortcut icon" href="../img/libro.jpg" type="image/x-icon" />
     <title>Editorial</title>
-</head>
+  </head>
 
-<body class="container">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Libreria Rest</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="autor.html">Autor</a>
-                    </li>
+  <body class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Libreria Rest</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="autor.html"
+                >Autor</a
+              >
+            </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="cliente.html">Cliente</a>
-                    </li>
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="cliente.html"
+                >Cliente</a
+              >
+            </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="editorial.html">Editorial</a>
-                    </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="editorial.html"
+                >Editorial</a
+              >
+            </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="libro.html">Libro</a>
-                    </li>
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="libro.html"
+                >Libro</a
+              >
+            </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="prestamo.html">Prestamo</a>
-                    </li>
-                </ul>
-                <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-            </div>
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="prestamo.html"
+                >Prestamo</a
+              >
+            </li>
+          </ul>
+          <div class="d-flex">
+            <input
+              class="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              id="buscar"
+            />
+          </div>
         </div>
+      </div>
     </nav>
 
-</body>
+    <div>
+      <button class="btn btn-primary crear" id="crear">CREAR EDITORIAL</button>
+    </div>
 
+    <table class="table table-dark table-striped" id="tabla">
+      <thead>
+        <tr>
+          <th scope="col">Nombre</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Libros asociados</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tableAutores"></tbody>
+    </table>
+
+    <template id="crud-template">
+      <tr>
+        <td class="nombre align-middle"></td>
+        <td class="estado align-middle"></td>
+        <td class="asociados align-middle"></td>
+        <td>
+          <button class="btn btn-warning editar"></button>
+          <button class="botonEstado btn"></button>
+          <button class="btn btn-info ver"></button>
+        </td>
+      </tr>
+    </template>
+    <!-- Botones de cambio de pagina -->
+    <div class="d-flex justify-content-center align-items-center mt-3 mb-3">
+        <button type="button" class="btn btn-light btn-page me-2 ms-1" id="btn_prev">
+          < <
+        </button>
+        <p class="infoPagina me-1 ms-1">
+          PÁGINA <span id="pagActual">--</span> DE
+          <span id="pagTotales">--</span>
+        </p>
+        <button type="button" class="btn btn-light btn-page me-1 ms-2" id="btn_next">
+          > >
+        </button>
+    </div>
+    <!-- Fin botones de cambio de pagina -->
+    <div class="d-flex align-items-center justify-content-center mt-2 mb-2">
+      <p>--Made with 💕 by JAVADABADU ☕--</p>
+    </div>
+  </body>
 </html>
