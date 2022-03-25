@@ -1,72 +1,20 @@
 import { options, urlCliente, urlDesactivar, urlActivar, footerModal, footerModalFormulario } from "./constantes.js";
 import { obtenerJson } from "./asincronico.js";
 
+let clientes;
+let current_page = 0;
+let totalPages
+
 const d = document,
   $table = d.querySelector(".table"),
   $template = d.getElementById("crud-template").content,
   $fragment = d.createDocumentFragment();
 
-function obtenerClientes() {
-  obtenerJson(urlCliente).then(clientes => {
-    clientes.forEach(cliente => {
-      $template.querySelector(".documento").textContent = cliente.documento;
-      $template.querySelector(".documento").id = `documento_${cliente.id}`;
-      $template.querySelector(".nombre").textContent = cliente.nombre;
-      $template.querySelector(".nombre").id = `nombre_${cliente.id}`;
-      $template.querySelector(".apellido").textContent = cliente.apellido;
-      $template.querySelector(".apellido").id = `apellido_${cliente.id}`;
-      $template.querySelector(".telefono").textContent = cliente.telefono;
-      $template.querySelector(".telefono").id = `telefono_${cliente.id}`;
-     
-      $template.querySelector(".estado").textContent = cliente.alta;
-      $template.querySelector(".estado").id = `estado_${cliente.id}`;
-      $template.querySelector(".editar").dataset.id = `${cliente.id}`;
-      $template.querySelector(".editar").id = `editar_${cliente.id}`;
 
-      $template.querySelector(".ver").dataset.documento = cliente.documento;
-      $template.querySelector(".ver").dataset.nombre = cliente.nombre;
-      $template.querySelector(".ver").dataset.apellido = cliente.apellido;
-      $template.querySelector(".ver").dataset.telefono = cliente.telefono;
-   
-      $template.querySelector(".botonEstado").id = `botonEstado_${cliente.id}`;
-      $template.querySelector(".botonEstado").classList.remove('btn-success');
-      $template.querySelector(".botonEstado").classList.remove('btn-danger');
-      $template.querySelector(".botonEstado").dataset.nombre = cliente.nombre;
-
-      $template.querySelector(".documento").classList.remove('tachado');
-      $template.querySelector(".nombre").classList.remove('tachado');
-      $template.querySelector(".apellido").classList.remove('tachado');
-      $template.querySelector(".telefono").classList.remove('tachado');
-     
-      $template.querySelector(".estado").classList.remove('tachado');
-
-      $template.querySelector(".editar").removeAttribute("disabled")
-      $template.querySelector(".botonEstado").dataset.id = cliente.id;
-      $template.querySelector(".botonEstado").dataset.estado = cliente.alta;
-
-      if (cliente.alta) {
-        $template.querySelector(".botonEstado").classList.add('btn-success');
-        $template.querySelector(".estado").textContent = "Activado";
-      } else {
-        $template.querySelector(".estado").textContent = "Desactivado";
-        $template.querySelector(".botonEstado").classList.add('btn-danger');
-        $template.querySelector(".nombre").classList.add('tachado');
-        $template.querySelector(".estado").classList.add('tachado');
-        $template.querySelector(".editar").setAttribute("disabled", '')
-      }
-
-      let $clone = d.importNode($template, true);
-      $fragment.appendChild($clone);
-    });
-    $table.querySelector("tbody").appendChild($fragment);
-  });
-}
-d.addEventListener("DOMContentLoaded", obtenerClientes());
-
-function activarCliente(urlCliente, index) {
-  obtenerJson(urlCliente + index).then(response => {
+function activarCliente(id) {
+  obtenerJson(urlCliente + urlActivar + id).then(response => {
     {
-      let btn = d.querySelector("#botonEstado_" + index)
+      let btn = d.querySelector("#botonEstado_" + id)
       btn.classList.remove("btn-danger")
       btn.classList.add("btn-success")
       btn.dataset.estado = "true";
@@ -75,15 +23,15 @@ function activarCliente(urlCliente, index) {
       btn.parentNode.parentNode.children[1].classList.remove("tachado")
       btn.parentNode.parentNode.children[2].classList.remove("tachado")
       btn.parentNode.parentNode.children[3].classList.remove("tachado")
-      d.getElementById("estado_" + index).innerHTML = "Activado";
+      d.getElementById("estado_" + id).innerHTML = "Activado";
     }
   });
 }
 
-function desactivarCliente(urlCiente, index) {
-  obtenerJson(urlCliente + index).then(response => {
+function desactivarCliente(id) {
+  obtenerJson(urlCliente + urlDesactivar + id).then(response => {
     {
-      let btn = d.querySelector("#botonEstado_" + index)
+      let btn = d.querySelector("#botonEstado_" + id)
       btn.classList.remove("btn-success")
       btn.classList.add("btn-danger")
       btn.dataset.estado = "false";
@@ -93,7 +41,7 @@ function desactivarCliente(urlCiente, index) {
       btn.parentNode.parentNode.children[2].classList.add("tachado")
       btn.parentNode.parentNode.children[3].classList.add("tachado")
 
-      d.getElementById("estado_" + index).innerHTML = "Desactivado";
+      d.getElementById("estado_" + id).innerHTML = "Desactivado";
     }
   });
 }
@@ -103,9 +51,9 @@ d.addEventListener("click", async (e) => {
 
   if (e.target.matches(".botonEstado")) {
     if (btn.dataset.estado == 'true') {
-      desactivarCliente(urlCliente + urlDesactivar, btn.dataset.id);
+      desactivarCliente(btn.dataset.id);
     } else {
-      activarCliente(urlCliente + urlActivar, btn.dataset.id);
+      activarCliente(btn.dataset.id);
     }
   }
 });
@@ -218,6 +166,7 @@ function modificarCliente(urlCliente, id, options) {
     d.getElementById("nombre_" + id).innerHTML = response.nombre;
     d.getElementById("apellido_" + id).innerHTML = response.apellido;
     d.getElementById("telefono_" + id).innerHTML = response.telefono;
+    
    
     let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
     listadoBotones.children[1].dataset.nombre = response.nombre;
@@ -236,6 +185,7 @@ d.addEventListener("click", async (e) => {
     let apellido = d.getElementById("apellido_"+id).textContent;
     let telefono = d.getElementById("telefono_"+id).textContent;
     
+    
     Swal.fire({
       title: 'Ingrese los datos a modificar : ',
       html:
@@ -249,14 +199,17 @@ d.addEventListener("click", async (e) => {
       confirmButtonText: 'Guardar 💾',
       focusConfirm: false,
       preConfirm: () => {
-        let documento, nombre, apellido, telefono, username, password, roleId;
+        let documento, nombre, apellido, telefono,roleId, username, password;
         documento = Swal.getPopup().querySelector('#documento').value;
         nombre = Swal.getPopup().querySelector(`#nombre`).value;
         apellido = Swal.getPopup().querySelector('#apellido').value;
         telefono = Swal.getPopup().querySelector(`#telefono`).value;
       
         roleId=2;
-        return { documento, nombre, apellido, telefono, username, password, roleId };
+       username="js@js.com";
+       password="123";
+
+        return { documento, nombre, apellido, telefono, roleId, username, password };
       }
     }).then((result) => {
       if (result.isConfirmed) {
@@ -281,3 +234,92 @@ d.addEventListener("click", async (e) => {
 
 });
 
+
+function obtenerClientesPaginados() {
+  
+  obtenerJson(urlCliente + `paged?page=${current_page}&size=10`).then(response =>{
+      totalPages = response.totalPages;
+      current_page = response.pageable.pageNumber
+
+      document.querySelector("#pagActual").textContent = (current_page+1);
+      document.querySelector("#pagTotales").textContent = totalPages;
+
+      let btnPrevio = document.querySelector("#btn_prev");
+      let btnSiguiente = document.querySelector("#btn_next");
+
+      (current_page == 0) ? btnPrevio.setAttribute("disabled", '') : btnPrevio.removeAttribute("disabled");
+      (totalPages == (current_page+1)) ? btnSiguiente.setAttribute("disabled", '') : btnSiguiente.removeAttribute("disabled");
+      
+      response.content.forEach(cliente => {
+        $template.querySelector(".documento").textContent = cliente.documento;
+        $template.querySelector(".documento").id = `documento_${cliente.id}`;
+        $template.querySelector(".nombre").textContent = cliente.nombre;
+        $template.querySelector(".nombre").id = `nombre_${cliente.id}`;
+        $template.querySelector(".apellido").textContent = cliente.apellido;
+        $template.querySelector(".apellido").id = `apellido_${cliente.id}`;
+        $template.querySelector(".telefono").textContent = cliente.telefono;
+        $template.querySelector(".telefono").id = `telefono_${cliente.id}`;
+       
+        $template.querySelector(".estado").textContent = cliente.alta;
+        $template.querySelector(".estado").id = `estado_${cliente.id}`;
+        $template.querySelector(".editar").dataset.id = `${cliente.id}`;
+        $template.querySelector(".editar").id = `editar_${cliente.id}`;
+  
+        $template.querySelector(".ver").dataset.documento = cliente.documento;
+        $template.querySelector(".ver").dataset.nombre = cliente.nombre;
+        $template.querySelector(".ver").dataset.apellido = cliente.apellido;
+        $template.querySelector(".ver").dataset.telefono = cliente.telefono;
+     
+        $template.querySelector(".botonEstado").id = `botonEstado_${cliente.id}`;
+        $template.querySelector(".botonEstado").classList.remove('btn-success');
+        $template.querySelector(".botonEstado").classList.remove('btn-danger');
+        $template.querySelector(".botonEstado").dataset.nombre = cliente.nombre;
+  
+        $template.querySelector(".documento").classList.remove('tachado');
+        $template.querySelector(".nombre").classList.remove('tachado');
+        $template.querySelector(".apellido").classList.remove('tachado');
+        $template.querySelector(".telefono").classList.remove('tachado');
+       
+        $template.querySelector(".estado").classList.remove('tachado');
+  
+        $template.querySelector(".editar").removeAttribute("disabled")
+        $template.querySelector(".botonEstado").dataset.id = cliente.id;
+        $template.querySelector(".botonEstado").dataset.estado = cliente.alta;
+  
+        if (cliente.alta) {
+          $template.querySelector(".botonEstado").classList.add('btn-success');
+          $template.querySelector(".estado").textContent = "Activado";
+        } else {
+          $template.querySelector(".estado").textContent = "Desactivado";
+          $template.querySelector(".botonEstado").classList.add('btn-danger');
+          $template.querySelector(".nombre").classList.add('tachado');
+          $template.querySelector(".estado").classList.add('tachado');
+          $template.querySelector(".editar").setAttribute("disabled", '')
+        }
+          let $clone = document.importNode($template, true);
+          $fragment.appendChild($clone);
+      });
+      $table.querySelector("tbody").appendChild($fragment);
+  })
+}
+
+d.addEventListener("DOMContentLoaded", obtenerClientesPaginados()); 
+ 
+d.addEventListener("click", async (e) => {
+if (e.target.matches("#btn_next")) {
+  if (current_page < (totalPages - 1)) {
+    current_page++;
+    $table.querySelector("tbody").innerHTML = "";
+    obtenerClientesPaginados();
+  }
+}
+
+if (e.target.matches("#btn_prev")) {
+  if (current_page > 0) {
+    current_page--;
+    $table.querySelector("tbody").innerHTML = "";
+    obtenerClientesPaginados();
+  }
+}
+});
+ 
