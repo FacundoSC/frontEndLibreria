@@ -2,7 +2,6 @@ import { options, urlEditorial, urlDesactivar, urlActivar } from "./constantes.j
 import { obtenerJson } from "./asincronico.js";
 
 //Variables globales para funcionamiento de programa
-let autores;
 let current_page = 0;
 let totalPages
 let $table = document.querySelector(".table");
@@ -174,31 +173,21 @@ function main() {
     //Fin VER
 
     if (e.target.matches("#btn_next")) {
-      if (current_page < (totalPages - 1)) {
         current_page++;
         $table.querySelector("tbody").innerHTML = "";
         obtenerEditorialesPaginada();
-      }
     }
   
     if (e.target.matches("#btn_prev")) {
-      if (current_page > 0) {
         current_page--;
         $table.querySelector("tbody").innerHTML = "";
         obtenerEditorialesPaginada();
-      }
     }
-
-
   });
   //fin funciones
 };
 
 function obtenerEditorialesPaginada() {
-  let $table = document.querySelector(".table");
-  let $template = document.getElementById("crud-template").content;
-  let $fragment = document.createDocumentFragment();
-
   Swal.fire({
     title: 'CARGANDO DATOS',
     html: "<h3>Aguarde por favor</h3><p><img src='../img/nyan-cat.gif'><p>",
@@ -244,9 +233,7 @@ function obtenerEditorialesPaginada() {
       $template.querySelector(".estado").classList.remove('tachado');
 
       //logica para adicion de libros en select
-      while ($template.querySelector(".asociados").firstChild) {
-        $template.querySelector(".asociados").removeChild($template.querySelector(".asociados").firstChild);
-      }
+      $template.querySelector(".asociados").innerHTML = ""; //Remueve los hijos
       if (editorial.libros.length == 0) {
         let elemento = document.createElement('p')
         elemento.textContent = "NO EXISTEN LIBROS ASOCIADOS";
