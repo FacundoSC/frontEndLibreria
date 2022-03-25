@@ -112,25 +112,20 @@
       </tr>
     </template>
 
-    <div class="d-flex">
-      <div class="contenedor-botones col-3">
-        <button type="button" class="btn btn-light btn-page me-2" id="btn_prev">
-          < <
-        </button>
-        <button type="button" class="btn btn-light btn-page" id="btn_next">
-          > >
-        </button>
-      </div>
-      <div
-        class="contenedor-num-pag col-8 d-flex align-items-center justify-content-end"
-      >
-        <p class="infoPagina">
-          PÁGINA <span id="pagActual">--</span> DE
-          <span id="pagTotales">--</span>
-        </p>
-      </div>
-      <div class="col-1"></div>
-    </div>
+    <!-- Botones de cambio de pagina -->
+    <div class="d-flex justify-content-center align-items-center mt-3 mb-3">
+      <button type="button" class="btn btn-light btn-page me-2 ms-1" id="btn_prev">
+        < <
+      </button>
+      <p class="infoPagina me-1 ms-1">
+        PÁGINA <span id="pagActual">--</span> DE
+        <span id="pagTotales">--</span>
+      </p>
+      <button type="button" class="btn btn-light btn-page me-1 ms-2" id="btn_next">
+        > >
+      </button>
+  </div>
+  <!-- Fin botones de cambio de pagina -->
     <div class="d-flex align-items-center justify-content-center mt-2 mb-2">
       <p>--Made with 💕 by JAVADABADU ☕--</p>
     </div>
