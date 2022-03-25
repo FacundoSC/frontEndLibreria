@@ -1,9 +1,25 @@
 body{
   background-color: lightblue;
 }
+
+
+.nav-link{
+  color: white !important;
+  transition: all 0.3s ease-in-out;
+}
+
+.nav-link:hover{
+  scale: 1.15;
+  color: rgb(103, 191, 221) !important;
+}
+
+.active{
+  color: rgb(103, 191, 221) !important;
+  font-weight: bold;
+}
+
 .tachado {
   text-decoration: line-through;
-  color: red;
   color: rgba(255, 255, 255, 0.7);
 }
 
@@ -55,4 +71,27 @@ body{
 
 .asociados select{
   width: 15rem;
+}
+
+p{
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.btn-page{
+  font-weight: bold;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-page:hover{
+  scale: 1.1;
+}
+
+.contenedor-num-pag p{
+  margin: 0;
+}
+
+.infoPagina{
+  color: rgba(0, 0, 0, 0.65);
 }
