@@ -4,10 +4,65 @@ import { options, urlActivar, urlAutor,urlEditorial, urlDesactivar, urlLibro } f
 
 
 const d = document,
-  $table = d.querySelector(".table"),
-  $template = d.getElementById("crud-templateLibro").content,
-  $fragment = d.createDocumentFragment();
+$table = d.querySelector(".table"),
+$template = d.getElementById("crud-templateLibro").content,
+$fragment = d.createDocumentFragment();
+var current_page = 0;
+var objJson;
 
+  async function obtenerLibrosPaginados() {
+    let $table = document.querySelector(".table");
+    let $template = document.getElementById("crud-templateLibro").content;
+    let $fragment = document.createDocumentFragment();
+  
+    //let {content, totalPages } = await obtenerJson2(urlAutor + `paged?page=${current_page}&size=10`);
+  
+    var response = await fetch(urlLibro + `paged?page=${current_page}&size=10`);
+    objJson = await response.json();
+  
+    objJson.content.forEach((libro) => {
+      $template.querySelector(".titulo").textContent = libro.titulo;
+      $template.querySelector(".titulo").id = `titulo_${libro.id}`;
+      $template.querySelector(".isbn").textContent = libro.isbn;
+      $template.querySelector(".isbn").id = `isbn_${libro.id}`;
+      $template.querySelector(".ejemplaresRestantes").textContent = libro.ejemplaresRestantes;
+      $template.querySelector(".ejemplaresRestantes").id = `ejemplaresRestantes_${libro.id}`;
+      $template.querySelector(".estado").textContent = libro.alta;
+      $template.querySelector(".estado").id = `estado_${libro.id}`;
+  
+      $template.querySelector(".editar").dataset.id = `${libro.id}`;
+      $template.querySelector(".editar").id = `editar_${libro.id}`;
+      $template.querySelector(".ver").dataset.titulo = libro.titulo;
+      $template.querySelector(".ver").dataset.isbn = libro.isbn;
+      $template.querySelector(".ver").dataset.anio = libro.anio;
+      $template.querySelector(".ver").dataset.ejemplares = libro.ejemplares;
+      $template.querySelector(".ver").dataset.ejemplaresPrestados = libro.ejemplaresPrestados;
+      $template.querySelector(".ver").dataset.ejemplaresRestantes = libro.ejemplaresRestantes;
+      $template.querySelector(".ver").dataset.autorNombre = libro.autorNombre;
+      $template.querySelector(".ver").dataset.editorialNombre = libro.editorialNombre;
+  
+      $template.querySelector(".botonEstado").id = `botonEstado_${libro.id}`;
+      $template.querySelector(".botonEstado").classList.remove('btn-success');
+      $template.querySelector(".botonEstado").classList.remove('btn-danger');
+      $template.querySelector(".botonEstado").dataset.titulo = libro.titulo;
+      $template.querySelector(".titulo").classList.remove('tachado');
+      $template.querySelector(".estado").classList.remove('tachado');
+      $template.querySelector(".editar").removeAttribute("disabled")
+      $template.querySelector(".botonEstado").dataset.id = libro.id;
+      $template.querySelector(".botonEstado").dataset.estado = libro.alta;
+      if (libro.alta) {
+        $template.querySelector(".botonEstado").classList.add('btn-success');
+      } else {
+        $template.querySelector(".botonEstado").classList.add('btn-danger');
+        $template.querySelector(".titulo").classList.add('tachado');
+        $template.querySelector(".estado").classList.add('tachado');
+        $template.querySelector(".editar").setAttribute("disabled", '')
+      }
+      let $clone = d.importNode($template, true);
+      $fragment.appendChild($clone);
+    });
+    $table.querySelector("tbody").appendChild($fragment);
+  };
 function obtenerLibros() {
     obtenerJson(urlLibro).then(libros => {
         console.table(libros)
@@ -58,7 +113,8 @@ function obtenerLibros() {
       $table.querySelector("tbody").appendChild($fragment);
     });
 };
-d.addEventListener("DOMContentLoaded", obtenerLibros());
+//d.addEventListener("DOMContentLoaded", obtenerLibros());
+d.addEventListener("DOMContentLoaded", obtenerLibrosPaginados());
 async function obtenerAutores() {
       return await   obtenerJson(urlAutor)
 };
@@ -240,6 +296,22 @@ d.addEventListener("click", async (e) => {
       // //   Swal.fire('Se ha cancelado la operación', '', 'warning')
       // }
     })
+    
+ if (e.target.matches("#btn_next")) {
+  if (objJson.pageable.pageNumber < objJson.totalPages - 1) {
+    current_page++;
+    $table.querySelector("tbody").innerHTML = "";
+    obtenerLibrosPaginados();
+  }
+}
+
+if (e.target.matches("#btn_prev")) {
+  if (objJson.pageable.pageNumber > 0) {
+    current_page--;
+    $table.querySelector("tbody").innerHTML = "";
+    obtenerLibrosPaginados();
+  }
+}
   }
 
   if (e.target.matches(".editar")) {
@@ -371,6 +443,22 @@ d.addEventListener("click", async (e) => {
       </p>`
     })
   }
+  
+ if (e.target.matches("#btn_next")) {
+  if (objJson.pageable.pageNumber < objJson.totalPages - 1) {
+    current_page++;
+    $table.querySelector("tbody").innerHTML = "";
+    obtenerLibrosPaginados();
+  }
+}
+
+if (e.target.matches("#btn_prev")) {
+  if (objJson.pageable.pageNumber > 0) {
+    current_page--;
+    $table.querySelector("tbody").innerHTML = "";
+    obtenerLibrosPaginados();
+  }
+}
 
 });
 
