@@ -1,13 +1,8 @@
 import { options, urlEditorial} from "./constantes.js";
-import { obtenerJson } from "./asincronico.js";
 import * as utilidades from './utilidades.js';
 
-//Variables globales para funcionamiento de programa
 let current_page = 0;
-// let totalPages
 let $table = document.querySelector(".table");
-// let $template = document.getElementById("crud-template").content;
-// let $fragment = document.createDocumentFragment();
 //Fin variables globales
 
 main();
@@ -163,80 +158,3 @@ function main() {
   });
   //fin funciones
 };
-
-// function obtenerEditorialesPaginada() {
-//   utilidades.modalCargaDatos()
-//   obtenerJson(urlEditorial + `paged?page=${current_page}&size=10`).then(response => {
-//     utilidades.modalMostrarResultado(response.content);
-//     utilidades.seteoPaginas(response);
-//     utilidades.pintarResultado(response.content, "editorial");
-//   })
-// }//fin funcion obtener editoriales
-
-
-///Función CREAR EDITORIAL
-// function crearEditorial(url, options) {
-//   obtenerJson(url, options).then(response => {
-//     if (!response.message) {
-//       // let id = response.id
-//       // let nombre = response.nombre
-//       // let alta = response.alta
-
-//       // $template.querySelector(".nombre").textContent = nombre;
-//       // $template.querySelector(".nombre").id = `nombre_${id}`;
-//       // $template.querySelector(".nombre").classList.remove('tachado');
-
-//       // $template.querySelector(".estado").classList.remove('tachado');
-//       // $template.querySelector(".estado").textContent = "Activado";
-//       // $template.querySelector(".estado").id = `estado_${id}`;
-
-//       // //logica para adicion de libros en select
-//       // $template.querySelector(".asociados").innerHTML = ""; //Remueve los hijos
-//       // let elemento = document.createElement('p')
-//       // elemento.textContent = "NO EXISTEN LIBROS ASOCIADOS";
-//       // $template.querySelector(".asociados").appendChild(elemento)
-//       // $template.querySelector(".asociados").id = `asociados_${id}`
-
-//       // $template.querySelector(".editar").dataset.id = `${id}`;
-//       // $template.querySelector(".editar").id = `editar_${id}`;
-
-//       // $template.querySelector(".botonEstado").id = `botonEstado_${id}`;
-//       // $template.querySelector(".botonEstado").dataset.nombre = nombre;
-//       // $template.querySelector(".botonEstado").dataset.id = id;
-//       // $template.querySelector(".botonEstado").dataset.estado = alta;
-//       // $template.querySelector(".botonEstado").classList.remove('btn-danger');
-//       // $template.querySelector(".botonEstado").classList.add('btn-success');
-
-//       // $template.querySelector(".ver").dataset.nombre = nombre;
-//       // $template.querySelector(".ver").id = `ver_${id}`;
-
-//       // let $clone = document.importNode($template, true);
-//       // $fragment.appendChild($clone);
-//       // $table.querySelector("tbody").appendChild($fragment);
-//       utilidades.modalCrear();
-//     }
-//     else {
-//       return Promise.reject(response);
-//     }
-//   }).catch(badResponse => {
-//     utilidades.modalError(badResponse.message)
-//   });
-// }
-//Fin CREAR EDITORIAL
-
-//Función EDITAR
-
-// function modificarEditorial(id, options) {
-//   obtenerJson(urlEditorial + id, options).then(response => {
-//     if (!response.message) {
-//       utilidades.modificarInfo(response, id)
-//       utilidades.modalModificar()
-//     }
-//     else {
-//       return Promise.reject(response);
-//     }
-//   }).catch(badResponse => {
-//     utilidades.modalError(badResponse.message)
-//   });
-// }
-//Fin EDITAR
