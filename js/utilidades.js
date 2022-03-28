@@ -33,16 +33,12 @@ export function modalConfirmacionCambioEstado(estado, index) {
   Swal.fire(`El estado de la editorial <b>${nombre}</b> ha sido modificado a: <b>${estado}</b>.`, '', 'success')
 }
 
-export function modalModificar() {
-  Swal.fire(`Se ha modificado con éxito!`, '', 'success')
+export function modalExito() {
+  Swal.fire(`Se ha guardado correctamente!`, '', 'success')
 }
 
 export function modalError(msj) {
   Swal.fire(msj, '', 'error')
-}
-
-export function modalCrear() {
-  Swal.fire(`Se ha creado con éxito!`, '', 'success')
 }
 
 async function modalPedirConfirmacion() {
@@ -248,7 +244,7 @@ export function cambiarEstado(url, id) {
 export function crearEntidad(url, options){
   obtenerJson(url, options).then(response => {
     if (!response.message) {
-      modalCrear();
+      modalExito();
     }
     else {
       return Promise.reject(response);
@@ -262,7 +258,7 @@ export function modificarEntidad(url, id, options){
   obtenerJson(url+id, options).then(response => {
     if (!response.message) {
       modificarInfo(response, id)
-      modalModificar()
+      modalExito()
     }
     else {
       return Promise.reject(response);
