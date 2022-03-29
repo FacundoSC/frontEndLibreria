@@ -189,8 +189,21 @@ function main() {
     );
   }
 
+  function getActualDate() {
+    let todayDate = new Date();
+    todayDate =
+      todayDate.getFullYear() +
+      "-" +
+      ("0" + (todayDate.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + todayDate.getDate()).slice(-2);
+
+    return todayDate;
+  }
+
   d.addEventListener("click", async (e) => {
     let buttonPressed = e.target;
+    let todayDate = getActualDate();
 
     if (buttonPressed.matches(".btn-cancelar-prestamo")) {
       Swal.fire({
@@ -220,13 +233,18 @@ function main() {
     if (buttonPressed.matches(".crear")) {
       Swal.fire({
         title: "Crear nuevo prestamo ",
+        showDenyButton: true,
+        confirmButtonText: "Crear prestamo",
+        denyButtonText: `Volver atrás`,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
         html:
           `Elige un cliente ${
             d.querySelector("#divClientes").innerHTML
           } </br>` +
           `Elige un libro ${d.querySelector("#divLibros").innerHTML} </br>` +
-          `Fecha inicio <input required type=date id="swal-input3" class="swal2-input"> </br>` +
-          `Fecha fin <input required type=date id="swal-input4" class="swal2-input"> </br>`,
+          `Fecha inicio <input required min="${todayDate}" type=date id="swal-input3" class="swal2-input"> </br>` +
+          `Fecha fin <input required min="${todayDate}" type=date id="swal-input4" class="swal2-input"> </br>`,
 
         preConfirm: () => {
           const libro = Swal.getPopup().querySelector("#selectLibros").value;
@@ -245,31 +263,33 @@ function main() {
           };
         },
       }).then((result) => {
-        let libro = getLibroByTitulo(result.value.libro);
-        let cliente = getClienteByName(result.value.cliente);
+        if (result.isConfirmed) {
+          let libro = getLibroByTitulo(result.value.libro);
+          let cliente = getClienteByName(result.value.cliente);
 
-        options.method = "POST";
+          options.method = "POST";
 
-        options.body = JSON.stringify({
-          dniCliente: cliente.documento,
-          fechaPrestamo: result.value.fechaPrestamo,
-          fechaDevolucion: result.value.fechaDevolucion,
-          tituloLibro: libro.titulo,
-          isbn: libro.isbn,
-        });
+          options.body = JSON.stringify({
+            dniCliente: cliente.documento,
+            fechaPrestamo: result.value.fechaPrestamo,
+            fechaDevolucion: result.value.fechaDevolucion,
+            tituloLibro: libro.titulo,
+            isbn: libro.isbn,
+          });
 
-        crearPrestamo(options);
+          crearPrestamo(options);
 
-        Swal.fire(
-          `Se ha creado exitosamente el prestamo del libro: <b>${
-            libro.titulo
-          }</b> </br>
-              A cargo del cliente: <b>${
-                cliente.nombre + " " + cliente.apellido
-              }</b> `,
-          "",
-          "success"
-        );
+          Swal.fire(
+            `Se ha creado exitosamente el prestamo del libro: <b>${
+              libro.titulo
+            }</b> </br>
+                A cargo del cliente: <b>${
+                  cliente.nombre + " " + cliente.apellido
+                }</b> `,
+            "",
+            "success"
+          );
+        }
       });
     }
 
@@ -301,12 +321,13 @@ function main() {
 
       Swal.fire({
         title: "Datos del prestamo actuales",
+        confirmButtonText: "Modificar prestamo",
         showDenyButton: true,
         denyButtonText: `No, volver atrás`,
         html:
           `Libro elegido: ${selectLibros.outerHTML} </br>` +
           `Cliente a cargo: ${selectClientes.outerHTML} </br>` +
-          `Fecha de inicio: <input value=${fechaInicActual} id="swal-input3" type=date class="swal2-input"> </br>` +
+          `Fecha de inicio: <input value=${fechaInicActual}  id="swal-input3" type=date  class="swal2-input"> </br>` +
           `Fecha de devolución: <input value=${fechaDevActual} id="swal-input4" type=date class="swal2-input"> </br>`,
 
         preConfirm: () => {
@@ -352,7 +373,7 @@ function main() {
             "",
             "success"
           );
-        } else Swal.fire("No se han realizado cambios.", "", "info");
+        }
       });
 
       selectClientes.childNodes[posCliente].removeAttribute("selected", "");
@@ -381,13 +402,11 @@ function main() {
     console.log(clientes);
 
     clientes.body.forEach((cliente) => {
+      let optionCliente = d.createElement("option");
+      optionCliente.value = cliente.nombre + " " + cliente.apellido;
+      optionCliente.innerHTML = cliente.nombre + " " + cliente.apellido;
 
-        let optionCliente = d.createElement("option");
-        optionCliente.value = cliente.nombre + " " + cliente.apellido;
-        optionCliente.innerHTML = cliente.nombre + " " + cliente.apellido;
-
-        d.querySelector("#selectClientes").appendChild(optionCliente);
-      
+      d.querySelector("#selectClientes").appendChild(optionCliente);
     });
 
     /** Llenar select de libro */
@@ -414,11 +433,27 @@ function main() {
     obtenerJson(urlDesactivarPrestamo + index).then((response) => {
       console.log(response);
       if (response.status == 200) {
-        console.log("hola status");
+        updateDevolutionDate(index);
         return new Boolean(true);
       } else {
         return false;
       }
+    });
+  }
+
+  function updateDevolutionDate(prestamoId) {
+    let prestamoCancelado = getPrestamoById(prestamoId);
+
+    options.method = "PUT";
+    options.body = JSON.stringify({
+      dniCliente: prestamoCancelado.dniCliente,
+      fechaPrestamo: prestamoCancelado.fechaPrestamo,
+      fechaDevolucion: getActualDate(),
+    });
+
+    obtenerJson(urlPrestamoLocal + prestamoId, options).then((response) => {
+      console.log("Entre al update de desactivar");
+      console.log(response);
     });
   }
 
