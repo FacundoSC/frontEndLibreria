@@ -233,47 +233,6 @@ function obtenerAutores(urlAutor) {
     });
 }
 
-async function obtenerAutoresPaginados() {
-  let $table = document.querySelector(".table");
-  let $template = document.getElementById("crud-template").content;
-  let $fragment = document.createDocumentFragment();
-
-  //let {content, totalPages } = await obtenerJson2(urlAutor + `paged?page=${current_page}&size=10`);
-
-  var response = await fetch(urlAutor + `paged?page=${current_page}&size=10`);
-  objJson = await response.json();
-
-  objJson.content.forEach((autor) => {
-    $template.querySelector(".nombre").textContent = autor.nombre;
-    $template.querySelector(".nombre").id = `nombre_${autor.id}`;
-    $template.querySelector(".estado").textContent = autor.alta;
-    $template.querySelector(".estado").id = `estado_${autor.id}`;
-    $template.querySelector(".editar").dataset.id = `${autor.id}`;
-    $template.querySelector(".editar").id = `editar_${autor.id}`;
-    $template.querySelector(".ver").dataset.nombre = autor.nombre;
-    $template.querySelector(".botonEstado").id = `botonEstado_${autor.id}`;
-    $template.querySelector(".botonEstado").classList.remove("btn-success");
-    $template.querySelector(".botonEstado").classList.remove("btn-danger");
-    $template.querySelector(".botonEstado").dataset.nombre = autor.nombre;
-    $template.querySelector(".nombre").classList.remove("tachado");
-    $template.querySelector(".estado").classList.remove("tachado");
-    $template.querySelector(".editar").removeAttribute("disabled");
-    $template.querySelector(".botonEstado").dataset.id = autor.id;
-    $template.querySelector(".botonEstado").dataset.estado = autor.alta;
-    if (autor.alta) {
-      $template.querySelector(".botonEstado").classList.add("btn-success");
-    } else {
-      $template.querySelector(".botonEstado").classList.add("btn-danger");
-      $template.querySelector(".nombre").classList.add("tachado");
-      $template.querySelector(".estado").classList.add("tachado");
-      $template.querySelector(".editar").setAttribute("disabled", "");
-    }
-    let $clone = document.importNode($template, true);
-    $fragment.appendChild($clone);
-  });
-
-  $table.querySelector("tbody").appendChild($fragment);
-}
 
 function activarAutor(urlAutor, index) {
     obtenerJson(urlAutor + index).then(response => {
