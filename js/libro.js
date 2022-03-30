@@ -46,12 +46,12 @@ d.addEventListener("click", async (e) => {
       Swal.fire({
         title: 'Crear Libro:',
         html: `
-          <p>Titulo: <input id="titulo"  value= "" type="text" class="swal2-input" placeholder="Titulo Libro"></p>
-          <p>Año: <input id="anio"  value= "" type="text"  class="swal2-input" placeholder="Año publicacion"></p>
-          <p>ISBN: <input  id="isbn"  value= "" type="text"  class="swal2-input" placeholder="Isbn"></p>
-          <p>Ejemplares: <input  id="ejemplares" value= "" type="text"  class="swal2-input" placeholder="Ejemplares Totales"></p>
-          <p>Prestados: <input  id="ejemplaresPrestados" value= "" type="text"  class="swal2-input" placeholder="Ejemplares Prestados"></p>
-          <p>En Stock: <input  id="ejemplaresRestantes" value= "" type="text"  class="swal2-input" placeholder="Ejemplares Restantes"></p>
+          <p>Titulo: <input id="titulo"  value= "" type="text" class="swal2-input" placeholder="Titulo Libro" required ></p>
+          <p>Año: <input id="anio"  value= "" type="number"  class="swal2-input" placeholder="Año publicacion" required ></p>
+          <p>ISBN: <input  id="isbn"  value= "" type="text"  class="swal2-input" placeholder="Isbn"  maxlength ="13" required></p>
+          <p>Ejemplares: <input  id="ejemplares" value= "" type="number"  class="swal2-input" placeholder="Ejemplares Totales" required></p>
+          <p>Prestados: <input  id="ejemplaresPrestados" value= "" type="text"  class="swal2-input" placeholder="Ejemplares Prestados" required></p>
+          <p>En Stock: <input  id="ejemplaresRestantes" value= "" type="text"  class="swal2-input" placeholder="Ejemplares Restantes" required></p>
           <p>Autor: ${selectAutor}</p>
           <p>Editorial: ${selectEditorial}</p>`
         ,
@@ -61,40 +61,70 @@ d.addEventListener("click", async (e) => {
         customClass: {
           validationMessage: 'my-validation-message'
         },
-        preConfirm: () => {
-          const titulo = Swal.getPopup().querySelector('#titulo').value
-          const anio = Swal.getPopup().querySelector('#anio').value
-          const isbn = Swal.getPopup().querySelector('#isbn').value
-          const ejemplares = Swal.getPopup().querySelector('#ejemplares').value
-          const autorId = Swal.getPopup().querySelector('#autorId').value
-          const editorialId = Swal.getPopup().querySelector('#editorialId').value
-          const ejemplaresPrestados = Swal.getPopup().querySelector('#ejemplaresPrestados').value
-          const ejemplaresRestantes = Swal.getPopup().querySelector('#ejemplaresRestantes').value
-          if (!titulo || !anio|| !isbn|| !ejemplares|| !autorId|| !editorialId) {
-            Swal.showValidationMessage(`Todos los campos deben estar completos`)
-          }
-          return { titulo: titulo, isbn: isbn,anio: anio, ejemplares: ejemplares,autorId: autorId,editorialId: editorialId,ejemplaresRestantes:ejemplaresRestantes,ejemplaresPrestados:ejemplaresPrestados}
-        }
-      }).then((result) => {
-         console.log(result)
-          let titulo =result.value.titulo;
-          let anio =result.value.anio;
-          let isbn =result.value.isbn;
-          let ejemplares =result.value.ejemplares;
-          let autorId =result.value.autorId;
-          let editorialId =result.value.editorialId;
-          let ejemplaresRestantes =result.value.ejemplaresRestantes;
-          let ejemplaresPrestados =result.value.ejemplaresPrestados;
-          
+        preConfirm: async () => { 
+          let libroModificar={
+          titulo : obtenerValorSwalPopUp("titulo"),
+          anio : obtenerValorSwalPopUp("anio"),
+          isbn : obtenerValorSwalPopUp("isbn"),
+          ejemplares : obtenerValorSwalPopUp("ejemplares"),
+          ejemplaresPrestados : obtenerValorSwalPopUp("ejemplaresPrestados"),
+          ejemplaresRestantes : function(){this.ejemplares - this.ejemplaresPrestado},
+          autorId : obtenerValorSwalPopUp("autorId"),
+          editorialId : obtenerValorSwalPopUp("editorialId") }
+        
           options.method = 'POST';
-          options.body = JSON.stringify({ titulo ,anio, isbn, ejemplares, autorId,editorialId,ejemplaresRestantes,ejemplaresPrestados });
-          console.log(options.body);
-          crearLibro( options);
-          Swal.fire(`Se ha creado exitosamente el libro: <b></b>!`, '', 'success')
-        // // } else {
-        // //   Swal.fire('Se ha cancelado la operación', '', 'warning')
-        // }
-      })
+          options.body = JSON.stringify(libroModificar);
+          let  responseBackEnd = await crearLibro(options);
+          console.log(typeof libroModificar.isbn)
+         
+          if(!isNaN(libroModificar.isbn) && !isEmpty(libroModificar)){
+            if(responseBackEnd){
+              Swal.showValidationMessage(responseBackEnd);}
+          }else{
+            if(isNaN(libroModificar.isbn)){
+              Swal.showValidationMessage(`El isbn debe ser numerico`)}
+             if(isEmpty(libroModificar)){
+              Swal.showValidationMessage(`Los campos deben estar completos`)}
+            }
+      }
+         /*
+          if (!titulo || !anio|| !isbn|| !ejemplares|| !autorId|| !editorialId) {
+          Swal.showValidationMessage(`Todos los campos deben estar completos`)
+          }if (anio<868 || anio> 2022){
+          Swal.showValidationMessage(`El anio no puede ser menor a 868 , ni mayor al actual`)
+
+           <script>
+
+        let message = "isbn : EL isbn supera el numero maximo permitido | editorialId : La editorial es obligatoria | autorId : El autor es obligatorio";
+
+        let messageSplit = message.split(" | ");
+
+        console.log(messageSplit)
+
+        let textoParseado = messageSplit.map((error) => {
+
+            let ar = error.split(": ")
+
+            return {
+
+                [ar[0].trim()]: ar[1]
+
+            }
+
+        });
+
+        console.log(textoParseado)
+
+    </script>
+          }               */          
+        
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            text: 'Se ha creado el libro',
+          });
+        }
+      });
       
    if (e.target.matches("#btn_next")) {
     if (objJson.pageable.pageNumber < objJson.totalPages - 1) {
@@ -162,18 +192,18 @@ d.addEventListener("click", async (e) => {
           validationMessage: 'my-validation-message'
         },
         preConfirm: async () => { 
-          let libroModificar={};  
-          libroModificar.titulo = obtenerValorSwalPopUp("titulo");
-          libroModificar.anio = obtenerValorSwalPopUp("anio");
-          libroModificar.isbn = obtenerValorSwalPopUp("isbn");
-          libroModificar.ejemplares = obtenerValorSwalPopUp("ejemplares");
-          libroModificar.ejemplaresPrestados = obtenerValorSwalPopUp("ejemplaresPrestados");
-          libroModificar.ejemplaresRestantes = ejemplares - ejemplaresPrestados
-          libroModificar.autorId = obtenerValorSwalPopUp("autorId");
-          libroModificar.editorialId = obtenerValorSwalPopUp("editorialId"); 
+          let libroModificar={
+            titulo : obtenerValorSwalPopUp("titulo"),
+            anio : obtenerValorSwalPopUp("anio"),
+            isbn : obtenerValorSwalPopUp("isbn"),
+            ejemplares : obtenerValorSwalPopUp("ejemplares"),
+            ejemplaresPrestados : obtenerValorSwalPopUp("ejemplaresPrestados"),
+            ejemplaresRestantes : function(){this.ejemplares - this.ejemplaresPrestado},
+            autorId : obtenerValorSwalPopUp("autorId"),
+            editorialId : obtenerValorSwalPopUp("editorialId") }
           options.method = 'PUT';
           options.body = JSON.stringify(libroModificar);
-          let  responseBackEnd = await modificarLibro(id,options);
+          let  responseBackEnd = await crearLibro(options);
           if(responseBackEnd)
             Swal.showValidationMessage(responseBackEnd);
          /*
@@ -345,8 +375,9 @@ async function obtenerAutores() {
 async function obtenerEditoriales() {
       return await   obtenerJson(urlEditorial)
 };
-function crearLibro( options) {
-    obtenerJson(urlLibro, options).then(response => {
+async function  crearLibro( options) {
+  return await obtenerJson(urlLibro, options).then(response => {
+    if (!response.message) {
       let id = response.id
       let titulo = response.titulo
       let alta = response.alta
@@ -393,9 +424,14 @@ function crearLibro( options) {
         let $clone = d.importNode($template, true);
         $fragment.appendChild($clone);
         $table.querySelector("tbody").appendChild($fragment);
-      
-    }).catch(error => console.error(error));
-};
+      } else {
+        return Promise.reject(response);
+}
+}).catch(badResponse => {
+      console.log(badResponse)
+      return(badResponse.message)
+});
+}
 async function modificarLibro(id, options) {
   return await obtenerJson(urlLibro + id, options).then(response => {
   if (!response.message) {
