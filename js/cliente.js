@@ -99,7 +99,7 @@ async function crearCliente(urlCliente, options) {
   }).catch(error => console.error(error));
 
   // return await obtenerJson(urlCliente, options);
-}
+} 
 
 d.addEventListener("click", async (e) => {
   if (e.target.matches(".crear")) {
@@ -114,7 +114,7 @@ d.addEventListener("click", async (e) => {
         'Telefono<input id="telefono" class="swal2-input">' +
         'Username<input id="username" class="swal2-input" type ="email">' +
         'Password<input id="password" class="swal2-input" type ="password">',
-        maxlength: 10,
+      
       showCancelButton: true,
       cancelButtonText: 'Cancelar ❌',
       confirmButtonText: 'Guardar 💾',
@@ -129,27 +129,23 @@ d.addEventListener("click", async (e) => {
         username = Swal.getPopup().querySelector(`#username`).value;
         password = Swal.getPopup().querySelector('#password').value;
         roleId = 2;
+
         return { documento, nombre, apellido, telefono, username, password, roleId };
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        if (result.value) {
 
-          options.method = 'POST';
+        options.method = 'POST';
           options.body = JSON.stringify(result.value);
           let urlLocal = "http://localhost:8085/api/v1/cliente/";
-          crearCliente(urlLocal, options)
-            .then(() => {
-              Swal.fire(`Se ha creado exitosamente el cliente ${nombreFormularioCliente}`, '', 'success')
-            }).catch(error => {
-              console.log(error);
-              Swal.fire('Contactese con el admin.', '', 'warning')
-            })
+           //crearCliente(urlLocal, options)
 
-        } else {
-          Swal.fire('Se ha cancelado la operación', '', 'warning')
+        if(options.body.value){
+          console.log(options.body.value);
+          Swal.fire(`Se ha creado exitosamente el cliente ${nombreFormularioCliente}`, '', 'success')
+        }else{
+          Swal.fire(`Se cancelado la operacion ${nombreFormularioCliente}`, '', 'success')
         }
-
       } else {
         Swal.fire('Se ha cancelado la operación', '', 'warning')
       }
