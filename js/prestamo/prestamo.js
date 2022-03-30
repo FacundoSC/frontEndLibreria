@@ -66,8 +66,8 @@ function main() {
             d.querySelector("#divClientes").innerHTML
           } </br>` +
           `Elige un libro ${d.querySelector("#divLibros").innerHTML} </br>` +
-          `Fecha inicio <input required min="${todayDate}" type=date id="swal-input3" class="swal2-input"> </br>` +
-          `Fecha fin <input required min="${todayDate}" type=date id="swal-input4" class="swal2-input"> </br>`,
+          `Fecha inicio <input  min="${todayDate}" type=date id="swal-input3" class="swal2-input" required> </br>` +
+          `Fecha fin <input  min="${todayDate}" type=date id="swal-input4" class="swal2-input" required> </br>`,
 
         preConfirm: () => {
           const libro = Swal.getPopup().querySelector("#selectLibros").value;
@@ -77,6 +77,12 @@ function main() {
             Swal.getPopup().querySelector("#swal-input3").value;
           const fechaDevolucion =
             Swal.getPopup().querySelector("#swal-input4").value;
+
+          if (!libro || !cliente || !fechaPrestamo || !fechaDevolucion) {
+            Swal.showValidationMessage(
+              "Por favor complete todos los campos para crear el prestamo"
+            );
+          }
 
           return {
             libro: libro,
