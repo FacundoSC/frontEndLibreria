@@ -114,7 +114,7 @@ d.addEventListener("click", async (e) => {
     }
     if (e.target.matches(".editar")) {
       const id = e.target.dataset.id;
-      var libro = d.querySelector("#ver_"+id);
+      let libro = d.querySelector("#ver_"+id);
       let selectorAutor = document.createElement('select')
       let selectorEditorial = document.createElement('select')
       selectorAutor.className="swal2-input";
@@ -131,6 +131,7 @@ d.addEventListener("click", async (e) => {
         selectorAutor.appendChild(elemento);
       });
       let selectAutor = selectorAutor.outerHTML
+
       listadoEditoriales.forEach((editorial) => {
         let elemento = document.createElement('option');
         elemento.textContent = editorial.nombre;
@@ -145,9 +146,9 @@ d.addEventListener("click", async (e) => {
         title: 'Modificar Libro:',
         html: `
         <p>Titulo: <input id="titulo"  value= "${libro.dataset.titulo}" type="text" class="swal2-input" placeholder="Titulo Libro" minlength="2" maxlength="62" required></p>
-        <p>Año: <input id="anio"  value= "${libro.dataset.anio}" type="num"  class="swal2-input" placeholder="Año publicacion" min="868" max="3000" required></p>
+        <p>Año: <input id="anio"  value= "${libro.dataset.anio}" type="number"  class="swal2-input" placeholder="Año publicacion" min="868" max="3000" required></p>
         <p>ISBN: <input  id="isbn"  value= "${libro.dataset.isbn}" type="text"  class="swal2-input" placeholder="Isbn" maxlength="13" required ></p>
-        <p>Ejemplares: <input  id="ejemplares" value= "${libro.dataset.ejemplares}" type="text"  class="swal2-input" placeholder="Año publicacion" required></p>
+        <p>Ejemplares: <input  id="ejemplares" value= "${libro.dataset.ejemplares}" type="number"  class="swal2-input" placeholder="Año publicacion" required></p>
          <input  id="ejemplaresPrestados" value= "${libro.dataset.ejemplaresPrestados}" type="hidden"  >
          <input  id="ejemplaresRestantes" value= "${libro.dataset.ejemplaresRestantes}" type="hidden"  >
          <p>Autor: ${selectAutor}</p>
@@ -160,46 +161,38 @@ d.addEventListener("click", async (e) => {
         customClass: {
           validationMessage: 'my-validation-message'
         },
-        preConfirm: () => {
-
-          const titulo = Swal.getPopup().querySelector('#titulo').value
-          const anio = Swal.getPopup().querySelector('#anio').value
-          const isbn = Swal.getPopup().querySelector('#isbn').value
-          const ejemplares = Swal.getPopup().querySelector('#ejemplares').value
-          const ejemplaresPrestados = Swal.getPopup().querySelector('#ejemplaresPrestados').value
-          const ejemplaresRestantes = ejemplares - ejemplaresPrestados
-          const autorId = Swal.getPopup().querySelector('#autorId').value
-          const editorialId = Swal.getPopup().querySelector('#editorialId').value
-         
+        preConfirm: async () => { 
+          let libroModificar={};  
+          libroModificar.titulo = obtenerValorSwalPopUp("titulo");
+          libroModificar.anio = obtenerValorSwalPopUp("anio");
+          libroModificar.isbn = obtenerValorSwalPopUp("isbn");
+          libroModificar.ejemplares = obtenerValorSwalPopUp("ejemplares");
+          libroModificar.ejemplaresPrestados = obtenerValorSwalPopUp("ejemplaresPrestados");
+          libroModificar.ejemplaresRestantes = ejemplares - ejemplaresPrestados
+          libroModificar.autorId = obtenerValorSwalPopUp("autorId");
+          libroModificar.editorialId = obtenerValorSwalPopUp("editorialId"); 
+          options.method = 'PUT';
+          options.body = JSON.stringify(libroModificar);
+          let  responseBackEnd = await modificarLibro(id,options);
+          if(responseBackEnd)
+            Swal.showValidationMessage(responseBackEnd);
+         /*
           if (!titulo || !anio|| !isbn|| !ejemplares|| !autorId|| !editorialId) {
           Swal.showValidationMessage(`Todos los campos deben estar completos`)
           }if (anio<868 || anio> 2022){
           Swal.showValidationMessage(`El anio no puede ser menor a 868 , ni mayor al actual`)
-          }
-          options.method = 'PUT';
-          options.body = JSON.stringify({ titulo ,anio, isbn, ejemplares,ejemplaresPrestados,ejemplaresRestantes, autorId,editorialId});
-
-          ;
-          return  fetch( modificarLibro( id, options))
-            .then(response => {
-              if (!response.message) {
-                console.log(response);
-                Swal.showValidationMessage(response.json)
-              }
-              return response.json()
-            })
-          
+          }               */          
         },
-      //allowOutsideClick: () => !Swal.isLoading()
       }).then((result) => {
         if (result.isConfirmed) {
           Swal.fire({
-            title: `${result.value.login}'s avatar`,
-            imageUrl: result.value.avatar_url
-          })
+            text: 'Se ha modificado el libro',
+          });
         }
       });
     }
+
+
     if (e.target.matches(".botonEstado")) {
       Swal.fire({
         title: '¿Deseas cambiar el estado del libro?',
@@ -459,3 +452,7 @@ obtenerJson(urlLibro+urlDesactivar+index).then(response => {
   }
 });
 };
+
+function obtenerValorSwalPopUp(clase){
+  return Swal.getPopup().querySelector('#'+clase).value
+}
