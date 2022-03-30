@@ -20,15 +20,8 @@ export const urlActivar = "activar/";
 export const urlDesactivar = "desactivar/";
 export const urlEditorial = "https://libreria-rest.herokuapp.com/api/v1/editorial/";
 
-//export const urlEditorial = "https://localhost:8080/api/v1/editorial/";
-
-export const footerModalFormulario = ` <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-<button type="button" class="btn btn-primary" id="saveAutor">Guardar</button>`;
-export const footerModal = ` <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`;
-
-//Libro
-
 export const urlLibro = "https://libreria-rest.herokuapp.com/api/v1/libro/";
+export const urlLibroLocal = "http://localhost:8085/api/v1/libro/";
 
-//export const urlLibro = "https://localhost:8080/api/v1/libro/";
-
+export const urlCliente = "https://libreria-rest.herokuapp.com/api/v1/cliente/"
+export const urlClienteLocal = "http://localhost:8085/api/v1/cliente/"
