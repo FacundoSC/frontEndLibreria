@@ -222,7 +222,7 @@ function pintarPropiedad(entidad) {
   })
 }
 
-function pintarBotones(entidad, listadoProp) {
+function pintarBotones(entidad, listadoPropData) {
   let botones = botonesAPintar();
 
   $template.querySelector(".botonEstado").classList.remove('btn-success');
@@ -238,25 +238,23 @@ function pintarBotones(entidad, listadoProp) {
   for (const boton of botones) {
     let tipoBoton = boton.dataset.toshow;
     boton.id = `${tipoBoton}_${entidad.id}`
-    listadoProp.forEach(prop => {
+    listadoPropData.forEach(prop => {
       boton.dataset[prop] = entidad[prop];
       }
     )
   }
 }
 
-function propiedadesDeEntidad(response) {
-  return Object.keys(response[0]);
-}
 
 //Prueba pintadoGenerico
 function pintarEntidad(response) {
 
-  let listado = propiedadesDeEntidad(response);
+  let listadoPropData = Object.keys(response[0]);
 
   response.forEach(entidad => {
     pintarPropiedad(entidad)
-    pintarBotones(entidad, listado)
+    pintarBotones(entidad, listadoPropData)
+
     let $clone = document.importNode($template, true);
     $fragment.appendChild($clone);
   })
