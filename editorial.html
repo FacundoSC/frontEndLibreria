@@ -104,13 +104,13 @@
 
     <template id="crud-template">
       <tr>
-        <td class="nombre align-middle"></td>
-        <td class="estado align-middle"></td>
+        <td class="nombre editable align-middle" data-toshow="nombre"></td>
+        <td class="alta editable align-middle" data-toshow="alta"></td>
         <td class="asociados align-middle"></td>
-        <td>
-          <button class="btn btn-warning editar"></button>
-          <button class="botonEstado btn"></button>
-          <button class="btn btn-info ver"></button>
+        <td id="botones">
+          <button class="btn btn-warning editar" data-toshow="editar"></button>
+          <button class="botonEstado btn" data-toshow="estado"></button>
+          <button class="btn btn-info ver" data-toshow="ver"></button>
         </td>
       </tr>
     </template>

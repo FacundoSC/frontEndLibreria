@@ -68,7 +68,7 @@ export function modalInformativo(tipo, nombre, textoHTML = '') {
 //Fin modales
 
 //Modificaciones DOM
-export function obtenerEntidadPaginada(url, tipo, current_page = 0){
+export function obtenerEntidadPaginada(url, tipo, current_page = 0) {
   modalCargaDatos()
   obtenerJson(url + `paged?page=${current_page}&size=10`).then(response => {
     modalMostrarResultado(response.content);
@@ -113,13 +113,15 @@ export function seteoPaginas(response) {
 }
 
 export function pintarResultado(response, tipo) {
-    if (tipo == 'editorial') {
-      pintarEditorial(response)
-    }
-    if (tipo == 'autor') {
-      pintarAutor(response)
-    }
-    $table.querySelector("tbody").appendChild($fragment);
+  if (tipo == 'editorial') {
+    // pintarEditorial(response)
+    pintarEntidad(response)
+  }
+  if (tipo == 'autor') {
+    // pintarAutor(response)
+    pintarEntidad(response)
+  }
+  $table.querySelector("tbody").appendChild($fragment);
 };
 
 function pintarEditorial(response) {
@@ -128,9 +130,14 @@ function pintarEditorial(response) {
     $template.querySelector(".nombre").textContent = editorial.nombre;
     $template.querySelector(".nombre").id = `nombre_${editorial.id}`;
     $template.querySelector(".nombre").classList.remove('tachado');
+    // $template.querySelector(".nombre").dataset.editable = true;
+    $template.querySelector(".nombre").dataset.type = "text";
 
     $template.querySelector(".estado").id = `estado_${editorial.id}`;
     $template.querySelector(".estado").classList.remove('tachado');
+    // $template.querySelector(".estado").dataset.editable = true;
+    $template.querySelector(".estado").dataset.type = "text";
+
 
     //logica para adicion de libros en select
     $template.querySelector(".asociados").innerHTML = ""; //Remueve los hijos
@@ -186,17 +193,92 @@ function pintarEditorial(response) {
   });
 }
 
+function propiedadesAPintar() {
+  let padre = $template.children[0].children;
+  let propiedadesAPintar = [];
+
+  for (const hijo of padre) {
+    if (hijo.dataset.toshow) {
+      propiedadesAPintar.push(hijo.dataset.toshow)
+    }
+  }
+  return propiedadesAPintar;
+}
+
+function botonesAPintar() {
+  return $template.querySelector("#botones").children
+}
+
+function pintarPropiedad(entidad) {
+  let listadoPropiedades = propiedadesAPintar();
+  listadoPropiedades.forEach(propiedad => {
+    $template.querySelector(`.${propiedad}`).textContent = entidad[propiedad];
+    $template.querySelector(`.${propiedad}`).id = `${propiedad}_${entidad.id}`;
+    $template.querySelector(`.${propiedad}`).dataset[propiedad] = entidad[propiedad];
+    $template.querySelector(`.${propiedad}`).classList.remove('tachado');
+    if (!entidad["alta"]) {
+      $template.querySelector(`.${propiedad}`).classList.add('tachado');
+    }
+  })
+}
+
+function pintarBotones(entidad, listadoProp) {
+  let botones = botonesAPintar();
+
+  $template.querySelector(".botonEstado").classList.remove('btn-success');
+  $template.querySelector(".botonEstado").classList.remove('btn-danger');
+  if (entidad["alta"]) {
+    $template.querySelector(".botonEstado").classList.add('btn-success');
+    $template.querySelector(".editar").removeAttribute("disabled")
+  } else {
+    $template.querySelector(".botonEstado").classList.add('btn-danger');
+    $template.querySelector(".editar").setAttribute("disabled", '')
+  }
+
+  for (const boton of botones) {
+    let tipoBoton = boton.dataset.toshow;
+    boton.id = `${tipoBoton}_${entidad.id}`
+    listadoProp.forEach(prop => {
+      boton.dataset[prop] = entidad[prop];
+      }
+    )
+  }
+}
+
+function propiedadesDeEntidad(response) {
+  return Object.keys(response[0]);
+}
+
+//Prueba pintadoGenerico
+function pintarEntidad(response) {
+
+  let listado = propiedadesDeEntidad(response);
+
+  response.forEach(entidad => {
+    pintarPropiedad(entidad)
+    pintarBotones(entidad, listado)
+    let $clone = document.importNode($template, true);
+    $fragment.appendChild($clone);
+  })
+}
+
+//FIn prueba
+
 function pintarAutor(response) {
   response.forEach(autor => {
     $template.querySelector(".nombre").textContent = autor.nombre;
     $template.querySelector(".nombre").id = `nombre_${autor.id}`;
+
     $template.querySelector(".estado").textContent = autor.alta;
     $template.querySelector(".estado").id = `estado_${autor.id}`;
+
     $template.querySelector(".editar").dataset.id = `${autor.id}`;
     $template.querySelector(".editar").id = `editar_${autor.id}`;
+
     $template.querySelector(".ver").dataset.nombre = autor.nombre;
     $template.querySelector(".ver").id = `ver_${autor.id}`;
     $template.querySelector(".ver").dataset.id = autor.id;
+
     $template.querySelector(".botonEstado").id = `botonEstado_${autor.id}`;
     $template.querySelector(".botonEstado").classList.remove('btn-success');
     $template.querySelector(".botonEstado").classList.remove('btn-danger');
@@ -241,7 +323,7 @@ export function cambiarEstado(url, id) {
   });
 }
 
-export function crearEntidad(url, options){
+export function crearEntidad(url, options) {
   obtenerJson(url, options).then(response => {
     if (!response.message) {
       modalExito();
@@ -254,8 +336,8 @@ export function crearEntidad(url, options){
   });
 }
 
-export function modificarEntidad(url, id, options){
-  obtenerJson(url+id, options).then(response => {
+export function modificarEntidad(url, id, options) {
+  obtenerJson(url + id, options).then(response => {
     if (!response.message) {
       modificarInfo(response, id)
       modalExito()

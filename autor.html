@@ -99,15 +99,17 @@
 
       <tbody id="tableAutores"></tbody>
     </table>
-
     <template id="crud-template">
       <tr>
-        <td class="nombre"></td>
-        <td class="estado"></td>
-        <td>
-          <button class="btn btn-warning editar"></button>
+        <td class="nombre" data-toshow="nombre"></td>
+        <td class="alta" data-toshow="alta"></td>
+        <td id="botones">
+          <button class="btn btn-warning editar" data-toshow="editar"></button>
+          <button class="botonEstado btn" data-toshow="estado"></button>
+          <button class="btn btn-info ver" data-toshow="ver"></button>
+          <!-- <button class="btn btn-warning editar"></button>
           <button class="botonEstado btn"></button>
-          <button class="btn btn-info ver"></button>
+          <button class="btn btn-info ver"></button> -->
         </td>
       </tr>
     </template>
