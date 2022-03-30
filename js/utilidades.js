@@ -241,8 +241,8 @@ export function cambiarEstado(url, id) {
   });
 }
 
-export function crearEntidad(url, options){
-  obtenerJson(url, options).then(response => {
+export async function crearEntidad(url, options){
+  return await obtenerJson(url, options).then(response => {
     if (!response.message) {
       modalExito();
     }
@@ -250,7 +250,8 @@ export function crearEntidad(url, options){
       return Promise.reject(response);
     }
   }).catch(badResponse => {
-    modalError(badResponse.message)
+    // modalError(badResponse.message)
+    return badResponse.message;
   });
 }
 

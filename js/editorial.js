@@ -26,21 +26,22 @@ function main() {
         customClass: {
           validationMessage: 'my-validation-message'
         },
-        preConfirm: (value) => {
-          if (!value) {
-            Swal.showValidationMessage(
-              '<i class="fa fa-info-circle"></i>El nombre es requerido.'
-            )
-          }
-        }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          let nombre = result.value
+        // preConfirm: (value) => {
+        //   if (!value) {
+        //     Swal.showValidationMessage(
+        //       '<i class="fa fa-info-circle"></i>El nombre es requerido.'
+        //     )
+        //   }
+        // }
+        preConfirm: async (nombre) => {
           options.method = 'POST';
           options.body = JSON.stringify({ nombre });
-          utilidades.crearEntidad(urlEditorial, options);
-        } else {
-          utilidades.modalCancelacion()
+          let responseBackEnd = await utilidades.crearEntidad(urlEditorial, options);
+          if(responseBackEnd) Swal.showValidationMessage(responseBackEnd);
+        }
+      }).then((result) => {
+        if (!result.isConfirmed) {
+          utilidades.modalCancelacion();
         }
       })
     } //fin CREAR
