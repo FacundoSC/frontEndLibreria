@@ -78,23 +78,23 @@ export function obtenerEntidadPaginada(url, tipo, current_page = 0) {
 }
 
 export function pintarCambioEstado(index, estadoAnterior) {
-  let btn = document.querySelector("#botonEstado_" + index)
+  let btn = document.querySelector("#estado_" + index)
   if (!estadoAnterior) {
     btn.classList.remove("btn-danger")
     btn.classList.add("btn-success")
-    btn.dataset.estado = "true";
+    btn.dataset.alta = "true";
     btn.parentElement.children[0].removeAttribute("disabled")
     btn.parentNode.parentNode.children[0].classList.remove("tachado")
     btn.parentNode.parentNode.children[1].classList.remove("tachado")
-    document.getElementById("estado_" + index).innerHTML = "Activado";
+    document.getElementById("alta_" + index).innerHTML = "Activado";
   } else {
     btn.classList.remove("btn-success")
     btn.classList.add("btn-danger")
-    btn.dataset.estado = "false";
+    btn.dataset.alta = "false";
     btn.parentElement.children[0].setAttribute("disabled", '')
     btn.parentNode.parentNode.children[0].classList.add("tachado")
     btn.parentNode.parentNode.children[1].classList.add("tachado")
-    document.getElementById("estado_" + index).innerHTML = "Desactivado";
+    document.getElementById("alta_" + index).innerHTML = "Desactivado";
   }
 }
 
@@ -110,87 +110,6 @@ export function seteoPaginas(response) {
 
   (current_page == 0) ? btnPrevio.setAttribute("disabled", '') : btnPrevio.removeAttribute("disabled");
   (totalPages == (current_page + 1)) ? btnSiguiente.setAttribute("disabled", '') : btnSiguiente.removeAttribute("disabled");
-}
-
-export function pintarResultado(response, tipo) {
-  if (tipo == 'editorial') {
-    // pintarEditorial(response)
-    pintarEntidad(response)
-  }
-  if (tipo == 'autor') {
-    // pintarAutor(response)
-    pintarEntidad(response)
-  }
-  $table.querySelector("tbody").appendChild($fragment);
-};
-
-function pintarEditorial(response) {
-  response.forEach(editorial => {
-
-    $template.querySelector(".nombre").textContent = editorial.nombre;
-    $template.querySelector(".nombre").id = `nombre_${editorial.id}`;
-    $template.querySelector(".nombre").classList.remove('tachado');
-    // $template.querySelector(".nombre").dataset.editable = true;
-    $template.querySelector(".nombre").dataset.type = "text";
-
-    $template.querySelector(".estado").id = `estado_${editorial.id}`;
-    $template.querySelector(".estado").classList.remove('tachado');
-    // $template.querySelector(".estado").dataset.editable = true;
-    $template.querySelector(".estado").dataset.type = "text";
-
-
-    //logica para adicion de libros en select
-    $template.querySelector(".asociados").innerHTML = ""; //Remueve los hijos
-    if (editorial.libros.length == 0) {
-      let elemento = document.createElement('p')
-      elemento.textContent = "NO EXISTEN LIBROS ASOCIADOS";
-      $template.querySelector(".asociados").appendChild(elemento)
-    }
-    else {
-      let selector = document.createElement('select')
-      selector.setAttribute("id", "select_" + editorial.id)
-      let fragmentLibro = document.createDocumentFragment();
-      editorial.libros.forEach((libro) => {
-        let elemento = document.createElement('option');
-        elemento.textContent = libro.titulo;
-        elemento.dataset.autor = libro.autorNombre;
-        selector.appendChild(elemento);
-      });
-      fragmentLibro.appendChild(selector);
-      $template.querySelector(".asociados").appendChild(fragmentLibro);
-    }
-    //fin logica para adicion de libros en select
-
-    $template.querySelector(".asociados").id = `asociados_${editorial.id}`;
-
-    $template.querySelector(".editar").dataset.id = `${editorial.id}`;
-    $template.querySelector(".editar").id = `editar_${editorial.id}`;
-    $template.querySelector(".editar").removeAttribute("disabled")
-
-    $template.querySelector(".ver").dataset.nombre = editorial.nombre;
-    $template.querySelector(".ver").id = `ver_${editorial.id}`;
-    $template.querySelector(".ver").dataset.id = editorial.id;
-
-    $template.querySelector(".botonEstado").id = `botonEstado_${editorial.id}`;
-    $template.querySelector(".botonEstado").classList.remove('btn-success');
-    $template.querySelector(".botonEstado").classList.remove('btn-danger');
-    $template.querySelector(".botonEstado").dataset.nombre = editorial.nombre;
-    $template.querySelector(".botonEstado").dataset.id = editorial.id;
-    $template.querySelector(".botonEstado").dataset.estado = editorial.alta;
-
-    if (editorial.alta) {
-      $template.querySelector(".estado").textContent = "Activado";
-      $template.querySelector(".botonEstado").classList.add('btn-success');
-    } else {
-      $template.querySelector(".estado").textContent = "Desactivado";
-      $template.querySelector(".botonEstado").classList.add('btn-danger');
-      $template.querySelector(".nombre").classList.add('tachado');
-      $template.querySelector(".estado").classList.add('tachado');
-      $template.querySelector(".editar").setAttribute("disabled", '')
-    }
-    let $clone = document.importNode($template, true);
-    $fragment.appendChild($clone);
-  });
 }
 
 function propiedadesAPintar() {
@@ -238,66 +157,61 @@ function pintarBotones(entidad, listadoPropData) {
   for (const boton of botones) {
     let tipoBoton = boton.dataset.toshow;
     boton.id = `${tipoBoton}_${entidad.id}`
-    listadoPropData.forEach(prop => {
-      boton.dataset[prop] = entidad[prop];
+    listadoPropData.forEach(propiedad => {
+      let tipoEntidad = typeof entidad[propiedad]
+      if (tipoEntidad != "object") {
+        boton.dataset[propiedad] = entidad[propiedad];
       }
+    }
     )
+  }
+}
+
+function datosPorTipo(tipo, entidad) {
+  if (tipo == "editorial") {
+    pintarLibrosAsociados(entidad)
+  }
+}
+
+function pintarLibrosAsociados(editorial) {
+  $template.querySelector(".libros").innerHTML = ""; //Remueve los hijos
+  if (editorial.libros.length == 0) {
+    let elemento = document.createElement('p')
+    elemento.textContent = "NO EXISTEN LIBROS ASOCIADOS";
+    $template.querySelector(".libros").appendChild(elemento)
+  }
+  else {
+    let selector = document.createElement('select')
+    selector.setAttribute("id", "select_" + editorial.id)
+    let fragmentLibro = document.createDocumentFragment();
+    editorial.libros.forEach((libro) => {
+      let elemento = document.createElement('option');
+      elemento.textContent = libro.titulo;
+      elemento.dataset.autor = libro.autorNombre;
+      selector.appendChild(elemento);
+    });
+    fragmentLibro.appendChild(selector);
+    $template.querySelector(".libros").appendChild(fragmentLibro);
   }
 }
 
 
 //Prueba pintadoGenerico
-function pintarEntidad(response) {
+export function pintarResultado(response, tipo) {
 
   let listadoPropData = Object.keys(response[0]);
 
   response.forEach(entidad => {
     pintarPropiedad(entidad)
     pintarBotones(entidad, listadoPropData)
-
+    datosPorTipo(tipo, entidad)
     let $clone = document.importNode($template, true);
     $fragment.appendChild($clone);
   })
-}
 
+  $table.querySelector("tbody").appendChild($fragment);
+}
 //FIn prueba
-
-function pintarAutor(response) {
-  response.forEach(autor => {
-    $template.querySelector(".nombre").textContent = autor.nombre;
-    $template.querySelector(".nombre").id = `nombre_${autor.id}`;
-
-    $template.querySelector(".estado").textContent = autor.alta;
-    $template.querySelector(".estado").id = `estado_${autor.id}`;
-
-    $template.querySelector(".editar").dataset.id = `${autor.id}`;
-    $template.querySelector(".editar").id = `editar_${autor.id}`;
-
-    $template.querySelector(".ver").dataset.nombre = autor.nombre;
-    $template.querySelector(".ver").id = `ver_${autor.id}`;
-    $template.querySelector(".ver").dataset.id = autor.id;
-
-    $template.querySelector(".botonEstado").id = `botonEstado_${autor.id}`;
-    $template.querySelector(".botonEstado").classList.remove('btn-success');
-    $template.querySelector(".botonEstado").classList.remove('btn-danger');
-    $template.querySelector(".botonEstado").dataset.nombre = autor.nombre;
-    $template.querySelector(".nombre").classList.remove('tachado');
-    $template.querySelector(".estado").classList.remove('tachado');
-    $template.querySelector(".editar").removeAttribute("disabled")
-    $template.querySelector(".botonEstado").dataset.id = autor.id;
-    $template.querySelector(".botonEstado").dataset.estado = autor.alta;
-    if (autor.alta) {
-      $template.querySelector(".botonEstado").classList.add('btn-success');
-    } else {
-      $template.querySelector(".botonEstado").classList.add('btn-danger');
-      $template.querySelector(".nombre").classList.add('tachado');
-      $template.querySelector(".estado").classList.add('tachado');
-      $template.querySelector(".editar").setAttribute("disabled", '')
-    }
-    let $clone = document.importNode($template, true);
-    $fragment.appendChild($clone);
-  });
-}
 
 export function modificarInfo(response, id) {
   let nombreNuevo = response.nombre
@@ -309,7 +223,7 @@ export function modificarInfo(response, id) {
 export function cambiarEstado(url, id) {
   modalPedirConfirmacion().then((result) => {
     if (result.isConfirmed) {
-      let estado = document.querySelector("#botonEstado_" + id).dataset.estado
+      let estado = document.querySelector("#estado_" + id).dataset.alta
       if (estado == "true") {
         desactivarEntidad(url + urlDesactivar, id);
       } else {

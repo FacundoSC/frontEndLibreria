@@ -173,11 +173,11 @@ function main() {
       let nombre = e.target.dataset.nombre
       let textoHTML = ''
 
-      if (document.getElementById("asociados_" + id).firstChild.localName == "p") {
+      if (document.getElementById("libros_" + id).firstChild.localName == "p") {
         textoHTML = `<p><b>Actualmente no posee libros asociados</b></p>`
       } else {
-        let cantidadDeLibros = document.getElementById("asociados_" + id).firstChild.length
-        let listado = document.getElementById("asociados_" + id).firstChild.children
+        let cantidadDeLibros = document.getElementById("libros_" + id).firstChild.length
+        let listado = document.getElementById("libros_" + id).firstChild.children
 
         switch (cantidadDeLibros) {
           case 1:
