@@ -66,8 +66,8 @@ function main() {
             d.querySelector("#divClientes").innerHTML
           } </br>` +
           `Elige un libro ${d.querySelector("#divLibros").innerHTML} </br>` +
-          `Fecha inicio <input  min="${todayDate}" type=date id="swal-input3" class="swal2-input" required> </br>` +
-          `Fecha fin <input  min="${todayDate}" type=date id="swal-input4" class="swal2-input" required> </br>`,
+          `Fecha de inicio <input  min="${todayDate}" type=date id="swal-input3" class="swal2-input" required> </br>` +
+          `Fecha de fin <input  min="${todayDate}" type=date id="swal-input4" class="swal2-input" required> </br>`,
 
         preConfirm: () => {
           const libro = Swal.getPopup().querySelector("#selectLibros").value;
@@ -139,12 +139,16 @@ function main() {
 
       let posCliente = clientes.body
         .map(function (clientito) {
-          return clientito.nombre;
+          return clientito.nombre + " " + clientito.apellido;
         })
-        .indexOf(prestamoEditado.cliente.nombre);
+        .indexOf(
+          prestamoEditado.cliente.nombre +
+            " " +
+            prestamoEditado.cliente.apellido
+        );
 
-      selectClientes.childNodes[posCliente].setAttribute("selected", "");
-      selectLibros.childNodes[posLibro].setAttribute("selected", "");
+      selectClientes.childNodes[posCliente + 1].setAttribute("selected", "");
+      selectLibros.childNodes[posLibro + 1].setAttribute("selected", "");
 
       /* Pop - up */
 
@@ -157,7 +161,7 @@ function main() {
           `Libro elegido: ${selectLibros.outerHTML} </br>` +
           `Cliente a cargo: ${selectClientes.outerHTML} </br>` +
           `Fecha de inicio: <input value=${fechaInicActual}  id="swal-input3" type=date  class="swal2-input"> </br>` +
-          `Fecha de devolución: <input value=${fechaDevActual} id="swal-input4" type=date class="swal2-input"> </br>`,
+          `Fecha de fin: <input value=${fechaDevActual} id="swal-input4" type=date class="swal2-input"> </br>`,
 
         preConfirm: () => {
           const nombreCliente =
@@ -205,8 +209,8 @@ function main() {
         }
       });
 
-      selectClientes.childNodes[posCliente].removeAttribute("selected", "");
-      selectLibros.childNodes[posLibro].removeAttribute("selected", "");
+      selectClientes.childNodes[posCliente + 1].removeAttribute("selected", "");
+      selectLibros.childNodes[posLibro + 1].removeAttribute("selected", "");
     }
 
     if (e.target.matches("#btn_next")) {
@@ -323,7 +327,8 @@ function main() {
       d.querySelector("#selectClientes").appendChild(optionCliente);
     });
 
-    ordenarSelect(d.querySelector("#selectClientes"));
+    //ordenarSelect(d.querySelector("#selectClientes"));
+    //ordenarArrayString(clientes.body);
   }
 
   async function getSelectLibros() {
@@ -340,8 +345,8 @@ function main() {
         d.querySelector("#selectLibros").appendChild(optionLibro);
       }
     });
-
-    ordenarSelect(d.querySelector("#selectLibros"));
+    //ordenarSelect(d.querySelector("#selectLibros"));
+    //ordenarArrayString(libro);
   }
 
   function crearPrestamo(options) {
@@ -350,21 +355,51 @@ function main() {
         $template.querySelector(".nombreCliente").textContent =
           response.body.cliente.nombre + " " + response.body.cliente.apellido;
 
+        $template.querySelector(
+          ".nombreCliente"
+        ).id = `nombreCliente_${response.body.id}`;
+
         $template.querySelector(".documentoCliente").textContent =
           response.body.cliente.documento;
 
+        $template.querySelector(
+          ".documentoCliente"
+        ).id = `documentoCliente_${response.body.id}`;
+
         $template.querySelector(".libroTomado").textContent =
           response.body.libro.titulo;
+
+        $template.querySelector(
+          ".libroTomado"
+        ).id = `libroTomado_${response.body.id}`;
 
         $template.querySelector(".fechaPrestamo").textContent = formatDate(
           response.body.fechaPrestamo,
           true
         );
 
+        $template.querySelector(
+          ".fechaPrestamo"
+        ).id = `fechaPrestamo_${response.body.id}`;
+
         $template.querySelector(".fechaDevolucion").textContent = formatDate(
           response.body.fechaDevolucion,
           true
         );
+
+        $template.querySelector(
+          ".fechaDevolucion"
+        ).id = `fechaDevolucion_${response.body.id}`;
+
+        $template.querySelector(".rowTable").id = `row_${response.body.id}`;
+
+        $template.querySelector(
+          ".botoncitoCancelar"
+        ).innerHTML = `<button class="btn btn-danger btn-cancelar-prestamo" data-id="${response.body.id}"}>Dar de baja</button>`;
+
+        $template.querySelector(
+          ".botoncitoEditar"
+        ).innerHTML = `<button class="btn btn-warning btn-editar-prestamo"  data-id="edit_${response.body.id}"}>Editar</button>`;
 
         let $clone = d.importNode($template, true);
         $fragment.appendChild($clone);
@@ -408,7 +443,7 @@ function main() {
   function cancelarPrestamo(id) {
     obtenerJson(urlDesactivarPrestamo + id).then((response) => {
       console.log(response);
-      if (response.status == 200) {
+      if (response.status >= 200 && response.status < 300) {
         updateDevolutionDate(id);
         return new Boolean(true);
       } else {
@@ -429,6 +464,7 @@ function main() {
     });
 
     obtenerJson(urlPrestamoLocal + prestamoId, options).then((response) => {
+      console.log(response);
       if (response.status >= 200 && response.status < 300) {
         return true;
       } else return false;
@@ -510,6 +546,21 @@ function main() {
       selectElem.options[i] = op;
     }
     return;
+  }
+
+  function ordenarArrayString(arrayDesordenado) {
+    arrayDesordenado.sort((a, b) => {
+      let fa = a.nombre.toLowerCase(),
+        fb = b.nombre.toLowerCase();
+
+      if (fa < fb) {
+        return -1;
+      }
+      if (fa > fb) {
+        return 1;
+      }
+      return 0;
+    });
   }
 
   let searchInput = document.getElementById("buscar");
