@@ -95,3 +95,13 @@ p{
 .infoPagina{
   color: rgba(0, 0, 0, 0.65);
 }
+/* ventana de campo requerido */
+.my-validation-message::before {
+  display: none;
+}
+
+.my-validation-message i {
+  margin: 0 .4em;
+  color: #f27474;
+  font-size: 1.4em;
+}
