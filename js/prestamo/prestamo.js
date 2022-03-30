@@ -18,188 +18,11 @@ var current_page = 0;
 main();
 
 function main() {
-  d.addEventListener("DOMContentLoaded", pintarTablaPaginada());
-
-  async function pintarTablaPaginada() {
-    let prestamosAsPag = await obtenerJson(
-      urlPrestamoLocal + `paged?page=${current_page}&size=10`
-    );
-
-    console.log(prestamosAsPag);
-
-    let totalPages = prestamosAsPag.body.totalPages;
-    current_page = prestamosAsPag.body.pageable.pageNumber;
-
-    document.querySelector("#pagActual").textContent = current_page + 1;
-    document.querySelector("#pagTotales").textContent = totalPages;
-
-    let btnPrevio = document.querySelector("#btn_prev");
-    let btnSiguiente = document.querySelector("#btn_next");
-
-    current_page == 0
-      ? btnPrevio.setAttribute("disabled", "")
-      : btnPrevio.removeAttribute("disabled");
-    totalPages == current_page + 1
-      ? btnSiguiente.setAttribute("disabled", "")
-      : btnSiguiente.removeAttribute("disabled");
-
-    prestamosAsPag.body.content.forEach((prestamo) => {
-      $template.querySelector(".nombreCliente").textContent =
-        prestamo.cliente.nombre + " " + prestamo.cliente.apellido;
-
-      $template.querySelector(
-        ".nombreCliente"
-      ).id = `nombreCliente_${prestamo.id}`;
-
-      $template.querySelector(".documentoCliente").textContent =
-        prestamo.cliente.documento;
-
-      $template.querySelector(
-        ".documentoCliente"
-      ).id = `documentoCliente_${prestamo.id}`;
-
-      $template.querySelector(".libroTomado").textContent =
-        prestamo.libro.titulo;
-
-      $template.querySelector(".libroTomado").id = `libroTomado_${prestamo.id}`;
-
-      $template.querySelector(".fechaPrestamo").textContent = formatDate(
-        prestamo.fechaPrestamo,
-        true
-      );
-
-      $template.querySelector(
-        ".fechaPrestamo"
-      ).id = `fechaPrestamo_${prestamo.id}`;
-
-      $template.querySelector(".fechaDevolucion").textContent = formatDate(
-        prestamo.fechaDevolucion,
-        true
-      );
-
-      $template.querySelector(
-        ".fechaDevolucion"
-      ).id = `fechaDevolucion_${prestamo.id}`;
-
-      $template.querySelector(".rowTable").id = `row_${prestamo.id}`;
-
-      $template.querySelector(
-        ".botoncitoCancelar"
-      ).innerHTML = `<button class="btn btn-danger btn-cancelar-prestamo" data-id="${prestamo.id}"}>Dar de baja</button>`;
-
-      $template.querySelector(
-        ".botoncitoEditar"
-      ).innerHTML = `<button class="btn btn-warning btn-editar-prestamo"  data-id="edit_${prestamo.id}"}>Editar</button>`;
-
-      let $clone = d.importNode($template, true);
-      $fragment.appendChild($clone);
-    });
-
-    $table.querySelector("tbody").appendChild($fragment);
-  }
-
-  function formatDate(date, isReversed) {
-    // (Ejemplo)
-    //Date inicial : 2022-03-30T00:00:00.000+00:00
-
-    let formatDate = date.split("T");
-    // Se crea este array de 2 elementos: [2022-03-30] , [T00:00:00.000+00:00]
-
-    formatDate = formatDate[0].split("-");
-    // Se crea este array de 3 elementos: [2022] , [03] , [30]
-
-    if (isReversed) {
-      formatDate = formatDate.reverse(); //Invierte el array previo
-    }
-
-    formatDate = formatDate.toString().replaceAll(",", "-");
-    //Se crea este String 30-03-2022
-
-    return formatDate; //Retorno la fecha final en String
-  }
-
-  function crearPrestamo(options) {
-    obtenerJson(urlPrestamoLocal, options).then((response) => {
-      if (response.body.alta) {
-        $template.querySelector(".nombreCliente").textContent =
-          response.body.cliente.nombre + " " + response.cliente.apellido;
-
-        $template.querySelector(".documentoCliente").textContent =
-          response.body.cliente.documento;
-
-        $template.querySelector(".libroTomado").textContent =
-          response.body.libro.titulo;
-
-        $template.querySelector(".fechaPrestamo").textContent = formatDate(
-          response.body.fechaPrestamo,
-          true
-        );
-
-        $template.querySelector(".fechaDevolucion").textContent = formatDate(
-          response.body.fechaDevolucion,
-          true
-        );
-
-        let $clone = d.importNode($template, true);
-        $fragment.appendChild($clone);
-        $table.querySelector("tbody").appendChild($fragment);
-
-        return true;
-      } else {
-        return false;
-      }
-    });
-  }
-
-  function modificarPrestamo(id, options) {
-    obtenerJson(urlPrestamoLocal + id, options)
-      .then((response) => {
-        console.log(response);
-        if (response.body.alta) {
-          d.getElementById("nombreCliente_" + id).innerHTML =
-            response.body.cliente.nombre + " " + response.body.cliente.apellido;
-          d.getElementById("documentoCliente_" + id).innerHTML =
-            response.body.cliente.documento;
-          d.getElementById("libroTomado_" + id).innerHTML =
-            response.body.libro.titulo;
-          d.getElementById("fechaPrestamo_" + id).innerHTML = formatDate(
-            response.body.fechaPrestamo,
-            true
-          );
-          d.getElementById("fechaDevolucion_" + id).innerHTML = formatDate(
-            response.body.fechaDevolucion,
-            true
-          );
-
-          return true;
-        } else {
-          return false;
-        }
-      })
-      .catch((error) => console.error(error));
-  }
-
-  function getLibroByTitulo(titulo) {
-    return libros.find((librito) => librito.titulo == titulo);
-  }
-
-  function getClienteByName(name) {
-    return clientes.body.find(
-      (clientito) => clientito.nombre + " " + clientito.apellido == name
-    );
-  }
-
-  function getActualDate() {
-    let todayDate = new Date();
-    todayDate =
-      todayDate.getFullYear() +
-      "-" +
-      ("0" + (todayDate.getMonth() + 1)).slice(-2) +
-      "-" +
-      ("0" + todayDate.getDate()).slice(-2);
-
-    return todayDate;
-  }
+  d.addEventListener("DOMContentLoaded", () => {
+    pintarTablaPaginada();
+    getSelectClientes();
+    getSelectLibros();
+  });
 
   d.addEventListener("click", async (e) => {
     let buttonPressed = e.target;
@@ -393,9 +216,94 @@ function main() {
     }
   });
 
-  d.addEventListener("DOMContentLoaded", async function () {
-    /** Llenar select de cliente */
+  d.addEventListener("scroll", () => {
+    let elemento = document.querySelector("#crear");
+    elemento.classList.add("desaparecer");
 
+    setTimeout(() => {
+      elemento.classList.remove("desaparecer");
+    }, 1000);
+  });
+
+  async function pintarTablaPaginada() {
+    let prestamosAsPag = await obtenerJson(
+      urlPrestamoLocal + `paged?page=${current_page}&size=10`
+    );
+
+    console.log(prestamosAsPag);
+
+    let totalPages = prestamosAsPag.body.totalPages;
+    current_page = prestamosAsPag.body.pageable.pageNumber;
+
+    document.querySelector("#pagActual").textContent = current_page + 1;
+    document.querySelector("#pagTotales").textContent = totalPages;
+
+    let btnPrevio = document.querySelector("#btn_prev");
+    let btnSiguiente = document.querySelector("#btn_next");
+
+    current_page == 0
+      ? btnPrevio.setAttribute("disabled", "")
+      : btnPrevio.removeAttribute("disabled");
+    totalPages == current_page + 1
+      ? btnSiguiente.setAttribute("disabled", "")
+      : btnSiguiente.removeAttribute("disabled");
+
+    prestamosAsPag.body.content.forEach((prestamo) => {
+      $template.querySelector(".nombreCliente").textContent =
+        prestamo.cliente.nombre + " " + prestamo.cliente.apellido;
+
+      $template.querySelector(
+        ".nombreCliente"
+      ).id = `nombreCliente_${prestamo.id}`;
+
+      $template.querySelector(".documentoCliente").textContent =
+        prestamo.cliente.documento;
+
+      $template.querySelector(
+        ".documentoCliente"
+      ).id = `documentoCliente_${prestamo.id}`;
+
+      $template.querySelector(".libroTomado").textContent =
+        prestamo.libro.titulo;
+
+      $template.querySelector(".libroTomado").id = `libroTomado_${prestamo.id}`;
+
+      $template.querySelector(".fechaPrestamo").textContent = formatDate(
+        prestamo.fechaPrestamo,
+        true
+      );
+
+      $template.querySelector(
+        ".fechaPrestamo"
+      ).id = `fechaPrestamo_${prestamo.id}`;
+
+      $template.querySelector(".fechaDevolucion").textContent = formatDate(
+        prestamo.fechaDevolucion,
+        true
+      );
+
+      $template.querySelector(
+        ".fechaDevolucion"
+      ).id = `fechaDevolucion_${prestamo.id}`;
+
+      $template.querySelector(".rowTable").id = `row_${prestamo.id}`;
+
+      $template.querySelector(
+        ".botoncitoCancelar"
+      ).innerHTML = `<button class="btn btn-danger btn-cancelar-prestamo" data-id="${prestamo.id}"}>Dar de baja</button>`;
+
+      $template.querySelector(
+        ".botoncitoEditar"
+      ).innerHTML = `<button class="btn btn-warning btn-editar-prestamo"  data-id="edit_${prestamo.id}"}>Editar</button>`;
+
+      let $clone = d.importNode($template, true);
+      $fragment.appendChild($clone);
+    });
+
+    $table.querySelector("tbody").appendChild($fragment);
+  }
+
+  async function getSelectClientes() {
     clientes = await obtenerJson(urlClienteLocal + "/alta");
 
     console.log("//LISTA DE CLIENTES//");
@@ -409,8 +317,10 @@ function main() {
       d.querySelector("#selectClientes").appendChild(optionCliente);
     });
 
-    /** Llenar select de libro */
+    ordenarSelect(d.querySelector("#selectClientes"));
+  }
 
+  async function getSelectLibros() {
     let librosNoFilter = await obtenerJson(urlLibroLocal + "/alta");
 
     librosNoFilter.body.forEach((libro) => {
@@ -425,15 +335,75 @@ function main() {
       }
     });
 
-    console.log("//LISTA DE LIBROS //");
-    console.log(libros);
-  });
+    ordenarSelect(d.querySelector("#selectLibros"));
+  }
 
-  function cancelarPrestamo(index) {
-    obtenerJson(urlDesactivarPrestamo + index).then((response) => {
+  function crearPrestamo(options) {
+    obtenerJson(urlPrestamoLocal, options).then((response) => {
+      if (response.body.alta) {
+        $template.querySelector(".nombreCliente").textContent =
+          response.body.cliente.nombre + " " + response.body.cliente.apellido;
+
+        $template.querySelector(".documentoCliente").textContent =
+          response.body.cliente.documento;
+
+        $template.querySelector(".libroTomado").textContent =
+          response.body.libro.titulo;
+
+        $template.querySelector(".fechaPrestamo").textContent = formatDate(
+          response.body.fechaPrestamo,
+          true
+        );
+
+        $template.querySelector(".fechaDevolucion").textContent = formatDate(
+          response.body.fechaDevolucion,
+          true
+        );
+
+        let $clone = d.importNode($template, true);
+        $fragment.appendChild($clone);
+        $table.querySelector("tbody").appendChild($fragment);
+
+        return true;
+      } else {
+        return false;
+      }
+    });
+  }
+
+  function modificarPrestamo(id, options) {
+    obtenerJson(urlPrestamoLocal + id, options)
+      .then((response) => {
+        console.log(response);
+        if (response.body.alta) {
+          d.getElementById("nombreCliente_" + id).innerHTML =
+            response.body.cliente.nombre + " " + response.body.cliente.apellido;
+          d.getElementById("documentoCliente_" + id).innerHTML =
+            response.body.cliente.documento;
+          d.getElementById("libroTomado_" + id).innerHTML =
+            response.body.libro.titulo;
+          d.getElementById("fechaPrestamo_" + id).innerHTML = formatDate(
+            response.body.fechaPrestamo,
+            true
+          );
+          d.getElementById("fechaDevolucion_" + id).innerHTML = formatDate(
+            response.body.fechaDevolucion,
+            true
+          );
+
+          return true;
+        } else {
+          return false;
+        }
+      })
+      .catch((error) => console.error(error));
+  }
+
+  function cancelarPrestamo(id) {
+    obtenerJson(urlDesactivarPrestamo + id).then((response) => {
       console.log(response);
       if (response.status == 200) {
-        updateDevolutionDate(index);
+        updateDevolutionDate(id);
         return new Boolean(true);
       } else {
         return false;
@@ -441,20 +411,99 @@ function main() {
     });
   }
 
-  function updateDevolutionDate(prestamoId) {
-    let prestamoCancelado = getPrestamoById(prestamoId);
+  async function updateDevolutionDate(prestamoId) {
+    let prestamoCancelado = await getPrestamoById(prestamoId);
 
     options.method = "PUT";
     options.body = JSON.stringify({
-      dniCliente: prestamoCancelado.dniCliente,
+      isbn: prestamoCancelado.libro.isbn,
+      dniCliente: prestamoCancelado.cliente.documento,
       fechaPrestamo: prestamoCancelado.fechaPrestamo,
       fechaDevolucion: getActualDate(),
     });
 
     obtenerJson(urlPrestamoLocal + prestamoId, options).then((response) => {
-      console.log("Entre al update de desactivar");
-      console.log(response);
+      if (response.status >= 200 && response.status < 300) {
+        return true;
+      } else return false;
     });
+  }
+
+  async function getPrestamoById(id) {
+    let response, prestamo;
+
+    if (id.includes("_")) {
+      //Caso donde el id es: "edit_[Nro. ID]"
+      id = id.split("_");
+      response = await fetch(urlPrestamoLocal + id[1]);
+    } else {
+      // Caso donde el id es únicamente el número
+      response = await fetch(urlPrestamoLocal + id);
+    }
+
+    prestamo = await response.json();
+
+    return prestamo;
+  }
+
+  function getLibroByTitulo(titulo) {
+    return libros.find((librito) => librito.titulo == titulo);
+  }
+
+  function getClienteByName(name) {
+    return clientes.body.find(
+      (clientito) => clientito.nombre + " " + clientito.apellido == name
+    );
+  }
+
+  function formatDate(date, isReversed) {
+    // (Ejemplo)
+    //Date inicial : 2022-03-30T00:00:00.000+00:00
+
+    let formatDate = date.split("T");
+    // Se crea este array de 2 elementos: [2022-03-30] , [T00:00:00.000+00:00]
+
+    formatDate = formatDate[0].split("-");
+    // Se crea este array de 3 elementos: [2022] , [03] , [30]
+
+    if (isReversed) {
+      formatDate = formatDate.reverse(); //Invierte el array previo
+    }
+
+    formatDate = formatDate.toString().replaceAll(",", "-");
+    //Se crea este String 30-03-2022
+
+    return formatDate; //Retorno la fecha final en String
+  }
+
+  function getActualDate() {
+    let todayDate = new Date();
+    todayDate =
+      todayDate.getFullYear() +
+      "-" +
+      ("0" + (todayDate.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + todayDate.getDate()).slice(-2);
+
+    return todayDate;
+  }
+
+  function ordenarSelect(selectElem) {
+    var tmpAry = new Array();
+    for (var i = 0; i < selectElem.options.length; i++) {
+      tmpAry[i] = new Array();
+      tmpAry[i][0] = selectElem.options[i].text;
+      tmpAry[i][1] = selectElem.options[i].value;
+    }
+    tmpAry.sort();
+    while (selectElem.options.length > 0) {
+      selectElem.options[0] = null;
+    }
+    for (var i = 0; i < tmpAry.length; i++) {
+      var op = new Option(tmpAry[i][0], tmpAry[i][1]);
+      selectElem.options[i] = op;
+    }
+    return;
   }
 
   let searchInput = document.getElementById("buscar");
@@ -472,24 +521,6 @@ function main() {
         row.style.display = null;
       } else row.style.display = "none";
     }
-  }
-
-  d.addEventListener("scroll", () => {
-    let elemento = document.querySelector("#crear");
-    elemento.classList.add("desaparecer");
-
-    setTimeout(() => {
-      elemento.classList.remove("desaparecer");
-    }, 1000);
-  });
-
-  async function getPrestamoById(id) {
-    let idSplitted = id.split("_");
-
-    let response = await fetch(urlPrestamoLocal + idSplitted[1]);
-    let prestamo = await response.json();
-
-    return prestamo;
   }
 }
 
