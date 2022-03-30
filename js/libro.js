@@ -144,15 +144,15 @@ d.addEventListener("click", async (e) => {
       Swal.fire({
         title: 'Modificar Libro:',
         html: `
-          <p>Titulo: <input id="titulo"  value= "${libro.dataset.titulo}" type="text" class="swal2-input" placeholder="Titulo Libro"></p>
-          <p>Año: <input id="anio"  value= "${libro.dataset.anio}" type="text"  class="swal2-input" placeholder="Año publicacion"></p>
-          <p>ISBN: <input  id="isbn"  value= "i${libro.dataset.isbn}" type="text"  class="swal2-input" placeholder="Año publicacion"></p>
-          <p>Ejemplares: <input  id="ejemplares" value= "${libro.dataset.ejemplares}" type="text"  class="swal2-input" placeholder="Año publicacion"></p>
-           <input  id="ejemplaresPrestados" value= "${libro.dataset.ejemplaresPrestados}" type="hidden"  >
-           <input  id="ejemplaresRestantes" value= "${libro.dataset.ejemplaresRestantes}" type="hidden"  >
-          <p>Autor: ${selectAutor}</p>
-          <p>Editorial: ${selectEditorial}</p>`
-        ,
+        <p>Titulo: <input id="titulo"  value= "${libro.dataset.titulo}" type="text" class="swal2-input" placeholder="Titulo Libro" minlength="2" maxlength="62" required></p>
+        <p>Año: <input id="anio"  value= "${libro.dataset.anio}" type="num"  class="swal2-input" placeholder="Año publicacion" min="868" max="3000" required></p>
+        <p>ISBN: <input  id="isbn"  value= "${libro.dataset.isbn}" type="text"  class="swal2-input" placeholder="Isbn" maxlength="13" required ></p>
+        <p>Ejemplares: <input  id="ejemplares" value= "${libro.dataset.ejemplares}" type="text"  class="swal2-input" placeholder="Año publicacion" required></p>
+         <input  id="ejemplaresPrestados" value= "${libro.dataset.ejemplaresPrestados}" type="hidden"  >
+         <input  id="ejemplaresRestantes" value= "${libro.dataset.ejemplaresRestantes}" type="hidden"  >
+         <p>Autor: ${selectAutor}</p>
+         <p>Editorial: ${selectEditorial}</p>
+              `,
         allowEnterKey: true,
         showCancelButton: true,
         cancelButtonText: 'Cancelar ❌',
@@ -161,6 +161,7 @@ d.addEventListener("click", async (e) => {
           validationMessage: 'my-validation-message'
         },
         preConfirm: () => {
+
           const titulo = Swal.getPopup().querySelector('#titulo').value
           const anio = Swal.getPopup().querySelector('#anio').value
           const isbn = Swal.getPopup().querySelector('#isbn').value
@@ -169,27 +170,36 @@ d.addEventListener("click", async (e) => {
           const ejemplaresRestantes = ejemplares - ejemplaresPrestados
           const autorId = Swal.getPopup().querySelector('#autorId').value
           const editorialId = Swal.getPopup().querySelector('#editorialId').value
+         
           if (!titulo || !anio|| !isbn|| !ejemplares|| !autorId|| !editorialId) {
-            Swal.showValidationMessage(`Todos los campos deben estar completos`)
+          Swal.showValidationMessage(`Todos los campos deben estar completos`)
+          }if (anio<868 || anio> 2022){
+          Swal.showValidationMessage(`El anio no puede ser menor a 868 , ni mayor al actual`)
           }
-          return { titulo: titulo, isbn: isbn,anio: anio, ejemplaresRestantes:ejemplaresRestantes,ejemplaresPrestados:ejemplaresPrestados,ejemplares: ejemplares,autorId: autorId,editorialId: editorialId}
-        }
-      }).then((result) => {
-         console.log(result)
-          let titulo =result.value.titulo;
-          let anio =result.value.anio;
-          let isbn =result.value.isbn;
-          let ejemplares =result.value.ejemplares;
-          let autorId =result.value.autorId;
-          let editorialId =result.value.editorialId;
-          let ejemplaresPrestados=result.value.ejemplaresPrestados;
-          let ejemplaresRestantes=result.value.ejemplaresRestantes;
           options.method = 'PUT';
           options.body = JSON.stringify({ titulo ,anio, isbn, ejemplares,ejemplaresPrestados,ejemplaresRestantes, autorId,editorialId});
-          console.log(options.body);
-          modificarLibro( id, options);
-      })
-    };
+
+          ;
+          return  fetch( modificarLibro( id, options))
+            .then(response => {
+              if (!response.message) {
+                console.log(response);
+                Swal.showValidationMessage(response.json)
+              }
+              return response.json()
+            })
+          
+        },
+      //allowOutsideClick: () => !Swal.isLoading()
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: `${result.value.login}'s avatar`,
+            imageUrl: result.value.avatar_url
+          })
+        }
+      });
+    }
     if (e.target.matches(".botonEstado")) {
       Swal.fire({
         title: '¿Deseas cambiar el estado del libro?',
@@ -393,8 +403,9 @@ function crearLibro( options) {
       
     }).catch(error => console.error(error));
 };
-function modificarLibro(id, options) {
-        obtenerJson(urlLibro + id, options).then(response => {
+async function modificarLibro(id, options) {
+  return await obtenerJson(urlLibro + id, options).then(response => {
+  if (!response.message) {
         d.getElementById("titulo_" + id).innerHTML = response.titulo;
         d.getElementById("isbn_" + id).innerHTML = response.isbn;
         d.getElementById("ejemplaresRestantes_" + id).innerHTML = response.ejemplaresRestantes;
@@ -407,8 +418,19 @@ function modificarLibro(id, options) {
          listadoBotones.children[2].dataset.ejemplares = response.ejemplares;
          listadoBotones.children[2].dataset.ejemplaresPrestados = response.ejemplaresPrestados;
          listadoBotones.children[2].dataset.ejemplaresRestantes = response.ejemplaresRestantes;
-        }).catch(error => console.error(error));
-};      
+  } else {
+          return Promise.reject(response);
+ }
+ }).catch(badResponse => {
+        console.log(badResponse)
+        return(badResponse.message)
+ });
+ }
+
+ function modalError(msj) {
+  Swal.fire(msj, '', 'error')
+}
+
 function activarLibro(index) {
 obtenerJson(urlLibro+urlActivar+index).then(response => {
   {
