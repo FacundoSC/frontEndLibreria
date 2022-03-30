@@ -101,6 +101,8 @@ async function crearCliente(urlCliente, options) {
   // return await obtenerJson(urlCliente, options);
 } 
 
+
+
 d.addEventListener("click", async (e) => {
   if (e.target.matches(".crear")) {
     let nombreFormularioCliente = "";
@@ -119,9 +121,14 @@ d.addEventListener("click", async (e) => {
       cancelButtonText: 'Cancelar ❌',
       confirmButtonText: 'Guardar 💾',
       focusConfirm: false,
+      customClass: {
+        validationMessage: 'my-validation-message'
+      },
       preConfirm: () => {
+        
         let documento, nombre, apellido, telefono, username, password, roleId;
         documento = Swal.getPopup().querySelector('#documento').value;
+       
         nombre = Swal.getPopup().querySelector(`#nombre`).value;
         nombreFormularioCliente = nombre;
         apellido = Swal.getPopup().querySelector('#apellido').value;
@@ -130,6 +137,14 @@ d.addEventListener("click", async (e) => {
         password = Swal.getPopup().querySelector('#password').value;
         roleId = 2;
 
+        //let clienteDatos={documento, nombre, apellido, telefono, username, password, roleId};
+
+        if (!documento| !nombre|!apellido|!telefono| !username|!password|!roleId) {
+          Swal.showValidationMessage(
+            '<i class="fa fa-info-circle"></i> El campo es obligatorio'
+          )
+        }
+ 
         return { documento, nombre, apellido, telefono, username, password, roleId };
       }
     }).then((result) => {
@@ -138,13 +153,13 @@ d.addEventListener("click", async (e) => {
         options.method = 'POST';
           options.body = JSON.stringify(result.value);
           let urlLocal = "http://localhost:8085/api/v1/cliente/";
-           //crearCliente(urlLocal, options)
+           crearCliente(urlLocal, options)
 
         if(options.body.value){
           console.log(options.body.value);
           Swal.fire(`Se ha creado exitosamente el cliente ${nombreFormularioCliente}`, '', 'success')
         }else{
-          Swal.fire(`Se cancelado la operacion ${nombreFormularioCliente}`, '', 'success')
+          Swal.fire(`No se ha podido crear el usuario  ${nombreFormularioCliente}`, '', 'success')
         }
       } else {
         Swal.fire('Se ha cancelado la operación', '', 'warning')
