@@ -241,8 +241,8 @@ export function cambiarEstado(url, id) {
   });
 }
 
-export function crearEntidad(url, options){
-  obtenerJson(url, options).then(response => {
+export async function crearEntidad(url, options){
+  return await obtenerJson(url, options).then(response => {
     if (!response.message) {
       modalExito();
     }
@@ -250,12 +250,13 @@ export function crearEntidad(url, options){
       return Promise.reject(response);
     }
   }).catch(badResponse => {
-    modalError(badResponse.message)
+    // modalError(badResponse.message)
+    return badResponse.message;
   });
 }
 
-export function modificarEntidad(url, id, options){
-  obtenerJson(url+id, options).then(response => {
+export async function modificarEntidad(url, id, options){
+  return await obtenerJson(url+id, options).then(response => {
     if (!response.message) {
       modificarInfo(response, id)
       modalExito()
@@ -264,7 +265,8 @@ export function modificarEntidad(url, id, options){
       return Promise.reject(response);
     }
   }).catch(badResponse => {
-    modalError(badResponse.message)
+    // modalError(badResponse.message)
+    return badResponse.message;
   });
 }
 //Fin modificaciones DOM
