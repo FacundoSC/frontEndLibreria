@@ -69,11 +69,11 @@ function main() {
     }
     //Fin VER
 
-    if (event.target.matches("#btn_next")) {
+    if (e.target.matches("#btn_next")) {
       utilidades.avanzarPagina(urlEditorial, "editorial");
     }
 
-    if (event.target.matches("#btn_prev")) {
+    if (e.target.matches("#btn_prev")) {
       utilidades.retrocederPagina(urlEditorial, "editorial");
     }
   });

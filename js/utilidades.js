@@ -252,8 +252,8 @@ export function cambiarEstado(url, id) {
   });
 }
 
-export function crearEntidad(url, options) {
-  obtenerJson(url, options)
+export async function crearEntidad(url, options) {
+  return await obtenerJson(url, options)
     .then((response) => {
       if (!response.message) {
         modalExito();
@@ -262,12 +262,12 @@ export function crearEntidad(url, options) {
       }
     })
     .catch((badResponse) => {
-      modalError(badResponse.message);
+      return badResponse.message;
     });
 }
 
-export function modificarEntidad(url, id, options) {
-  obtenerJson(url + id, options)
+export async function modificarEntidad(url, id, options) {
+  return await obtenerJson(url + id, options)
     .then((response) => {
       if (!response.message) {
         modificarInfo(response, id);
@@ -277,7 +277,7 @@ export function modificarEntidad(url, id, options) {
       }
     })
     .catch((badResponse) => {
-      modalError(badResponse.message);
+      return badResponse.message;
     });
 }
 
@@ -403,21 +403,21 @@ function modalFormulario(textoHTML, url, accion, id=undefined) {
     showCancelButton: true,
     cancelButtonText: "Cancelar ❌",
     confirmButtonText: "Guardar 💾",
-    preConfirm: () => {
-      return Swal.getPopup().querySelector('.swal2-input').value
-    }
-  }).then((result) => {
-    if (result.isConfirmed) {
-      let nombre = result.value;
+    preConfirm: async (nombre) => {
+      let responseBackEnd;
+      nombre = Swal.getPopup().querySelector('.swal2-input').value
       options.body = JSON.stringify({ nombre });
       if(accion.toLowerCase() == "modificar"){
         options.method = "PUT"
-        modificarEntidad(url, id, options);
+        responseBackEnd = await modificarEntidad(url, id, options);
       } else{
         options.method = "POST"
-        crearEntidad(url, options);
-      }     
-    } else {
+        responseBackEnd = await crearEntidad(url, options);
+      }
+      if(responseBackEnd) Swal.showValidationMessage(responseBackEnd);
+    }
+  }).then((result) => {
+    if (!result.isConfirmed) {
       modalCancelacion();
     }
   });
