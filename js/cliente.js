@@ -61,6 +61,9 @@ d.addEventListener("click", async (e) => {
 async function crearCliente(urlCliente, options) {
 
   return await obtenerJson(urlCliente, options).then(response => {
+    console.log(response);
+    if(response.status>=200 && response.status <=300){
+
     let id = response.id
     let nombre = response.nombre
     let alta = response.alta
@@ -96,7 +99,14 @@ async function crearCliente(urlCliente, options) {
     let $clone = d.importNode($template, true);
     $fragment.appendChild($clone);
     $table.querySelector("tbody").appendChild($fragment);
-  }).catch(error => console.error(error));
+    
+    }else{
+      return Promise.reject(response);
+
+    }
+  }).catch(function(response){
+    return response.message;
+  });
 
   // return await obtenerJson(urlCliente, options);
 }
@@ -336,10 +346,6 @@ d.addEventListener("click", async (e) => {
   }
 });
 
-function obtenerValorSwalPopUp(clase) {
-  return Swal.getPopup().querySelector('#' + clase).value
-}
-
 
 d.addEventListener("click", async (e) => {
   if (e.target.matches(".crear")) {
@@ -362,45 +368,47 @@ d.addEventListener("click", async (e) => {
         validationMessage: 'my-validation-message'
       },
       preConfirm: async () => {
-        //nombreFormularioCliente = nombre;
+        
         let clienteCrear = {
           documento: obtenerValorSwalPopUp("documento"),
           nombre: obtenerValorSwalPopUp("nombre"),
+           nombreFormularioCliente :nombre,
           apellido: obtenerValorSwalPopUp("apellido"),
           telefono: obtenerValorSwalPopUp("telefono"),
           username: obtenerValorSwalPopUp("username"),
           password: obtenerValorSwalPopUp("password"),
           roleId: 2
         }
+       
         //console.log(clienteCrear);
-        /*   if (!documento| !nombre|!apellido|!telefono| !username|!password|!roleId) {
+        if (!clienteCrear.documento|| !clienteCrear.nombre||!clienteCrear.apellido||!clienteCrear.telefono||!clienteCrear.username|!clienteCrear.password) 
             Swal.showValidationMessage(
-              '<i class="fa fa-info-circle"></i> El campo es obligatorio')
-          } */
+              '<i class="fa fa-info-circle"></i> El campo es obligatorio') 
+          
         options.method = 'POST';
         options.body = JSON.stringify(clienteCrear);
         let urlLocal = "http://localhost:8085/api/v1/cliente/";
-        let responseBackEnd = await crearCliente(urlLocal, options);
-
-        if (responseBackEnd)
-          Swal.showValidationMessage(responseBackEnd);
-      }
+         let responseBackEnd = await crearCliente(urlLocal, options);
+   
+        if (responseBackEnd){
+            Swal.showValidationMessage(responseBackEnd);
+        } 
+        
+      },
 
     }).then((result) => {
       if (result.isConfirmed) {
-
-        if (options.body) {
-          console.log(options.body);
-          Swal.fire(`Se ha creado exitosamente el cliente ${nombreFormularioCliente}`, '', 'success')
-        } else {
-          Swal.fire(`No se ha podido crear el usuario  ${nombreFormularioCliente}`, '', 'success')
-        }
-
         
-      } else {
+          Swal.fire(`Se ha creado exitosamente el cliente ${nombreFormularioCliente}`, '', 'success')
+      }else{
         Swal.fire('Se ha cancelado la operación', '', 'warning')
       }
     })
   }
 });
+
+ 
+function obtenerValorSwalPopUp(clase) {
+  return Swal.getPopup().querySelector('#' + clase).value
+}
 
