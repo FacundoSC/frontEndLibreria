@@ -30,7 +30,7 @@ export function modalMostrarResultado(resultado) {
 
 export function modalConfirmacionCambioEstado(estado, index) {
   let nombre = document.querySelector(`#nombre_${index}`).textContent
-  Swal.fire(`El estado de la editorial <b>${nombre}</b> ha sido modificado a: <b>${estado}</b>.`, '', 'success')
+  Swal.fire(`El estado de: <b>${nombre}</b> ha sido modificado a: <b>${estado}</b>.`, '', 'success')
 }
 
 export function modalExito() {
