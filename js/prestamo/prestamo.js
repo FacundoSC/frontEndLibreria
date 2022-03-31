@@ -78,7 +78,11 @@ function main() {
             Swal.showValidationMessage(
               "Por favor complete todos los campos para crear el prestamo"
             );
-          } else if (fechaDevolucion < todayDate || fechaPrestamo < todayDate || fechaDevolucion < fechaPrestamo) {
+          } else if (
+            fechaDevolucion < todayDate ||
+            fechaPrestamo < todayDate ||
+            fechaDevolucion < fechaPrestamo
+          ) {
             Swal.showValidationMessage(
               "Las fechas ingresadas para la creación del prestamo son inválidas (fecha previa a la actual)"
             );
@@ -114,12 +118,20 @@ function main() {
         console.log(result);
         if (result.isConfirmed) {
           Swal.fire(
-              `Se ha creado exitosamente el prestamo del libro: <b>"${result.value.libro}"</b> </br>
+            `Se ha creado exitosamente el prestamo del libro: <b>"${
+              result.value.libro
+            }"</b> </br>
               A cargo del cliente: <b>${result.value.cliente}</b> </br>
-              Fecha inicio: <b>${formatDate(result.value.fechaPrestamo,true)}</b> </br>
-              Fecha fin: <b>${formatDate(result.value.fechaDevolucion,true)}</b> </br>`,
-              "",
-              "success"
+              Fecha inicio: <b>${formatDate(
+                result.value.fechaPrestamo,
+                true
+              )}</b> </br>
+              Fecha fin: <b>${formatDate(
+                result.value.fechaDevolucion,
+                true
+              )}</b> </br>`,
+            "",
+            "success"
           );
         }
       });
@@ -166,7 +178,7 @@ function main() {
           `Fecha de inicio: <input value=${fechaInicActual}  id="swal-input3" type=date  class="swal2-input"> </br>` +
           `Fecha de fin: <input value=${fechaDevActual} id="swal-input4" type=date class="swal2-input"> </br>`,
 
-        preConfirm: () => {
+        preConfirm: async () => {
           const nombreCliente =
             Swal.getPopup().querySelector("#selectClientes").value;
           const nombreLibro =
@@ -175,6 +187,24 @@ function main() {
             Swal.getPopup().querySelector("#swal-input3").value;
           const fechaDevolucion =
             Swal.getPopup().querySelector("#swal-input4").value;
+
+          let libro = getLibroByTitulo(nombreLibro);
+          let cliente = getClienteByName(nombreCliente);
+
+          options.method = "PUT";
+          options.body = JSON.stringify({
+            dniCliente: cliente.documento,
+            fechaPrestamo: fechaPrestamo,
+            fechaDevolucion: fechaDevolucion,
+            tituloLibro: libro.titulo,
+            isbn: libro.isbn,
+          });
+
+          let message = await modificarPrestamo(prestamoEditado.id, options);
+
+          if (message) {
+            Swal.showValidationMessage(message);
+          }
 
           return {
             nombreLibro: nombreLibro,
@@ -185,27 +215,19 @@ function main() {
         },
       }).then((result) => {
         if (result.isConfirmed) {
-          let libro = getLibroByTitulo(result.value.nombreLibro);
-          let cliente = getClienteByName(result.value.nombreCliente);
-
-          options.method = "PUT";
-
-          options.body = JSON.stringify({
-            dniCliente: cliente.documento,
-            fechaPrestamo: result.value.fechaPrestamo,
-            fechaDevolucion: result.value.fechaDevolucion,
-            tituloLibro: libro.titulo,
-            isbn: libro.isbn,
-          });
-
-          modificarPrestamo(prestamoEditado.id, options);
           Swal.fire(
             `Se ha modificado exitosamente el prestamo del libro: <b>${
-              libro.titulo
+              result.value.nombreLibro
             }</b> </br>
-                A cargo del cliente: <b>${
-                  cliente.nombre + " " + cliente.apellido
-                }</b> `,
+                A cargo del cliente: <b>${result.value.nombreCliente}</b> 
+                Fecha inicio: <b>${formatDate(
+                  result.value.fechaPrestamo,
+                  true
+                )}</b> </br>
+              Fecha fin: <b>${formatDate(
+                result.value.fechaDevolucion,
+                true
+              )}</b> </br>`,
             "",
             "success"
           );
@@ -436,8 +458,8 @@ function main() {
     return prestamo;
   }
 
-  function modificarPrestamo(id, options) {
-    obtenerJson(urlPrestamo + id, options)
+  async function modificarPrestamo(id, options) {
+    return await obtenerJson(urlPrestamo + id, options)
       .then((response) => {
         console.log(response);
         if (response.body.alta) {
@@ -455,13 +477,15 @@ function main() {
             response.body.fechaDevolucion,
             true
           );
-
-          return true;
         } else {
-          return false;
+          return Promise.reject(response);
         }
       })
-      .catch((error) => console.error(error));
+      .catch((badResponse) => {
+        console.log(badResponse.body.message);
+
+        return badResponse.body.message;
+      });
   }
 
   function cancelarPrestamo(id) {
