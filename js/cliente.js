@@ -99,10 +99,10 @@ async function crearCliente(urlCliente, options) {
   }).catch(error => console.error(error));
 
   // return await obtenerJson(urlCliente, options);
-} 
+}
 
 
-
+/* 
 d.addEventListener("click", async (e) => {
   if (e.target.matches(".crear")) {
     let nombreFormularioCliente = "";
@@ -128,7 +128,6 @@ d.addEventListener("click", async (e) => {
         
         let documento, nombre, apellido, telefono, username, password, roleId;
         documento = Swal.getPopup().querySelector('#documento').value;
-       
         nombre = Swal.getPopup().querySelector(`#nombre`).value;
         nombreFormularioCliente = nombre;
         apellido = Swal.getPopup().querySelector('#apellido').value;
@@ -141,8 +140,7 @@ d.addEventListener("click", async (e) => {
 
         if (!documento| !nombre|!apellido|!telefono| !username|!password|!roleId) {
           Swal.showValidationMessage(
-            '<i class="fa fa-info-circle"></i> El campo es obligatorio'
-          )
+            '<i class="fa fa-info-circle"></i> El campo es obligatorio')
         }
  
         return { documento, nombre, apellido, telefono, username, password, roleId };
@@ -168,7 +166,7 @@ d.addEventListener("click", async (e) => {
 
   }
 
-});
+}); */
 
 
 function modificarCliente(urlCliente, id, options) {
@@ -177,8 +175,8 @@ function modificarCliente(urlCliente, id, options) {
     d.getElementById("nombre_" + id).innerHTML = response.nombre;
     d.getElementById("apellido_" + id).innerHTML = response.apellido;
     d.getElementById("telefono_" + id).innerHTML = response.telefono;
-    
-   
+
+
     let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
     listadoBotones.children[1].dataset.nombre = response.nombre;
     listadoBotones.children[2].dataset.nombre = response.nombre;
@@ -191,34 +189,34 @@ d.addEventListener("click", async (e) => {
 
     let id = e.target.dataset.id
 
-    let documento = d.getElementById("documento_"+id).textContent;
-    let nombre = d.getElementById("nombre_"+ id).textContent;
-    let apellido = d.getElementById("apellido_"+id).textContent;
-    let telefono = d.getElementById("telefono_"+id).textContent;
-    
-    
+    let documento = d.getElementById("documento_" + id).textContent;
+    let nombre = d.getElementById("nombre_" + id).textContent;
+    let apellido = d.getElementById("apellido_" + id).textContent;
+    let telefono = d.getElementById("telefono_" + id).textContent;
+
+
     Swal.fire({
       title: 'Ingrese los datos a modificar : ',
       html:
         `Documento<input id="documento" class="swal2-input" value = "${documento}">` +
         `Nombre<input id="nombre" class="swal2-input" value = "${nombre}">` +
-        `Apellido<input id="apellido" class="swal2-input" value = "${apellido}">`+
+        `Apellido<input id="apellido" class="swal2-input" value = "${apellido}">` +
         `Telefono<input id="telefono" class="swal2-input" value = "${telefono}">`,
-       
+
       showCancelButton: true,
       cancelButtonText: 'Cancelar ❌',
       confirmButtonText: 'Guardar 💾',
       focusConfirm: false,
       preConfirm: () => {
-        let documento, nombre, apellido, telefono,roleId, username, password;
+        let documento, nombre, apellido, telefono, roleId, username, password;
         documento = Swal.getPopup().querySelector('#documento').value;
         nombre = Swal.getPopup().querySelector(`#nombre`).value;
         apellido = Swal.getPopup().querySelector('#apellido').value;
         telefono = Swal.getPopup().querySelector(`#telefono`).value;
-      
-        roleId=2;
-       username="js@js.com";
-       password="123";
+
+        roleId = 2;
+        username = "js@js.com";
+        password = "123";
 
         return { documento, nombre, apellido, telefono, roleId, username, password };
       }
@@ -247,94 +245,162 @@ d.addEventListener("click", async (e) => {
 
 
 function obtenerClientesPaginados() {
-  
-  obtenerJson(urlCliente + `paged?page=${current_page}&size=10`).then(response =>{
-      totalPages = response.totalPages;
-      current_page = response.pageable.pageNumber
 
-      document.querySelector("#pagActual").textContent = (current_page+1);
-      document.querySelector("#pagTotales").textContent = totalPages;
+  obtenerJson(urlCliente + `paged?page=${current_page}&size=10`).then(response => {
+    totalPages = response.totalPages;
+    current_page = response.pageable.pageNumber
 
-      let btnPrevio = document.querySelector("#btn_prev");
-      let btnSiguiente = document.querySelector("#btn_next");
+    document.querySelector("#pagActual").textContent = (current_page + 1);
+    document.querySelector("#pagTotales").textContent = totalPages;
 
-      (current_page == 0) ? btnPrevio.setAttribute("disabled", '') : btnPrevio.removeAttribute("disabled");
-      (totalPages == (current_page+1)) ? btnSiguiente.setAttribute("disabled", '') : btnSiguiente.removeAttribute("disabled");
-      
-      response.content.forEach(cliente => {
-        $template.querySelector(".documento").textContent = cliente.documento;
-        $template.querySelector(".documento").id = `documento_${cliente.id}`;
-        $template.querySelector(".nombre").textContent = cliente.nombre;
-        $template.querySelector(".nombre").id = `nombre_${cliente.id}`;
-        $template.querySelector(".apellido").textContent = cliente.apellido;
-        $template.querySelector(".apellido").id = `apellido_${cliente.id}`;
-        $template.querySelector(".telefono").textContent = cliente.telefono;
-        $template.querySelector(".telefono").id = `telefono_${cliente.id}`;
-       
-        $template.querySelector(".estado").textContent = cliente.alta;
-        $template.querySelector(".estado").id = `estado_${cliente.id}`;
-        $template.querySelector(".editar").dataset.id = `${cliente.id}`;
-        $template.querySelector(".editar").id = `editar_${cliente.id}`;
-  
-        $template.querySelector(".ver").dataset.documento = cliente.documento;
-        $template.querySelector(".ver").dataset.nombre = cliente.nombre;
-        $template.querySelector(".ver").dataset.apellido = cliente.apellido;
-        $template.querySelector(".ver").dataset.telefono = cliente.telefono;
-     
-        $template.querySelector(".botonEstado").id = `botonEstado_${cliente.id}`;
-        $template.querySelector(".botonEstado").classList.remove('btn-success');
-        $template.querySelector(".botonEstado").classList.remove('btn-danger');
-        $template.querySelector(".botonEstado").dataset.nombre = cliente.nombre;
-  
-        $template.querySelector(".documento").classList.remove('tachado');
-        $template.querySelector(".nombre").classList.remove('tachado');
-        $template.querySelector(".apellido").classList.remove('tachado');
-        $template.querySelector(".telefono").classList.remove('tachado');
-       
-       // $template.querySelector(".estado").classList.remove('tachado');
-  
-        $template.querySelector(".editar").removeAttribute("disabled")
-        $template.querySelector(".botonEstado").dataset.id = cliente.id;
-        $template.querySelector(".botonEstado").dataset.estado = cliente.alta;
-  
-        if (cliente.alta) {
-          $template.querySelector(".botonEstado").classList.add('btn-success');
-          $template.querySelector(".estado").textContent = "Activado";
-        } else {
-          $template.querySelector(".estado").textContent = "Desactivado";
-          $template.querySelector(".botonEstado").classList.add('btn-danger');
-          $template.querySelector(".documento").classList.add('tachado');
-          $template.querySelector(".nombre").classList.add('tachado');
-          $template.querySelector(".apellido").classList.add('tachado');
-          $template.querySelector(".telefono").classList.add('tachado');
+    let btnPrevio = document.querySelector("#btn_prev");
+    let btnSiguiente = document.querySelector("#btn_next");
 
-         // $template.querySelector(".estado").classList.add('tachado');
-          $template.querySelector(".editar").setAttribute("disabled", '')
-        }
-          let $clone = document.importNode($template, true);
-          $fragment.appendChild($clone);
-      });
-      $table.querySelector("tbody").appendChild($fragment);
+    (current_page == 0) ? btnPrevio.setAttribute("disabled", '') : btnPrevio.removeAttribute("disabled");
+    (totalPages == (current_page + 1)) ? btnSiguiente.setAttribute("disabled", '') : btnSiguiente.removeAttribute("disabled");
+
+    response.content.forEach(cliente => {
+      $template.querySelector(".documento").textContent = cliente.documento;
+      $template.querySelector(".documento").id = `documento_${cliente.id}`;
+      $template.querySelector(".nombre").textContent = cliente.nombre;
+      $template.querySelector(".nombre").id = `nombre_${cliente.id}`;
+      $template.querySelector(".apellido").textContent = cliente.apellido;
+      $template.querySelector(".apellido").id = `apellido_${cliente.id}`;
+      $template.querySelector(".telefono").textContent = cliente.telefono;
+      $template.querySelector(".telefono").id = `telefono_${cliente.id}`;
+
+      $template.querySelector(".estado").textContent = cliente.alta;
+      $template.querySelector(".estado").id = `estado_${cliente.id}`;
+      $template.querySelector(".editar").dataset.id = `${cliente.id}`;
+      $template.querySelector(".editar").id = `editar_${cliente.id}`;
+
+      $template.querySelector(".ver").dataset.documento = cliente.documento;
+      $template.querySelector(".ver").dataset.nombre = cliente.nombre;
+      $template.querySelector(".ver").dataset.apellido = cliente.apellido;
+      $template.querySelector(".ver").dataset.telefono = cliente.telefono;
+
+      $template.querySelector(".botonEstado").id = `botonEstado_${cliente.id}`;
+      $template.querySelector(".botonEstado").classList.remove('btn-success');
+      $template.querySelector(".botonEstado").classList.remove('btn-danger');
+      $template.querySelector(".botonEstado").dataset.nombre = cliente.nombre;
+
+      $template.querySelector(".documento").classList.remove('tachado');
+      $template.querySelector(".nombre").classList.remove('tachado');
+      $template.querySelector(".apellido").classList.remove('tachado');
+      $template.querySelector(".telefono").classList.remove('tachado');
+
+      // $template.querySelector(".estado").classList.remove('tachado');
+
+      $template.querySelector(".editar").removeAttribute("disabled")
+      $template.querySelector(".botonEstado").dataset.id = cliente.id;
+      $template.querySelector(".botonEstado").dataset.estado = cliente.alta;
+
+      if (cliente.alta) {
+        $template.querySelector(".botonEstado").classList.add('btn-success');
+        $template.querySelector(".estado").textContent = "Activado";
+      } else {
+        $template.querySelector(".estado").textContent = "Desactivado";
+        $template.querySelector(".botonEstado").classList.add('btn-danger');
+        $template.querySelector(".documento").classList.add('tachado');
+        $template.querySelector(".nombre").classList.add('tachado');
+        $template.querySelector(".apellido").classList.add('tachado');
+        $template.querySelector(".telefono").classList.add('tachado');
+
+        // $template.querySelector(".estado").classList.add('tachado');
+        $template.querySelector(".editar").setAttribute("disabled", '')
+      }
+      let $clone = document.importNode($template, true);
+      $fragment.appendChild($clone);
+    });
+    $table.querySelector("tbody").appendChild($fragment);
   })
 }
 
-d.addEventListener("DOMContentLoaded", obtenerClientesPaginados()); 
- 
+d.addEventListener("DOMContentLoaded", obtenerClientesPaginados());
+
 d.addEventListener("click", async (e) => {
-if (e.target.matches("#btn_next")) {
-  if (current_page < (totalPages - 1)) {
-    current_page++;
-    $table.querySelector("tbody").innerHTML = "";
-    obtenerClientesPaginados();
+  if (e.target.matches("#btn_next")) {
+    if (current_page < (totalPages - 1)) {
+      current_page++;
+      $table.querySelector("tbody").innerHTML = "";
+      obtenerClientesPaginados();
+    }
   }
+
+  if (e.target.matches("#btn_prev")) {
+    if (current_page > 0) {
+      current_page--;
+      $table.querySelector("tbody").innerHTML = "";
+      obtenerClientesPaginados();
+    }
+  }
+});
+
+function obtenerValorSwalPopUp(clase) {
+  return Swal.getPopup().querySelector('#' + clase).value
 }
 
-if (e.target.matches("#btn_prev")) {
-  if (current_page > 0) {
-    current_page--;
-    $table.querySelector("tbody").innerHTML = "";
-    obtenerClientesPaginados();
+
+d.addEventListener("click", async (e) => {
+  if (e.target.matches(".crear")) {
+    let nombreFormularioCliente = "";
+    Swal.fire({
+      title: 'Ingrese sus Datos de Cliente: ',
+      html:
+        'Documento<input id="documento" class="swal2-input">' +
+        'Nombre<input id="nombre" class="swal2-input">' +
+        'Apellido<input id="apellido" class="swal2-input">' +
+        'Telefono<input id="telefono" class="swal2-input">' +
+        'Username<input id="username" class="swal2-input" type ="email">' +
+        'Password<input id="password" class="swal2-input" type ="password">',
+
+      showCancelButton: true,
+      cancelButtonText: 'Cancelar ❌',
+      confirmButtonText: 'Guardar 💾',
+      focusConfirm: false,
+      customClass: {
+        validationMessage: 'my-validation-message'
+      },
+      preConfirm: async () => {
+        //nombreFormularioCliente = nombre;
+        let clienteCrear = {
+          documento: obtenerValorSwalPopUp("documento"),
+          nombre: obtenerValorSwalPopUp("nombre"),
+          apellido: obtenerValorSwalPopUp("apellido"),
+          telefono: obtenerValorSwalPopUp("telefono"),
+          username: obtenerValorSwalPopUp("username"),
+          password: obtenerValorSwalPopUp("password"),
+          roleId: 2
+        }
+        //console.log(clienteCrear);
+        /*   if (!documento| !nombre|!apellido|!telefono| !username|!password|!roleId) {
+            Swal.showValidationMessage(
+              '<i class="fa fa-info-circle"></i> El campo es obligatorio')
+          } */
+        options.method = 'POST';
+        options.body = JSON.stringify(clienteCrear);
+        let urlLocal = "http://localhost:8085/api/v1/cliente/";
+        let responseBackEnd = await crearCliente(urlLocal, options);
+
+        if (responseBackEnd)
+          Swal.showValidationMessage(responseBackEnd);
+      }
+
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+        if (options.body) {
+          console.log(options.body);
+          Swal.fire(`Se ha creado exitosamente el cliente ${nombreFormularioCliente}`, '', 'success')
+        } else {
+          Swal.fire(`No se ha podido crear el usuario  ${nombreFormularioCliente}`, '', 'success')
+        }
+
+        
+      } else {
+        Swal.fire('Se ha cancelado la operación', '', 'warning')
+      }
+    })
   }
-}
 });
- 
+
