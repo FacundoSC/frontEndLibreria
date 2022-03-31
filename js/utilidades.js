@@ -131,7 +131,11 @@ function botonesAPintar() {
 function pintarPropiedad(entidad) {
   let listadoPropiedades = propiedadesAPintar();
   listadoPropiedades.forEach(propiedad => {
-    $template.querySelector(`.${propiedad}`).textContent = entidad[propiedad];
+    if(propiedad == "alta"){
+      (entidad[propiedad]) ? $template.querySelector(`.${propiedad}`).textContent="Activado":$template.querySelector(`.${propiedad}`).textContent="Desactivado"
+    } else{
+      $template.querySelector(`.${propiedad}`).textContent = entidad[propiedad];
+    }
     $template.querySelector(`.${propiedad}`).id = `${propiedad}_${entidad.id}`;
     $template.querySelector(`.${propiedad}`).dataset[propiedad] = entidad[propiedad];
     $template.querySelector(`.${propiedad}`).classList.remove('tachado');
