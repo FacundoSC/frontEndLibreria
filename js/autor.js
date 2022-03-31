@@ -43,42 +43,7 @@ function main() {
         }
 
         if (event.target.matches(".editar")) {
-            const id = event.target.dataset.id;
-            const nombreViejo = document.getElementById("nombre_" + id).textContent;
-            let nombre = nombreViejo;
-
-            Swal.fire({
-                title: 'Modificar nombre:',
-                input: 'text',
-                inputValue: nombreViejo,
-                inputAttributes: {
-                    placeholder: "Indique nuevo nombre",
-                    autocapitalize: 'off'
-                },
-                allowEnterKey: true,
-                showCancelButton: true,
-                cancelButtonText: 'Cancelar ❌',
-                confirmButtonText: 'Guardar 💾',
-                customClass: {
-                    validationMessage: 'my-validation-message'
-                },
-                preConfirm: (value) => {
-                    if (!value) {
-                        Swal.showValidationMessage(
-                            '<i class="fa fa-info-circle"></i>El nombre es requerido.'
-                        )
-                    }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    nombre = result.value
-                    options.method = 'PUT';
-                    options.body = JSON.stringify({ nombre });
-                    utilidades.modificarEntidad(urlAutor, id, options)
-                } else {
-                    utilidades.modalCancelacion();
-                }
-            })
+            utilidades.editar(event.target, urlAutor)
         };
 
         if (event.target.matches(".botonEstado")) {
