@@ -66,15 +66,14 @@ function main() {
           validationMessage: "my-validation-message",
         },
         preConfirm: async () => {
+            let ejemplaresRestantes = parseInt(obtenerValorSwalPopUp("ejemplares")) - parseInt(obtenerValorSwalPopUp("ejemplaresPrestados"));
           let libroModificar = {
             titulo: obtenerValorSwalPopUp("titulo"),
             anio: obtenerValorSwalPopUp("anio"),
             isbn: obtenerValorSwalPopUp("isbn"),
-            ejemplares: obtenerValorSwalPopUp("ejemplares"),
-            ejemplaresPrestados: obtenerValorSwalPopUp("ejemplaresPrestados"),
-            ejemplaresRestantes: function () {
-              this.ejemplares - this.ejemplaresPrestado;
-            },
+            ejemplares: parseInt(obtenerValorSwalPopUp("ejemplares")),
+            ejemplaresPrestados: parseInt(obtenerValorSwalPopUp("ejemplaresPrestados")),
+            ejemplaresRestantes,
             autorId: obtenerValorSwalPopUp("autorId"),
             editorialId: obtenerValorSwalPopUp("editorialId"),
           };
@@ -170,15 +169,14 @@ function main() {
           validationMessage: "my-validation-message",
         },
         preConfirm: async () => {
+            let ejemplaresRestantes = parseInt(obtenerValorSwalPopUp("ejemplares")) - parseInt(obtenerValorSwalPopUp("ejemplaresPrestados"));
           let libroModificar = {
             titulo: obtenerValorSwalPopUp("titulo"),
             anio: obtenerValorSwalPopUp("anio"),
             isbn: obtenerValorSwalPopUp("isbn"),
             ejemplares: obtenerValorSwalPopUp("ejemplares"),
             ejemplaresPrestados: obtenerValorSwalPopUp("ejemplaresPrestados"),
-            ejemplaresRestantes: function () {
-              this.ejemplares - this.ejemplaresPrestado;
-            },
+            ejemplaresRestantes,
             autorId: obtenerValorSwalPopUp("autorId"),
             editorialId: obtenerValorSwalPopUp("editorialId"),
           };
@@ -199,7 +197,7 @@ function main() {
       }).then((result) => {
         if (result.isConfirmed) {
           Swal.fire({
-            text: "Se ha creado el libro",
+            text: "Se ha modificado libro",
           });
         } else {
           Swal.fire({
@@ -444,8 +442,8 @@ async function modificarLibro(id, options) {
       if (!response.message) {
         d.getElementById("titulo_" + id).innerHTML = response.titulo;
         d.getElementById("isbn_" + id).innerHTML = response.isbn;
-        d.getElementById("ejemplaresRestantes_" + id).innerHTML =
-          response.ejemplaresRestantes;
+        console.log(" response.ejemplaresRestantes",  response.ejemplaresRestantes);
+        d.getElementById("ejemplaresRestantes_" + id).innerHTML = response.ejemplaresRestantes;
         let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
         listadoBotones.children[1].dataset.titulo = response.titulo;
         listadoBotones.children[2].dataset.titulo = response.titulo;
