@@ -1,7 +1,6 @@
 import { options, urlAutor, urlDesactivar, urlActivar } from "./constantes.js";
 import { obtenerJson } from "./asincronico.js";
 
-let autores;
 let current_page = 0;
 let totalPages
 let $table = document.querySelector(".table");
@@ -233,6 +232,7 @@ function obtenerAutores(urlAutor) {
         $table.querySelector("tbody").appendChild($fragment);
     });
 }
+
 
 function activarAutor(urlAutor, index) {
     obtenerJson(urlAutor + index).then(response => {
