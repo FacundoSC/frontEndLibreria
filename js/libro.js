@@ -82,9 +82,7 @@ function main() {
           options.method = "POST";
           options.body = JSON.stringify(libroModificar);
           let responseBackEnd = await crearLibro(options);
-          console.log(typeof libroModificar.isbn);
-
-          if (!isNaN(libroModificar.isbn) && !isEmpty(libroModificar)) {
+          if (!isNaN(libroModificar.isbn) && !(JSON.stringify(libroModificar) === '{}')) {
             if (responseBackEnd) {
               Swal.showValidationMessage(responseBackEnd);
             }
@@ -92,10 +90,7 @@ function main() {
             if (isNaN(libroModificar.isbn)) {
               Swal.showValidationMessage(`El isbn debe ser numerico`);
             }
-            if (isEmpty(libroModificar)) {
-              Swal.showValidationMessage(`Los campos deben estar completos`);
-            }
-          }
+           }
         },
       }).then((result) => {
         if (result.isConfirmed) {
@@ -191,7 +186,7 @@ function main() {
           options.body = JSON.stringify(libroModificar);
           let responseBackEnd = await modificarLibro(id, options);
           if (responseBackEnd) Swal.showValidationMessage(responseBackEnd);
-          if (!isNaN(libroModificar.isbn) && !isEmpty(libroModificar)) {
+          if (!isNaN(libroModificar.isbn) && !(JSON.stringify(libroModificar) === '{}')) {
             if (responseBackEnd) {
               Swal.showValidationMessage(responseBackEnd);
             }
@@ -199,10 +194,7 @@ function main() {
             if (isNaN(libroModificar.isbn)) {
               Swal.showValidationMessage(`El isbn debe ser numerico`);
             }
-            if (isEmpty(libroModificar)) {
-              Swal.showValidationMessage(`Los campos deben estar completos`);
-            }
-          }
+           }
         },
       }).then((result) => {
         if (result.isConfirmed) {
@@ -443,7 +435,6 @@ async function crearLibro(options) {
       }
     })
     .catch((badResponse) => {
-      console.log(badResponse);
       return badResponse.message;
     });
 }
@@ -456,7 +447,6 @@ async function modificarLibro(id, options) {
         d.getElementById("ejemplaresRestantes_" + id).innerHTML =
           response.ejemplaresRestantes;
         let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
-        console.log(listadoBotones);
         listadoBotones.children[1].dataset.titulo = response.titulo;
         listadoBotones.children[2].dataset.titulo = response.titulo;
         listadoBotones.children[2].dataset.anio = response.anio;
