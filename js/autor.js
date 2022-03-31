@@ -11,39 +11,11 @@ function main() {
 
   document.addEventListener("click", async (event) => {
     if (event.target.matches(".crear")) {
-      Swal.fire({
-        title: "Ingrese nombre del autor:",
-        input: "text",
-        inputAttributes: {
-          autocapitalize: "off",
-        },
-        showCancelButton: true,
-        cancelButtonText: "Cancelar ❌",
-        confirmButtonText: "Guardar 💾",
-        customClass: {
-          validationMessage: "my-validation-message",
-        },
-        preConfirm: (value) => {
-          if (!value) {
-            Swal.showValidationMessage(
-              '<i class="fa fa-info-circle"></i>El nombre es requerido.'
-            );
-          }
-        },
-      }).then((result) => {
-        if (result.isConfirmed) {
-          let nombre = result.value;
-          options.method = "POST";
-          options.body = JSON.stringify({ nombre });
-          utilidades.crearEntidad(urlAutor, options);
-        } else {
-          utilidades.modalCancelacion();
-        }
-      });
+        utilidades.crearConForm(urlAutor);
     }
 
     if (event.target.matches(".editar")) {
-      utilidades.editar(event.target, urlAutor);
+      utilidades.editarConForm(event.target, urlAutor);
     }
 
     if (event.target.matches(".botonEstado")) {

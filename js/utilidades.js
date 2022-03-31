@@ -38,7 +38,12 @@ export function modalConfirmacionCambioEstado(estado, index) {
 }
 
 export function modalExito() {
-  Swal.fire(`Se ha guardado correctamente!`, "", "success");
+  Swal.fire({
+    icon: 'success',
+    title: 'Se ha guardado correctamente!',
+    showConfirmButton: false,
+    timer: 1500
+  })
 }
 
 export function modalError(msj) {
@@ -363,35 +368,36 @@ function desactivarEntidad(url, index) {
 //Fin DESACTIVAR
 
 //prueba edicion
-export function editar(boton, urlEditar) {
+export function editarConForm(boton, urlEditar) {
   const id = boton.dataset.id;
-  const nombreViejo = document.getElementById("nombre_" + id).textContent;
-
-  let nombre = nombreViejo;
-  let textoHTML = "";
-
-  modalEditar(obtenerEditables(id), urlEditar, id);
+  modalFormulario(obtenerEditables(id), urlEditar, "Modificar", id);
 }
 
-function obtenerEditables(id) {
-  let nodoHijos = document.getElementById("nombre_" + id).parentElement
-    .children;
+export function crearConForm(urlCrear){
+  modalFormulario(obtenerEditables(), urlCrear, "Crear");
+}
+
+function obtenerEditables(id=undefined) {
+  let nodoHijos = document.querySelector("tr").children;
   let textoHTML = "";
   for (const hijo of nodoHijos) {
     if (hijo.classList.contains("editable")) {
-      let id = hijo.id;
-      let datoCargar = id.split("_")[0];
+      let forLabel = hijo.dataset.label;
       let type = hijo.dataset.type;
-      let valorActual = hijo.textContent;
-      textoHTML += `<label class="label-input" for="${id}">${datoCargar}:</label><input id="${id}" class="swal2-input" type="${type}" value="${valorActual}"><br>`;
+      let valorActual = "";
+      if(id){
+        let propiedad = forLabel.toLowerCase();
+        valorActual = document.querySelector(`#${propiedad}_${id}`).textContent
+      }
+      textoHTML += `<label class="label-input" for="${forLabel}">${forLabel}:</label><input id="${forLabel}" class="swal2-input" type="${type}" value="${valorActual}"><br>`;
     }
   }
   return textoHTML;
 }
 
-function modalEditar(textoHTML, urlEditar, id) {
+function modalFormulario(textoHTML, url, accion, id=undefined) {
   Swal.fire({
-    title: "Modificar:",
+    title: accion,
     html: textoHTML,
     allowEnterKey: true,
     showCancelButton: true,
@@ -403,9 +409,14 @@ function modalEditar(textoHTML, urlEditar, id) {
   }).then((result) => {
     if (result.isConfirmed) {
       let nombre = result.value;
-      options.method = "PUT";
       options.body = JSON.stringify({ nombre });
-      modificarEntidad(urlEditar, id, options);
+      if(accion.toLowerCase() == "modificar"){
+        options.method = "PUT"
+        modificarEntidad(url, id, options);
+      } else{
+        options.method = "POST"
+        crearEntidad(url, options);
+      }     
     } else {
       modalCancelacion();
     }

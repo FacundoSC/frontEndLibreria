@@ -10,40 +10,12 @@ function main() {
   document.addEventListener("click", async (e) => {
     //Inicio CREAR
     if (e.target.matches(".crear")) {
-      Swal.fire({
-        title: 'Ingrese nombre de la editorial:',
-        input: 'text',
-        inputAttributes: {
-          autocapitalize: 'off'
-        },
-        showCancelButton: true,
-        cancelButtonText: 'Cancelar ❌',
-        confirmButtonText: 'Guardar 💾',
-        customClass: {
-          validationMessage: 'my-validation-message'
-        },
-        preConfirm: (value) => {
-          if (!value) {
-            Swal.showValidationMessage(
-              '<i class="fa fa-info-circle"></i>El nombre es requerido.'
-            )
-          }
-        }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          let nombre = result.value
-          options.method = 'POST';
-          options.body = JSON.stringify({ nombre });
-          utilidades.crearEntidad(urlEditorial, options);
-        } else {
-          utilidades.modalCancelacion()
-        }
-      })
+      utilidades.crearConForm(urlEditorial);
     } //fin CREAR
 
     //Inicio EDITAR
     if (e.target.matches(".editar")) {
-       utilidades.editar(e.target, urlEditorial)
+       utilidades.editarConForm(e.target, urlEditorial)
     }
     //FIN EDITAR
 
