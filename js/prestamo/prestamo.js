@@ -78,7 +78,7 @@ function main() {
             Swal.showValidationMessage(
               "Por favor complete todos los campos para crear el prestamo"
             );
-          } else if (fechaDevolucion < todayDate || fechaPrestamo < todayDate) {
+          } else if (fechaDevolucion < todayDate || fechaPrestamo < todayDate || fechaDevolucion < fechaPrestamo) {
             Swal.showValidationMessage(
               "Las fechas ingresadas para la creación del prestamo son inválidas (fecha previa a la actual)"
             );
@@ -87,7 +87,7 @@ function main() {
             let clienteObj = getClienteByName(cliente);
 
             options.method = "POST";
-            
+
             options.body = JSON.stringify({
               dniCliente: clienteObj.documento,
               fechaPrestamo: fechaPrestamo,
@@ -114,10 +114,12 @@ function main() {
         console.log(result);
         if (result.isConfirmed) {
           Swal.fire(
-            `Se ha creado exitosamente el prestamo del libro: <b>${result.value.libro}</b> </br>
-                A cargo del cliente: <b>${result.value.cliente}</b> `,
-            "",
-            "success"
+              `Se ha creado exitosamente el prestamo del libro: <b>"${result.value.libro}"</b> </br>
+              A cargo del cliente: <b>${result.value.cliente}</b> </br>
+              Fecha inicio: <b>${formatDate(result.value.fechaPrestamo,true)}</b> </br>
+              Fecha fin: <b>${formatDate(result.value.fechaDevolucion,true)}</b> </br>`,
+              "",
+              "success"
           );
         }
       });
@@ -417,6 +419,23 @@ function main() {
       });
   }
 
+  async function getPrestamoById(id) {
+    let response, prestamo;
+
+    if (id.includes("_")) {
+      //Caso donde el id es: "edit_[Nro. ID]"
+      id = id.split("_");
+      response = await fetch(urlPrestamo + id[1]);
+    } else {
+      // Caso donde el id es únicamente el número
+      response = await fetch(urlPrestamo + id);
+    }
+
+    prestamo = await response.json();
+
+    return prestamo;
+  }
+
   function modificarPrestamo(id, options) {
     obtenerJson(urlPrestamo + id, options)
       .then((response) => {
@@ -474,23 +493,6 @@ function main() {
         return true;
       } else return false;
     });
-  }
-
-  async function getPrestamoById(id) {
-    let response, prestamo;
-
-    if (id.includes("_")) {
-      //Caso donde el id es: "edit_[Nro. ID]"
-      id = id.split("_");
-      response = await fetch(urlPrestamo + id[1]);
-    } else {
-      // Caso donde el id es únicamente el número
-      response = await fetch(urlPrestamo + id);
-    }
-
-    prestamo = await response.json();
-
-    return prestamo;
   }
 
   function getLibroByTitulo(titulo) {
