@@ -275,6 +275,18 @@ export function modificarEntidad(url, id, options) {
       modalError(badResponse.message);
     });
 }
+
+export function avanzarPagina(url, tipo){
+  current_page++;
+  $table.querySelector("tbody").innerHTML = "";
+  obtenerEntidadPaginada(url, tipo, current_page);
+}
+
+export function retrocederPagina(url, tipo){
+  current_page--;
+  $table.querySelector("tbody").innerHTML = "";
+  obtenerEntidadPaginada(url, tipo, current_page);
+}
 //Fin modificaciones DOM
 
 //Ocultar boton de creacion
@@ -313,6 +325,7 @@ function buscaTabla() {
 let $table = document.querySelector(".table");
 let $template = document.getElementById("crud-template").content;
 let $fragment = document.createDocumentFragment();
+let current_page = 0;
 //FIN Variables globales para pintado
 
 //Función ACTIVAR
@@ -398,4 +411,3 @@ function modalEditar(textoHTML, urlEditar, id) {
     }
   });
 }
-

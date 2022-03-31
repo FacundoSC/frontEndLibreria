@@ -1,10 +1,6 @@
 import { options, urlEditorial } from "./constantes.js";
 import * as utilidades from './utilidades.js';
 
-let current_page = 0;
-let $table = document.querySelector(".table");
-//Fin variables globales
-
 main();
 
 function main() {
@@ -101,16 +97,12 @@ function main() {
     }
     //Fin VER
 
-    if (e.target.matches("#btn_next")) {
-      current_page++;
-      $table.querySelector("tbody").innerHTML = "";
-      utilidades.obtenerEntidadPaginada(urlEditorial, "editorial", current_page);
+    if (event.target.matches("#btn_next")) {
+      utilidades.avanzarPagina(urlEditorial, "editorial");
     }
 
-    if (e.target.matches("#btn_prev")) {
-      current_page--;
-      $table.querySelector("tbody").innerHTML = "";
-      utilidades.obtenerEntidadPaginada(urlEditorial, "editorial", current_page);
+    if (event.target.matches("#btn_prev")) {
+      utilidades.retrocederPagina(urlEditorial, "editorial");
     }
   });
   //fin funciones
