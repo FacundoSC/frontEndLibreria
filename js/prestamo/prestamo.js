@@ -1,10 +1,6 @@
 import { obtenerJson } from "../asincronico.js";
-import {
-  urlPrestamo,
-  urlDesactivarPrestamo,
-  urlPrestamoLocal,
-} from "./PrestamoUris.js";
-import { urlClienteLocal, urlLibroLocal, options } from "../constantes.js";
+import { urlDesactivarPrestamo, urlPrestamo } from "./PrestamoUris.js";
+import { options, urlCliente, urlLibro } from "../constantes.js";
 
 const d = document,
   $table = d.querySelector("#tablaPrestamos"),
@@ -81,6 +77,10 @@ function main() {
           if (!libro || !cliente || !fechaPrestamo || !fechaDevolucion) {
             Swal.showValidationMessage(
               "Por favor complete todos los campos para crear el prestamo"
+            );
+          }else if (fechaDevolucion < todayDate || fechaPrestamo < todayDate){
+            Swal.showValidationMessage(
+              "Las fechas ingresadas para la creación del prestamo son inválidas (fecha previa a la actual)"
             );
           }
 
@@ -237,7 +237,7 @@ function main() {
 
   async function pintarTablaPaginada() {
     let prestamosAsPag = await obtenerJson(
-      urlPrestamoLocal + `paged?page=${current_page}&size=10`
+      urlPrestamo + `paged?page=${current_page}&size=10`
     );
 
     console.log(prestamosAsPag);
@@ -314,7 +314,7 @@ function main() {
   }
 
   async function getSelectClientes() {
-    clientes = await obtenerJson(urlClienteLocal + "/alta");
+    clientes = await obtenerJson(urlCliente + "alta");
 
     console.log("//LISTA DE CLIENTES//");
     console.log(clientes);
@@ -332,7 +332,7 @@ function main() {
   }
 
   async function getSelectLibros() {
-    let librosNoFilter = await obtenerJson(urlLibroLocal + "/alta");
+    let librosNoFilter = await obtenerJson(urlLibro + "alta");
 
     librosNoFilter.body.forEach((libro) => {
       if (libro.ejemplaresRestantes > 0) {
@@ -350,7 +350,7 @@ function main() {
   }
 
   function crearPrestamo(options) {
-    obtenerJson(urlPrestamoLocal, options).then((response) => {
+    obtenerJson(urlPrestamo, options).then((response) => {
       if (response.body.alta) {
         $template.querySelector(".nombreCliente").textContent =
           response.body.cliente.nombre + " " + response.body.cliente.apellido;
@@ -413,7 +413,7 @@ function main() {
   }
 
   function modificarPrestamo(id, options) {
-    obtenerJson(urlPrestamoLocal + id, options)
+    obtenerJson(urlPrestamo + id, options)
       .then((response) => {
         console.log(response);
         if (response.body.alta) {
@@ -463,7 +463,7 @@ function main() {
       fechaDevolucion: getActualDate(),
     });
 
-    obtenerJson(urlPrestamoLocal + prestamoId, options).then((response) => {
+    obtenerJson(urlPrestamo + prestamoId, options).then((response) => {
       console.log(response);
       if (response.status >= 200 && response.status < 300) {
         return true;
@@ -477,10 +477,10 @@ function main() {
     if (id.includes("_")) {
       //Caso donde el id es: "edit_[Nro. ID]"
       id = id.split("_");
-      response = await fetch(urlPrestamoLocal + id[1]);
+      response = await fetch(urlPrestamo + id[1]);
     } else {
       // Caso donde el id es únicamente el número
-      response = await fetch(urlPrestamoLocal + id);
+      response = await fetch(urlPrestamo + id);
     }
 
     prestamo = await response.json();
