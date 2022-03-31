@@ -65,7 +65,7 @@ function main() {
           `Fecha de inicio <input  min="${todayDate}" type=date id="swal-input3" class="swal2-input" required> </br>` +
           `Fecha de fin <input  min="${todayDate}" type=date id="swal-input4" class="swal2-input" required> </br>`,
 
-        preConfirm: () => {
+        preConfirm: async () => {
           const libro = Swal.getPopup().querySelector("#selectLibros").value;
           const cliente =
             Swal.getPopup().querySelector("#selectClientes").value;
@@ -78,10 +78,29 @@ function main() {
             Swal.showValidationMessage(
               "Por favor complete todos los campos para crear el prestamo"
             );
-          }else if (fechaDevolucion < todayDate || fechaPrestamo < todayDate){
+          } else if (fechaDevolucion < todayDate || fechaPrestamo < todayDate) {
             Swal.showValidationMessage(
               "Las fechas ingresadas para la creación del prestamo son inválidas (fecha previa a la actual)"
             );
+          } else {
+            let libroObj = getLibroByTitulo(libro);
+            let clienteObj = getClienteByName(cliente);
+
+            options.method = "POST";
+            
+            options.body = JSON.stringify({
+              dniCliente: clienteObj.documento,
+              fechaPrestamo: fechaPrestamo,
+              fechaDevolucion: fechaDevolucion,
+              tituloLibro: libroObj.titulo,
+              isbn: libroObj.isbn,
+            });
+
+            let message = await crearPrestamo(options);
+
+            if (message) {
+              Swal.showValidationMessage(message);
+            }
           }
 
           return {
@@ -92,29 +111,11 @@ function main() {
           };
         },
       }).then((result) => {
+        console.log(result);
         if (result.isConfirmed) {
-          let libro = getLibroByTitulo(result.value.libro);
-          let cliente = getClienteByName(result.value.cliente);
-
-          options.method = "POST";
-
-          options.body = JSON.stringify({
-            dniCliente: cliente.documento,
-            fechaPrestamo: result.value.fechaPrestamo,
-            fechaDevolucion: result.value.fechaDevolucion,
-            tituloLibro: libro.titulo,
-            isbn: libro.isbn,
-          });
-
-          crearPrestamo(options);
-
           Swal.fire(
-            `Se ha creado exitosamente el prestamo del libro: <b>${
-              libro.titulo
-            }</b> </br>
-                A cargo del cliente: <b>${
-                  cliente.nombre + " " + cliente.apellido
-                }</b> `,
+            `Se ha creado exitosamente el prestamo del libro: <b>${result.value.libro}</b> </br>
+                A cargo del cliente: <b>${result.value.cliente}</b> `,
             "",
             "success"
           );
@@ -349,67 +350,71 @@ function main() {
     //ordenarArrayString(libro);
   }
 
-  function crearPrestamo(options) {
-    obtenerJson(urlPrestamo, options).then((response) => {
-      if (response.body.alta) {
-        $template.querySelector(".nombreCliente").textContent =
-          response.body.cliente.nombre + " " + response.body.cliente.apellido;
+  async function crearPrestamo(options) {
+    return await obtenerJson(urlPrestamo, options)
+      .then((response) => {
+        if (response.body.alta) {
+          $template.querySelector(".nombreCliente").textContent =
+            response.body.cliente.nombre + " " + response.body.cliente.apellido;
 
-        $template.querySelector(
-          ".nombreCliente"
-        ).id = `nombreCliente_${response.body.id}`;
+          $template.querySelector(
+            ".nombreCliente"
+          ).id = `nombreCliente_${response.body.id}`;
 
-        $template.querySelector(".documentoCliente").textContent =
-          response.body.cliente.documento;
+          $template.querySelector(".documentoCliente").textContent =
+            response.body.cliente.documento;
 
-        $template.querySelector(
-          ".documentoCliente"
-        ).id = `documentoCliente_${response.body.id}`;
+          $template.querySelector(
+            ".documentoCliente"
+          ).id = `documentoCliente_${response.body.id}`;
 
-        $template.querySelector(".libroTomado").textContent =
-          response.body.libro.titulo;
+          $template.querySelector(".libroTomado").textContent =
+            response.body.libro.titulo;
 
-        $template.querySelector(
-          ".libroTomado"
-        ).id = `libroTomado_${response.body.id}`;
+          $template.querySelector(
+            ".libroTomado"
+          ).id = `libroTomado_${response.body.id}`;
 
-        $template.querySelector(".fechaPrestamo").textContent = formatDate(
-          response.body.fechaPrestamo,
-          true
-        );
+          $template.querySelector(".fechaPrestamo").textContent = formatDate(
+            response.body.fechaPrestamo,
+            true
+          );
 
-        $template.querySelector(
-          ".fechaPrestamo"
-        ).id = `fechaPrestamo_${response.body.id}`;
+          $template.querySelector(
+            ".fechaPrestamo"
+          ).id = `fechaPrestamo_${response.body.id}`;
 
-        $template.querySelector(".fechaDevolucion").textContent = formatDate(
-          response.body.fechaDevolucion,
-          true
-        );
+          $template.querySelector(".fechaDevolucion").textContent = formatDate(
+            response.body.fechaDevolucion,
+            true
+          );
 
-        $template.querySelector(
-          ".fechaDevolucion"
-        ).id = `fechaDevolucion_${response.body.id}`;
+          $template.querySelector(
+            ".fechaDevolucion"
+          ).id = `fechaDevolucion_${response.body.id}`;
 
-        $template.querySelector(".rowTable").id = `row_${response.body.id}`;
+          $template.querySelector(".rowTable").id = `row_${response.body.id}`;
 
-        $template.querySelector(
-          ".botoncitoCancelar"
-        ).innerHTML = `<button class="btn btn-danger btn-cancelar-prestamo" data-id="${response.body.id}"}>Dar de baja</button>`;
+          $template.querySelector(
+            ".botoncitoCancelar"
+          ).innerHTML = `<button class="btn btn-danger btn-cancelar-prestamo" data-id="${response.body.id}"}>Dar de baja</button>`;
 
-        $template.querySelector(
-          ".botoncitoEditar"
-        ).innerHTML = `<button class="btn btn-warning btn-editar-prestamo"  data-id="edit_${response.body.id}"}>Editar</button>`;
+          $template.querySelector(
+            ".botoncitoEditar"
+          ).innerHTML = `<button class="btn btn-warning btn-editar-prestamo"  data-id="edit_${response.body.id}"}>Editar</button>`;
 
-        let $clone = d.importNode($template, true);
-        $fragment.appendChild($clone);
-        $table.querySelector("tbody").appendChild($fragment);
+          let $clone = d.importNode($template, true);
+          $fragment.appendChild($clone);
+          $table.querySelector("tbody").appendChild($fragment);
+        } else {
+          return Promise.reject(response);
+        }
+      })
+      .catch((badResponse) => {
+        console.log(badResponse.body.message);
 
-        return true;
-      } else {
-        return false;
-      }
-    });
+        return badResponse.body.message;
+      });
   }
 
   function modificarPrestamo(id, options) {
