@@ -1,20 +1,14 @@
-import { options, urlEditorial, urlDesactivar, urlActivar } from "./constantes.js";
-import { obtenerJson } from "./asincronico.js";
+import { options, urlEditorial} from "./constantes.js";
+import * as utilidades from './utilidades.js';
 
-//Variables globales para funcionamiento de programa
-let autores;
 let current_page = 0;
-let totalPages
 let $table = document.querySelector(".table");
-let $template = document.getElementById("crud-template").content;
-let $fragment = document.createDocumentFragment();
 //Fin variables globales
 
 main();
 
 function main() {
-
-  document.addEventListener("DOMContentLoaded", obtenerEditorialesPaginada());
+  document.addEventListener("DOMContentLoaded", utilidades.obtenerEntidadPaginada(urlEditorial, "editorial"));
 
   //funciones de click de botones
   document.addEventListener("click", async (e) => {
@@ -32,21 +26,22 @@ function main() {
         customClass: {
           validationMessage: 'my-validation-message'
         },
-        preConfirm: (value) => {
-          if (!value) {
-            Swal.showValidationMessage(
-              '<i class="fa fa-info-circle"></i>El nombre es requerido.'
-            )
-          }
-        }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          let nombre = result.value
+        // preConfirm: (value) => {
+        //   if (!value) {
+        //     Swal.showValidationMessage(
+        //       '<i class="fa fa-info-circle"></i>El nombre es requerido.'
+        //     )
+        //   }
+        // }
+        preConfirm: async (nombre) => {
           options.method = 'POST';
           options.body = JSON.stringify({ nombre });
-          crearEditorial(urlEditorial, options);
-        } else {
-          Swal.fire('Se ha cancelado la operación', '', 'warning')
+          let responseBackEnd = await utilidades.crearEntidad(urlEditorial, options);
+          if(responseBackEnd) Swal.showValidationMessage(responseBackEnd);
+        }
+      }).then((result) => {
+        if (!result.isConfirmed) {
+          utilidades.modalCancelacion();
         }
       })
     } //fin CREAR
@@ -72,29 +67,22 @@ function main() {
         customClass: {
           validationMessage: 'my-validation-message'
         },
-        preConfirm: (value) => {
-          if (!value) {
-            Swal.showValidationMessage(
-              '<i class="fa fa-info-circle"></i>El nombre es requerido.'
-            )
-          }
+        // preConfirm: (value) => {
+        //   if (!value) {
+        //     Swal.showValidationMessage(
+        //       '<i class="fa fa-info-circle"></i>El nombre es requerido.'
+        //     )
+        //   }
+        // }
+        preConfirm: async (nombre) => {
+          options.method = 'PUT';
+          options.body = JSON.stringify({ nombre });
+          let responseBackEnd = await utilidades.modificarEntidad(urlEditorial, id, options);
+          if(responseBackEnd) Swal.showValidationMessage(responseBackEnd);
         }
       }).then((result) => {
-        if (result.isConfirmed) {
-          nombre = result.value
-          if (nombreViejo != nombre) {
-            options.method = 'PUT';
-            options.body = JSON.stringify({ nombre });
-            modificarEditorial(id, options);
-          } else {
-            Swal.fire({
-              icon: 'warning',
-              title: 'ERROR:',
-              html: `<p class="nombreAutor" style="font-size: 1.5rem;">No ha realizado modificaciones al nombre.</p>`
-            })
-          }
-        } else {
-          Swal.fire('Se ha cancelado la operación', '', 'warning')
+        if (!result.isConfirmed) {
+          utilidades.modalCancelacion();
         }
       })
     };
@@ -102,6 +90,7 @@ function main() {
 
     //Inicio cambio de estado
     if (e.target.matches(".botonEstado")) {
+
       Swal.fire({
         title: '¿Deseas cambiar el estado del autor?',
         showDenyButton: true,
@@ -127,7 +116,8 @@ function main() {
 
     //Inicio VER
     if (e.target.matches(".ver")) {
-      let id = e.target.id.split("_")[1]
+      let id = e.target.dataset.id
+      let nombre = e.target.dataset.nombre
       let textoHTML = ''
 
       if (document.getElementById("asociados_" + id).firstChild.localName == "p") {
@@ -164,34 +154,24 @@ function main() {
         }
       }
 
-      Swal.fire({
-        icon: 'info',
-        title: 'Editorial:',
-        html: `<p class="nombreAutor">${e.target.dataset.nombre}</p><br>
-      ${textoHTML}`
-      })
+      utilidades.modalInformativo("Editorial", nombre, textoHTML)
     }
     //Fin VER
 
     if (e.target.matches("#btn_next")) {
-      if (current_page < (totalPages - 1)) {
-        current_page++;
-        $table.querySelector("tbody").innerHTML = "";
-        obtenerEditorialesPaginada();
-      }
+      current_page++;
+      $table.querySelector("tbody").innerHTML = "";
+      utilidades.obtenerEntidadPaginada(urlEditorial, "editorial", current_page);
     }
-  
+
     if (e.target.matches("#btn_prev")) {
-      if (current_page > 0) {
-        current_page--;
-        $table.querySelector("tbody").innerHTML = "";
-        obtenerEditorialesPaginada();
-      }
+      current_page--;
+      $table.querySelector("tbody").innerHTML = "";
+      utilidades.obtenerEntidadPaginada(urlEditorial, "editorial", current_page);
     }
-
-
   });
   //fin funciones
+
 };
 
 function obtenerEditorialesPaginada() {

@@ -1,23 +1,13 @@
-import { options, urlAutor, urlDesactivar, urlActivar } from "./constantes.js";
-import { obtenerJson } from "./asincronico.js";
+import { options, urlAutor} from "./constantes.js";
+import * as utilidades from './utilidades.js';
 
 let current_page = 0;
-let totalPages
 let $table = document.querySelector(".table");
-let $template = document.getElementById("crud-template").content;
-let $fragment = document.createDocumentFragment();
 
 main();
 
 function main() {
-
-    document.addEventListener("DOMContentLoaded", obtenerAutoresPaginados());
-
-    document.addEventListener("DOMContentLoaded", function () {
-        obtenerJson(urlAutor).then(autoresArray => {
-            autores = autoresArray;
-        })
-    });
+    document.addEventListener("DOMContentLoaded", utilidades.obtenerEntidadPaginada(urlAutor, "autor"));
 
     document.addEventListener("click", async (event) => {
         if (event.target.matches(".crear")) {
@@ -45,10 +35,9 @@ function main() {
                     let nombre = result.value
                     options.method = 'POST';
                     options.body = JSON.stringify({ nombre });
-                    crearAutor(urlAutor, options);
-                    Swal.fire(`Se ha creado exitosamente el autor: <b>${nombre}</b>!`, '', 'success')
+                    utilidades.crearEntidad(urlAutor, options);
                 } else {
-                    Swal.fire('Se ha cancelado la operación', '', 'warning')
+                    utilidades.modalCancelacion();
                 }
             })
         }
@@ -85,65 +74,35 @@ function main() {
                     nombre = result.value
                     options.method = 'PUT';
                     options.body = JSON.stringify({ nombre });
-                    modificarAutor(urlAutor, id, options);
-                    Swal.fire(`Se ha modificado el nombre de <b>${nombreViejo}</b> a <b>${nombre}</b>!`, '', 'success')
+                    utilidades.modificarEntidad(urlAutor, id, options)
                 } else {
-                    Swal.fire('Se ha cancelado la operación', '', 'warning')
+                    utilidades.modalCancelacion();
                 }
             })
         };
 
         if (event.target.matches(".botonEstado")) {
-            Swal.fire({
-                title: '¿Deseas cambiar el estado del autor?',
-                showDenyButton: true,
-                icon: 'question',
-                confirmButtonText: 'SI 😎',
-                denyButtonText: `NO 🙏`,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    let btn = event.target;
-                    let estadoFinal;
-                    if (btn.dataset.estado == 'true') {
-                        estadoFinal = "false"
-                        desactivarAutor(urlAutor + urlDesactivar, btn.dataset.id);
-                    } else {
-                        estadoFinal = "true"
-                        activarAutor(urlAutor + urlActivar, btn.dataset.id);
-                    }
-                    Swal.fire(`El estado del autor <b>${btn.dataset.nombre}</b> ha sido modificado a <b>${estadoFinal}</b>.`, '', 'success')
-                } else if (result.isDenied) {
-                    Swal.fire('No se han realizado cambios.', '', 'info')
-                }
-            });
+            utilidades.cambiarEstado(urlAutor, event.target.dataset.id)
         }
 
         if (event.target.matches(".ver")) {
-            Swal.fire({
-                icon: 'info',
-                title: 'Autor:',
-                html: `<p class="nombreAutor">${event.target.dataset.nombre}</p>`
-            })
+            let nombre = event.target.dataset.nombre
+            utilidades.modalInformativo("Autor", nombre)
         }
 
         if (event.target.matches("#btn_next")) {
-            if (current_page < (totalPages - 1)) {
               current_page++;
               $table.querySelector("tbody").innerHTML = "";
-              obtenerAutoresPaginados();
-            }
+              utilidades.obtenerEntidadPaginada(urlAutor, "autor", current_page);
           }
         
           if (event.target.matches("#btn_prev")) {
-            if (current_page > 0) {
               current_page--;
               $table.querySelector("tbody").innerHTML = "";
-              obtenerAutoresPaginados();
-            }
+              utilidades.obtenerEntidadPaginada(urlAutor, "autor", current_page);
           }
     });
+
 };
 
 function obtenerAutoresPaginados() {
@@ -305,4 +264,3 @@ function modificarAutor(urlAutor, id, options) {
         listadoBotones.children[2].dataset.nombre = response.nombre;
     }).catch(error => console.error(error));
 }
-
