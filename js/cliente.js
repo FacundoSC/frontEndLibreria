@@ -111,74 +111,6 @@ async function crearCliente(urlCliente, options) {
   // return await obtenerJson(urlCliente, options);
 }
 
-
-/* 
-d.addEventListener("click", async (e) => {
-  if (e.target.matches(".crear")) {
-    let nombreFormularioCliente = "";
-
-    Swal.fire({
-      title: 'Ingrese sus Datos de Cliente: ',
-      html:
-        'Documento<input id="documento" class="swal2-input">' +
-        'Nombre<input id="nombre" class="swal2-input">' +
-        'Apellido<input id="apellido" class="swal2-input">' +
-        'Telefono<input id="telefono" class="swal2-input">' +
-        'Username<input id="username" class="swal2-input" type ="email">' +
-        'Password<input id="password" class="swal2-input" type ="password">',
-      
-      showCancelButton: true,
-      cancelButtonText: 'Cancelar ❌',
-      confirmButtonText: 'Guardar 💾',
-      focusConfirm: false,
-      customClass: {
-        validationMessage: 'my-validation-message'
-      },
-      preConfirm: () => {
-        
-        let documento, nombre, apellido, telefono, username, password, roleId;
-        documento = Swal.getPopup().querySelector('#documento').value;
-        nombre = Swal.getPopup().querySelector(`#nombre`).value;
-        nombreFormularioCliente = nombre;
-        apellido = Swal.getPopup().querySelector('#apellido').value;
-        telefono = Swal.getPopup().querySelector(`#telefono`).value;
-        username = Swal.getPopup().querySelector(`#username`).value;
-        password = Swal.getPopup().querySelector('#password').value;
-        roleId = 2;
-
-        //let clienteDatos={documento, nombre, apellido, telefono, username, password, roleId};
-
-        if (!documento| !nombre|!apellido|!telefono| !username|!password|!roleId) {
-          Swal.showValidationMessage(
-            '<i class="fa fa-info-circle"></i> El campo es obligatorio')
-        }
- 
-        return { documento, nombre, apellido, telefono, username, password, roleId };
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-
-        options.method = 'POST';
-          options.body = JSON.stringify(result.value);
-          let urlLocal = "http://localhost:8085/api/v1/cliente/";
-           crearCliente(urlLocal, options)
-
-        if(options.body.value){
-          console.log(options.body.value);
-          Swal.fire(`Se ha creado exitosamente el cliente ${nombreFormularioCliente}`, '', 'success')
-        }else{
-          Swal.fire(`No se ha podido crear el usuario  ${nombreFormularioCliente}`, '', 'success')
-        }
-      } else {
-        Swal.fire('Se ha cancelado la operación', '', 'warning')
-      }
-    });
-
-  }
-
-}); */
-
-
 function modificarCliente(urlCliente, id, options) {
   obtenerJson(urlCliente + id, options).then(response => {
     d.getElementById("documento_" + id).innerHTML = response.documento;
@@ -392,9 +324,27 @@ d.addEventListener("click", async (e) => {
         let urlLocal = "http://localhost:8085/api/v1/cliente/";
          let responseBackEnd = await crearCliente(urlLocal, options);
 
-         if(!isNaN(clienteCrear.documento)){
-           mostrarMensajeError(responseBackEnd)
+         if (!isNaN(clienteCrear.documento)) {
+          if (responseBackEnd) {
+            Swal.showValidationMessage(responseBackEnd);
+          }
+        } else {
+          if (isNaN(clienteCrear.documento)) {
+            Swal.showValidationMessage(`El documento debe ser numerico`);
+          }
          }
+
+        let regVar=/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3,4})+$/
+
+          if (!regVar.test(crearCliente.username)){
+            Swal.showValidationMessage(
+              '<i class="fa fa-info-circle"></i> El username no es valido') 
+          }else{
+            if (responseBackEnd) {
+              Swal.showValidationMessage(responseBackEnd);
+            }
+          }
+        
        
         
       },
