@@ -25,26 +25,63 @@ function main() {
     let todayDate = getActualDate();
 
     if (buttonPressed.matches(".btn-cancelar-prestamo")) {
-      Swal.fire({
-        title: "¿Deseas cancelar el prestamo?",
-        showDenyButton: true,
-        icon: "question",
-        confirmButtonText: "Si, cancelar el prestamo",
-        denyButtonText: `No, volver atrás`,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
+      Swal.fire(
+        {
+          title: "¿Deseas cancelar el prestamo?",
+          showDenyButton: true,
+          icon: "question",
+          confirmButtonText: "Si, cancelar el prestamo",
+          denyButtonText: `No, volver atrás`,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          preConfirm: async () => {
+            let responseEntity = await cancelarPrestamo(
+              buttonPressed.dataset.id
+            );
+
+            return responseEntity;
+          },
+        },
+        {
+          id: 8,
+          documento: 20199326,
+          nombre: "Juan",
+          apellido: "Lopez Lopez",
+          telefono: "114578638",
+          alta: true,
+        }
+      ).then(async (result) => {
         if (result.isConfirmed) {
-          if (cancelarPrestamo(buttonPressed.dataset.id)) {
-            console.log("entre al true");
-            //Swal.fire(`Se ha eliminado exitosamente el prestamo `, "", "success");
+          let prestamoCancelado = await getPrestamoById(
+            buttonPressed.dataset.id
+          );
+
+          if (result.value.status >= 200 && result.value.status < 300) {
+            Swal.fire(
+              `Se ha eliminado exitosamente el prestamo a nombre de: <b>${
+                prestamoCancelado.cliente.nombre +
+                " " +
+                prestamoCancelado.cliente.apellido
+              }</b>  </br> 
+            Fecha de devolución: <b>${formatDate(
+              getActualDate(),
+              true
+            )}</b> </br> 
+            Libro devuelto:  "<b>${prestamoCancelado.libro.titulo}" </b>
+            Editorial:  <b>${prestamoCancelado.libro.editorialNombre} </b>`,
+              "",
+              "success"
+            );
+
+            d.querySelector("#row_" + buttonPressed.dataset.id).remove();
           } else {
-            console.log("entre al else");
+            Swal.fire(
+              `Status: <b>${result.value.body.status}</b> </br> 
+            Message: <b>"${result.value.body.message}"</b> `,
+              "",
+              "error"
+            );
           }
-
-          Swal.fire(`Se ha eliminado exitosamente el prestamo `, "", "success");
-
-          d.querySelector("#row_" + buttonPressed.dataset.id).remove();
         } else Swal.fire("No se han realizado cambios.", "", "info");
       });
     }
@@ -115,7 +152,6 @@ function main() {
           };
         },
       }).then((result) => {
-        console.log(result);
         if (result.isConfirmed) {
           Swal.fire(
             `Se ha creado exitosamente el prestamo del libro: <b>"${
@@ -188,30 +224,36 @@ function main() {
           const fechaDevolucion =
             Swal.getPopup().querySelector("#swal-input4").value;
 
-          let libro = getLibroByTitulo(nombreLibro);
-          let cliente = getClienteByName(nombreCliente);
+          if (fechaDevolucion < fechaPrestamo) {
+            Swal.showValidationMessage(
+              "La fecha de devolución no puede ser anterior a la de inicio del préstamo"
+            );
+          } else {
+            let libro = getLibroByTitulo(nombreLibro);
+            let cliente = getClienteByName(nombreCliente);
 
-          options.method = "PUT";
-          options.body = JSON.stringify({
-            dniCliente: cliente.documento,
-            fechaPrestamo: fechaPrestamo,
-            fechaDevolucion: fechaDevolucion,
-            tituloLibro: libro.titulo,
-            isbn: libro.isbn,
-          });
+            options.method = "PUT";
+            options.body = JSON.stringify({
+              dniCliente: cliente.documento,
+              fechaPrestamo: fechaPrestamo,
+              fechaDevolucion: fechaDevolucion,
+              tituloLibro: libro.titulo,
+              isbn: libro.isbn,
+            });
 
-          let message = await modificarPrestamo(prestamoEditado.id, options);
+            let message = await modificarPrestamo(prestamoEditado.id, options);
 
-          if (message) {
-            Swal.showValidationMessage(message);
+            if (message) {
+              Swal.showValidationMessage(message);
+            }
+
+            return {
+              nombreLibro: nombreLibro,
+              nombreCliente: nombreCliente,
+              fechaPrestamo: fechaPrestamo,
+              fechaDevolucion: fechaDevolucion,
+            };
           }
-
-          return {
-            nombreLibro: nombreLibro,
-            nombreCliente: nombreCliente,
-            fechaPrestamo: fechaPrestamo,
-            fechaDevolucion: fechaDevolucion,
-          };
         },
       }).then((result) => {
         if (result.isConfirmed) {
@@ -219,7 +261,7 @@ function main() {
             `Se ha modificado exitosamente el prestamo del libro: <b>${
               result.value.nombreLibro
             }</b> </br>
-                A cargo del cliente: <b>${result.value.nombreCliente}</b> 
+                A cargo del cliente: <b>${result.value.nombreCliente}</b> </br>
                 Fecha inicio: <b>${formatDate(
                   result.value.fechaPrestamo,
                   true
@@ -264,8 +306,6 @@ function main() {
     let prestamosAsPag = await obtenerJson(
       urlPrestamo + `paged?page=${current_page}&size=10`
     );
-
-    console.log(prestamosAsPag);
 
     let totalPages = prestamosAsPag.body.totalPages;
     current_page = prestamosAsPag.body.pageable.pageNumber;
@@ -340,9 +380,6 @@ function main() {
 
   async function getSelectClientes() {
     clientes = await obtenerJson(urlCliente + "alta");
-
-    console.log("//LISTA DE CLIENTES//");
-    console.log(clientes);
 
     clientes.body.forEach((cliente) => {
       let optionCliente = d.createElement("option");
@@ -461,7 +498,6 @@ function main() {
   async function modificarPrestamo(id, options) {
     return await obtenerJson(urlPrestamo + id, options)
       .then((response) => {
-        console.log(response);
         if (response.body.alta) {
           d.getElementById("nombreCliente_" + id).innerHTML =
             response.body.cliente.nombre + " " + response.body.cliente.apellido;
@@ -488,16 +524,21 @@ function main() {
       });
   }
 
-  function cancelarPrestamo(id) {
-    obtenerJson(urlDesactivarPrestamo + id).then((response) => {
-      console.log(response);
-      if (response.status >= 200 && response.status < 300) {
-        updateDevolutionDate(id);
-        return new Boolean(true);
-      } else {
-        return false;
-      }
-    });
+  async function cancelarPrestamo(id) {
+    return await obtenerJson(urlDesactivarPrestamo + id)
+      .then((response) => {
+        if (response.status >= 200 && response.status < 300) {
+          updateDevolutionDate(id);
+          return response;
+        } else {
+          return Promise.reject(response);
+        }
+      })
+      .catch((badResponse) => {
+        console.log(badResponse.body.message);
+
+        return badResponse;
+      });
   }
 
   async function updateDevolutionDate(prestamoId) {
@@ -512,7 +553,6 @@ function main() {
     });
 
     obtenerJson(urlPrestamo + prestamoId, options).then((response) => {
-      console.log(response);
       if (response.status >= 200 && response.status < 300) {
         return true;
       } else return false;
@@ -530,23 +570,25 @@ function main() {
   }
 
   function formatDate(date, isReversed) {
-    // (Ejemplo)
-    //Date inicial : 2022-03-30T00:00:00.000+00:00
+    let formattedDate;
 
-    let formatDate = date.split("T");
-    // Se crea este array de 2 elementos: [2022-03-30] , [T00:00:00.000+00:00]
-
-    formatDate = formatDate[0].split("-");
-    // Se crea este array de 3 elementos: [2022] , [03] , [30]
-
-    if (isReversed) {
-      formatDate = formatDate.reverse(); //Invierte el array previo
+    if (date.includes("T")) {
+      formattedDate = date.split("T"); // Se crea este array de 2 elementos: [2022-03-30] , [T00:00:00.000+00:00]
+      formattedDate = formattedDate[0].split("-");
+      // Se crea este array de 3 elementos: [2022] , [03] , [30]
+    } else {
+      formattedDate = date.split("-");
+      // Se crea este array de 3 elementos: [2022] , [03] , [30]
     }
 
-    formatDate = formatDate.toString().replaceAll(",", "-");
+    if (isReversed) {
+      formattedDate = formattedDate.reverse(); //Invierte el array previo
+    }
+
+    formattedDate = formattedDate.toString().replaceAll(",", "-");
     //Se crea este String 30-03-2022
 
-    return formatDate; //Retorno la fecha final en String
+    return formattedDate; //Retorno la fecha final formateada en String
   }
 
   function getActualDate() {
@@ -611,17 +653,3 @@ function main() {
     }
   }
 }
-
-/* 
-if (localStorage.getItem("clientesNoFilter")) {
-  //console.log(localStorage.getItem('clientesNoFilter'));
-  clientesNoFilter = JSON.parse(localStorage.getItem("clientesNoFilter"));
-
-  console.log(clientesNoFilter);
-} else {
-  clientesNoFilter = await obtenerJson(urlClienteLocal);
-  localStorage.setItem(
-    "clientesNoFilter",
-    JSON.stringify(clientesNoFilter)
-  );
-} */
