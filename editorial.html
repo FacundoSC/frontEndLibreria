@@ -93,7 +93,7 @@
     <table class="table table-dark table-striped" id="tabla">
       <thead>
         <tr>
-          <th scope="col">Nombre</th>
+          <th scope="col" class="editable" data-type="text" data-label="Nombre">Nombre</th>
           <th scope="col">Estado</th>
           <th scope="col">Libros asociados</th>
           <th scope="col">Acciones</th>
@@ -104,13 +104,13 @@
 
     <template id="crud-template">
       <tr>
-        <td class="nombre align-middle"></td>
-        <td class="estado align-middle"></td>
-        <td class="asociados align-middle"></td>
-        <td>
-          <button class="btn btn-warning editar"></button>
-          <button class="botonEstado btn"></button>
-          <button class="btn btn-info ver"></button>
+        <td class="nombre align-middle" data-toshow="nombre"></td>
+        <td class="alta align-middle" data-toshow="alta"></td>
+        <td class="libros align-middle" data-toshow="libros"></td>
+        <td id="botones">
+          <button class="btn btn-warning editar" data-toshow="editar"></button>
+          <button class="botonEstado btn" data-toshow="estado"></button>
+          <button class="btn btn-info ver" data-toshow="ver"></button>
         </td>
       </tr>
     </template>
