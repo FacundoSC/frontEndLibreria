@@ -287,7 +287,7 @@ async function obtenerLibrosPaginados() {
   obtenerJson(urlLibro + `paged?page=${current_page}&size=10`).then(
     (response) => {
       let msj;
-      if (response.content) {
+      if (response.body.content) {
         msj = "<h3 style='margin: 0; padding: 3rem'>Petición exitosa! 🥳</h3>";
       } else {
         msj = "<h3 style='margin: 0; padding: 3rem'>Algo ha fallado 😭</h3>";
@@ -300,8 +300,8 @@ async function obtenerLibrosPaginados() {
         timer: 1500,
       });
 
-      totalPages = response.totalPages;
-      current_page = response.pageable.pageNumber;
+      totalPages = response.body.totalPages;
+      current_page = response.body.pageable.pageNumber;
 
       document.querySelector("#pagActual").textContent = current_page + 1;
       document.querySelector("#pagTotales").textContent = totalPages;
@@ -316,7 +316,7 @@ async function obtenerLibrosPaginados() {
         ? btnSiguiente.setAttribute("disabled", "")
         : btnSiguiente.removeAttribute("disabled");
 
-      response.content.forEach((libro) => {
+      response.body.content.forEach((libro) => {
         $template.querySelector(".titulo").textContent = libro.titulo;
         $template.querySelector(".titulo").id = `titulo_${libro.id}`;
         $template.querySelector(".isbn").textContent = libro.isbn;
@@ -377,17 +377,17 @@ async function obtenerEditoriales() {
 async function crearLibro(options) {
   return await obtenerJson(urlLibro, options)
     .then((response) => {
-      if (!response.message) {
-        let id = response.id;
-        let titulo = response.titulo;
-        let alta = response.alta;
-        let isbn = response.isbn;
-        let anio = response.anio;
-        let ejemplares = response.ejemplares;
-        let ejemplaresRestantes = response.ejemplaresRestantes;
-        let ejemplaresPrestados = response.ejemplaresPrestados;
-        let autorNombre = response.autorNombre;
-        let editorialNombre = response.editorialNombre;
+      if (response.status >= 200 && response.status<300) {
+        let id = response.body.id;
+        let titulo = response.body.titulo;
+        let alta = response.body.alta;
+        let isbn = response.body.isbn;
+        let anio = response.body.anio;
+        let ejemplares = response.body.ejemplares;
+        let ejemplaresRestantes = response.body.ejemplaresRestantes;
+        let ejemplaresPrestados = response.body.ejemplaresPrestados;
+        let autorNombre = response.body.autorNombre;
+        let editorialNombre = response.body.editorialNombre;
 
         $template.querySelector(".titulo").textContent = titulo;
         $template.querySelector(".titulo").id = `titulo_` + id;
@@ -429,7 +429,7 @@ async function crearLibro(options) {
         $fragment.appendChild($clone);
         $table.querySelector("tbody").appendChild($fragment);
       } else {
-        return Promise.reject(response);
+        return Promise.reject(response.body);
       }
     })
     .catch((badResponse) => {
@@ -439,23 +439,23 @@ async function crearLibro(options) {
 async function modificarLibro(id, options) {
   return await obtenerJson(urlLibro + id, options)
     .then((response) => {
-      if (!response.message) {
-        d.getElementById("titulo_" + id).innerHTML = response.titulo;
-        d.getElementById("isbn_" + id).innerHTML = response.isbn;
-        console.log(" response.ejemplaresRestantes",  response.ejemplaresRestantes);
-        d.getElementById("ejemplaresRestantes_" + id).innerHTML = response.ejemplaresRestantes;
+      if (response.status >= 200 && response.status<300) {
+        d.getElementById("titulo_" + id).innerHTML = response.body.titulo;
+        d.getElementById("isbn_" + id).innerHTML = response.body.isbn;
+        console.log(" response.ejemplaresRestantes",  response.body.ejemplaresRestantes);
+        d.getElementById("ejemplaresRestantes_" + id).innerHTML = response.body.ejemplaresRestantes;
         let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
-        listadoBotones.children[1].dataset.titulo = response.titulo;
-        listadoBotones.children[2].dataset.titulo = response.titulo;
-        listadoBotones.children[2].dataset.anio = response.anio;
-        listadoBotones.children[2].dataset.isbn = response.isbn;
-        listadoBotones.children[2].dataset.ejemplares = response.ejemplares;
+        listadoBotones.children[1].dataset.titulo = response.body.titulo;
+        listadoBotones.children[2].dataset.titulo = response.body.titulo;
+        listadoBotones.children[2].dataset.anio = response.body.anio;
+        listadoBotones.children[2].dataset.isbn = response.body.isbn;
+        listadoBotones.children[2].dataset.ejemplares = response.body.ejemplares;
         listadoBotones.children[2].dataset.ejemplaresPrestados =
-          response.ejemplaresPrestados;
+          response.body.ejemplaresPrestados;
         listadoBotones.children[2].dataset.ejemplaresRestantes =
-          response.ejemplaresRestantes;
+          response.body.ejemplaresRestantes;
       } else {
-        return Promise.reject(response);
+        return Promise.reject(response.body);
       }
     })
     .catch((badResponse) => {
