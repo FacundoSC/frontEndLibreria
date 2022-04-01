@@ -1,4 +1,4 @@
-body{
+body {
   background-color: lightblue;
 }
 
@@ -19,7 +19,6 @@ body{
 
 .tachado {
   text-decoration: line-through;
-  color: red;
   color: rgba(255, 255, 255, 0.7);
 }
 
@@ -47,11 +46,11 @@ body{
   transition: all 0.2s ease;
 }
 
-.crear:hover{
+.crear:hover {
   scale: 1.1;
 }
 
-.desaparecer{
+.desaparecer {
   visibility: hidden;
 }
 
@@ -76,4 +75,30 @@ body{
 p{
   margin-top: 0;
   margin-bottom: 0;
+}
+
+.btn-page{
+  font-weight: bold;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-page:hover{
+  scale: 1.1;
+}
+
+.contenedor-num-pag p{
+  margin: 0;
+}
+
+.infoPagina{
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.swal2-input{
+  margin-left: 1rem;
+}
+
+.label-input{
+  font-size: 1.3rem;
 }
