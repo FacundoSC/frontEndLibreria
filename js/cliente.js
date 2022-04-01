@@ -1,4 +1,4 @@
-import { options, urlCliente, urlDesactivar, urlActivar, footerModal, footerModalFormulario } from "./constantes.js";
+import { options, urlCliente, urlDesactivar, urlActivar } from "./constantes.js";
 import { obtenerJson } from "./asincronico.js";
 
 let clientes;
@@ -9,6 +9,62 @@ const d = document,
   $table = d.querySelector(".table"),
   $template = d.getElementById("crud-template").content,
   $fragment = d.createDocumentFragment();
+main();
+
+function main() {
+  d.addEventListener("DOMContentLoaded", obtenerClientesPaginados());
+
+  document.addEventListener("click", async (event) => {
+
+    if (event.target.matches(".crear")) {
+
+    }
+
+    if (event.target.matches(".editar")) {
+
+    }
+
+    if (event.target.matches(".botonEstado")) {
+      var btn = event.target;
+      if (btn.dataset.estado == 'true') {
+        desactivarCliente(btn.dataset.id);
+      } else {
+        activarCliente(btn.dataset.id);
+      }
+    }
+
+
+    if (event.target.matches(".ver")) {
+
+      let nombreCliente = event.target.dataset.nombre;
+      let apellidoCliente = event.target.dataset.apellido;
+      Swal.fire({
+        icon: "info",
+        title: "cliente",
+        html: `<p class="nombreAutor">${nombreCliente}</p><br>
+               <p class="nombreAutor">${apellidoCliente}</p>`,
+              
+      });
+    }
+
+    if (event.target.matches("#btn_next")) {
+      if (current_page < (totalPages - 1)) {
+        current_page++;
+        $table.querySelector("tbody").innerHTML = "";
+        obtenerClientesPaginados();
+      }
+    }
+
+    if (event.target.matches("#btn_prev")) {
+      if (current_page > 0) {
+        current_page--;
+        $table.querySelector("tbody").innerHTML = "";
+        obtenerClientesPaginados();
+      }
+
+    }
+  });
+}
 
 
 function activarCliente(id) {
@@ -45,7 +101,7 @@ function desactivarCliente(id) {
     }
   });
 }
-
+/*
 d.addEventListener("click", async (e) => {
   var btn = e.target;
 
@@ -113,15 +169,16 @@ async function crearCliente(urlCliente, options) {
 
 function modificarCliente(urlCliente, id, options) {
   obtenerJson(urlCliente + id, options).then(response => {
-    d.getElementById("documento_" + id).innerHTML = response.documento;
-    d.getElementById("nombre_" + id).innerHTML = response.nombre;
-    d.getElementById("apellido_" + id).innerHTML = response.apellido;
-    d.getElementById("telefono_" + id).innerHTML = response.telefono;
+    console.log(response);
+    d.getElementById("documento_" + id).innerHTML = response.body.documento;
+    d.getElementById("nombre_" + id).innerHTML = response.body.nombre;
+    d.getElementById("apellido_" + id).innerHTML = response.body.apellido;
+    d.getElementById("telefono_" + id).innerHTML = response.body.telefono;
 
 
     let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
-    listadoBotones.children[1].dataset.nombre = response.nombre;
-    listadoBotones.children[2].dataset.nombre = response.nombre;
+    listadoBotones.children[1].dataset.nombre = response.body.nombre;
+    listadoBotones.children[2].dataset.nombre = response.body.nombre;
   }).catch(error => console.error(error));
 }
 
@@ -185,12 +242,14 @@ d.addEventListener("click", async (e) => {
 
 });
 
-
+*/
 function obtenerClientesPaginados() {
 
   obtenerJson(urlCliente + `paged?page=${current_page}&size=10`).then(response => {
-    totalPages = response.totalPages;
-    current_page = response.pageable.pageNumber
+    console.log(response);
+
+    totalPages = response.body.totalPages;
+    current_page = response.body.pageable.pageNumber
 
     document.querySelector("#pagActual").textContent = (current_page + 1);
     document.querySelector("#pagTotales").textContent = totalPages;
@@ -201,7 +260,7 @@ function obtenerClientesPaginados() {
     (current_page == 0) ? btnPrevio.setAttribute("disabled", '') : btnPrevio.removeAttribute("disabled");
     (totalPages == (current_page + 1)) ? btnSiguiente.setAttribute("disabled", '') : btnSiguiente.removeAttribute("disabled");
 
-    response.content.forEach(cliente => {
+    response.body.content.forEach(cliente => {
       $template.querySelector(".documento").textContent = cliente.documento;
       $template.querySelector(".documento").id = `documento_${cliente.id}`;
       $template.querySelector(".nombre").textContent = cliente.nombre;
@@ -258,8 +317,8 @@ function obtenerClientesPaginados() {
   })
 }
 
-d.addEventListener("DOMContentLoaded", obtenerClientesPaginados());
 
+/*
 d.addEventListener("click", async (e) => {
   if (e.target.matches("#btn_next")) {
     if (current_page < (totalPages - 1)) {
@@ -369,4 +428,4 @@ function mostrarMensajeError(responseBackEnd) {
   if (responseBackEnd) {
     return Swal.showValidationMessage(responseBackEnd);
   }
-}
+} */
