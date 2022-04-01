@@ -1,7 +1,6 @@
-body{
+body {
   background-color: lightblue;
 }
-
 
 .nav-link{
   color: white !important;
@@ -47,11 +46,11 @@ body{
   transition: all 0.2s ease;
 }
 
-.crear:hover{
+.crear:hover {
   scale: 1.1;
 }
 
-.desaparecer{
+.desaparecer {
   visibility: hidden;
 }
 
@@ -104,4 +103,11 @@ p{
   margin: 0 .4em;
   color: #f27474;
   font-size: 1.4em;
+}
+.swal2-input{
+  margin-left: 1rem;
+}
+
+.label-input{
+  font-size: 1.3rem;
 }
