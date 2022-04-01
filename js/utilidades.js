@@ -80,9 +80,9 @@ export function modalInformativo(tipo, nombre, textoHTML = "") {
 export function obtenerEntidadPaginada(url, tipo, current_page = 0) {
   modalCargaDatos();
   obtenerJson(url + `paged?page=${current_page}&size=10`).then((response) => {
-    modalMostrarResultado(response.content);
+    modalMostrarResultado(response.body.content);
     seteoPaginas(response);
-    pintarResultado(response.content, tipo);
+    pintarResultado(response.body.content, tipo);
   });
 }
 
@@ -108,8 +108,8 @@ export function pintarCambioEstado(index, estadoAnterior) {
 }
 
 export function seteoPaginas(response) {
-  let totalPages = response.totalPages;
-  let current_page = response.pageable.pageNumber;
+  let totalPages = response.body.totalPages;
+  let current_page = response.body.pageable.pageNumber;
 
   document.querySelector("#pagActual").textContent = current_page + 1;
   document.querySelector("#pagTotales").textContent = totalPages;
@@ -255,10 +255,10 @@ export function cambiarEstado(url, id) {
 export async function crearEntidad(url, options) {
   return await obtenerJson(url, options)
     .then((response) => {
-      if (!response.message) {
+      if (response.status >= 200 && response.status <300) {
         modalExito();
       } else {
-        return Promise.reject(response);
+        return Promise.reject(response.body);
       }
     })
     .catch((badResponse) => {
@@ -269,11 +269,11 @@ export async function crearEntidad(url, options) {
 export async function modificarEntidad(url, id, options) {
   return await obtenerJson(url + id, options)
     .then((response) => {
-      if (!response.message) {
-        modificarInfo(response, id);
+      if (response.status >= 200 && response.status <300) {
+        modificarInfo(response.body, id);
         modalExito();
       } else {
-        return Promise.reject(response);
+        return Promise.reject(response.body);
       }
     })
     .catch((badResponse) => {
