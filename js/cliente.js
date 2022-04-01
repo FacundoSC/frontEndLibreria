@@ -62,49 +62,49 @@ async function crearCliente(urlCliente, options) {
 
   return await obtenerJson(urlCliente, options).then(response => {
     console.log(response);
-    if(response.status>=200 && response.status <=300){
+    if (response.status >= 200 && response.status <= 300) {
 
-    let id = response.id
-    let nombre = response.nombre
-    let alta = response.alta
+      let id = response.id
+      let nombre = response.nombre
+      let alta = response.alta
 
-    $template.querySelector(".documento").textContent = response.documento;
-    $template.querySelector(".documento").id = `documento_${id}`;
-    $template.querySelector(".nombre").textContent = nombre;
-    $template.querySelector(".nombre").id = `nombre_${id}`;
-    $template.querySelector(".apellido").textContent = response.apellido;
-    $template.querySelector(".apellido").id = `apellido_${id}`;
-    $template.querySelector(".telefono").textContent = response.telefono;
-    $template.querySelector(".telefono").id = `telefono_${id}`;
-    $template.querySelector(".username").textContent = response.username;
-    $template.querySelector(".username").id = `username_${id}`;
-    $template.querySelector(".password").textContent = response.password;
-    $template.querySelector(".password").id = `password_${id}`;
+      $template.querySelector(".documento").textContent = response.documento;
+      $template.querySelector(".documento").id = `documento_${id}`;
+      $template.querySelector(".nombre").textContent = nombre;
+      $template.querySelector(".nombre").id = `nombre_${id}`;
+      $template.querySelector(".apellido").textContent = response.apellido;
+      $template.querySelector(".apellido").id = `apellido_${id}`;
+      $template.querySelector(".telefono").textContent = response.telefono;
+      $template.querySelector(".telefono").id = `telefono_${id}`;
+      $template.querySelector(".username").textContent = response.username;
+      $template.querySelector(".username").id = `username_${id}`;
+      $template.querySelector(".password").textContent = response.password;
+      $template.querySelector(".password").id = `password_${id}`;
 
 
-    $template.querySelector(".estado").textContent = alta;
-    $template.querySelector(".estado").id = `estado_${id}`;
-    $template.querySelector(".editar").dataset.id = `${id}`;
-    $template.querySelector(".editar").id = `editar_${id}`;
-    $template.querySelector(".ver").dataset.nombre = nombre;
-    $template.querySelector(".botonEstado").id = `botonEstado_${id}`;
-    $template.querySelector(".botonEstado").dataset.nombre = nombre;
-    $template.querySelector(".botonEstado").dataset.id = id;
-    $template.querySelector(".botonEstado").dataset.estado = alta;
-    $template.querySelector(".botonEstado").classList.remove('btn-danger');
-    $template.querySelector(".nombre").classList.remove('tachado');
-    $template.querySelector(".estado").classList.remove('tachado');
-    $template.querySelector(".botonEstado").classList.add('btn-success');
+      $template.querySelector(".estado").textContent = alta;
+      $template.querySelector(".estado").id = `estado_${id}`;
+      $template.querySelector(".editar").dataset.id = `${id}`;
+      $template.querySelector(".editar").id = `editar_${id}`;
+      $template.querySelector(".ver").dataset.nombre = nombre;
+      $template.querySelector(".botonEstado").id = `botonEstado_${id}`;
+      $template.querySelector(".botonEstado").dataset.nombre = nombre;
+      $template.querySelector(".botonEstado").dataset.id = id;
+      $template.querySelector(".botonEstado").dataset.estado = alta;
+      $template.querySelector(".botonEstado").classList.remove('btn-danger');
+      $template.querySelector(".nombre").classList.remove('tachado');
+      $template.querySelector(".estado").classList.remove('tachado');
+      $template.querySelector(".botonEstado").classList.add('btn-success');
 
-    let $clone = d.importNode($template, true);
-    $fragment.appendChild($clone);
-    $table.querySelector("tbody").appendChild($fragment);
-    
-    }else{
+      let $clone = d.importNode($template, true);
+      $fragment.appendChild($clone);
+      $table.querySelector("tbody").appendChild($fragment);
+
+    } else {
       return Promise.reject(response);
 
     }
-  }).catch(function(response){
+  }).catch(function (response) {
     return response.message;
   });
 
@@ -368,46 +368,43 @@ d.addEventListener("click", async (e) => {
         validationMessage: 'my-validation-message'
       },
       preConfirm: async () => {
-        
+
         let clienteCrear = {
           documento: obtenerValorSwalPopUp("documento"),
           nombre: obtenerValorSwalPopUp("nombre"),
-           nombreFormularioCliente :nombre,
+          nombreFormularioCliente: nombre,
           apellido: obtenerValorSwalPopUp("apellido"),
           telefono: obtenerValorSwalPopUp("telefono"),
           username: obtenerValorSwalPopUp("username"),
           password: obtenerValorSwalPopUp("password"),
           roleId: 2
         }
-       
-        //console.log(clienteCrear);
-        if (!clienteCrear.documento|| !clienteCrear.nombre||!clienteCrear.apellido||!clienteCrear.telefono||!clienteCrear.username|!clienteCrear.password) 
-            Swal.showValidationMessage(
-              '<i class="fa fa-info-circle"></i> El campo es obligatorio') 
-          
+
+        if (!clienteCrear.apellido)
+          Swal.showValidationMessage(
+            '<i class="fa fa-info-circle"></i> El campo es obligatorio')
+
         options.method = 'POST';
         options.body = JSON.stringify(clienteCrear);
         let urlLocal = "http://localhost:8085/api/v1/cliente/";
-         let responseBackEnd = await crearCliente(urlLocal, options);
-   
-        if (responseBackEnd){
-            Swal.showValidationMessage(responseBackEnd);
-        } 
-        
-      },
+        let responseBackEnd = await crearCliente(urlLocal, options);
 
+        if (responseBackEnd) {
+          Swal.showValidationMessage(responseBackEnd);
+        }
+      },
     }).then((result) => {
       if (result.isConfirmed) {
-        
-          Swal.fire(`Se ha creado exitosamente el cliente ${nombreFormularioCliente}`, '', 'success')
-      }else{
+
+        Swal.fire(`Se ha creado exitosamente el cliente ${nombreFormularioCliente}`, '', 'success')
+      } else {
         Swal.fire('Se ha cancelado la operación', '', 'warning')
       }
     })
   }
 });
 
- 
+
 function obtenerValorSwalPopUp(clase) {
   return Swal.getPopup().querySelector('#' + clase).value
 }
