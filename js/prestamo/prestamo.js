@@ -42,14 +42,6 @@ function main() {
             return responseEntity;
           },
         },
-        {
-          id: 8,
-          documento: 20199326,
-          nombre: "Juan",
-          apellido: "Lopez Lopez",
-          telefono: "114578638",
-          alta: true,
-        }
       ).then(async (result) => {
         if (result.isConfirmed) {
           let prestamoCancelado = await getPrestamoById(
