@@ -22,6 +22,58 @@ function main() {
 
     if (event.target.matches(".editar")) {
 
+      let id = event.target.dataset.id
+  
+      let documento = d.getElementById("documento_" + id).textContent;
+      let nombre = d.getElementById("nombre_" + id).textContent;
+      let apellido = d.getElementById("apellido_" + id).textContent;
+      let telefono = d.getElementById("telefono_" + id).textContent;
+  
+  
+      Swal.fire({
+        title: 'Ingrese los datos a modificar : ',
+        html:
+          `Documento<input id="documento" class="swal2-input" value = "${documento}"><br>` +
+          `Nombre<input id="nombre" class="swal2-input" value = "${nombre}"><br>` +
+          `Apellido<input id="apellido" class="swal2-input" value = "${apellido}"><br>` +
+          `Telefono<input id="telefono" class="swal2-input" value = "${telefono}"><br>`,
+  
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar ❌',
+        confirmButtonText: 'Guardar 💾',
+        focusConfirm: false,
+        preConfirm: () => {
+          let documento, nombre, apellido, telefono, roleId, username, password;
+          documento = Swal.getPopup().querySelector('#documento').value;
+          nombre = Swal.getPopup().querySelector(`#nombre`).value;
+          apellido = Swal.getPopup().querySelector('#apellido').value;
+          telefono = Swal.getPopup().querySelector(`#telefono`).value;
+  
+          roleId = 2;
+          username = "js@js.com";
+          password = "123";
+  
+          return { documento, nombre, apellido, telefono, roleId, username, password };
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          if (result.value) {
+  
+            let id = event.target.dataset.id;
+            options.method = 'PUT';
+            options.body = JSON.stringify(result.value);
+            let urlLocal = "http://localhost:8085/api/v1/cliente/";
+            modificarCliente(urlLocal, id, options)
+  
+          } else {
+            Swal.fire('Se ha cancelado la operación', '', 'warning')
+          }
+  
+        } else {
+          Swal.fire('Se ha cancelado la operación', '', 'warning')
+        }
+      });
+  
     }
 
     if (event.target.matches(".botonEstado")) {
@@ -46,7 +98,7 @@ function main() {
         html: `<p class="nombreAutor">Nombre: ${nombreCliente}</p><br>
                <p class="nombreAutor">Apellido: ${apellidoCliente}</p><br>,
               <p class="nombreAutor">DNI: ${documentoCliente}</p><br>
-               <p class="nombreAutor">Telefono: ${telefonoCliente}</p>`,
+               <p class="nombreAutor">Telefono:${telefonoCliente}</p>`,
 
 
 
@@ -171,7 +223,7 @@ async function crearCliente(urlCliente, options) {
   });
 
   // return await obtenerJson(urlCliente, options);
-}
+}*/
 
 function modificarCliente(urlCliente, id, options) {
   obtenerJson(urlCliente + id, options).then(response => {
@@ -188,7 +240,7 @@ function modificarCliente(urlCliente, id, options) {
   }).catch(error => console.error(error));
 }
 
-
+/*
 d.addEventListener("click", async (e) => {
   if (e.target.matches(".editar")) {
 
