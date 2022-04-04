@@ -422,3 +422,11 @@ function modalFormulario(textoHTML, url, accion, id=undefined) {
     }
   });
 }
+
+export function esUnNumero(numero) {
+  if ((numero) && !isNaN(numero)) {
+    return true;
+  } else {
+    return false;
+  }
+}
