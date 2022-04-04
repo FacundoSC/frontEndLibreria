@@ -18,19 +18,65 @@ function main() {
   document.addEventListener("click", async (event) => {
 
     if (event.target.matches(".crear")) {
+      let nombreFormularioCliente = "";
+      Swal.fire({
+        title: 'Ingrese sus Datos de Cliente: ',
+        html:
+          'Documento<input id="documento" class="swal2-input"><br>' +
+          'Nombre<input id="nombre" class="swal2-input"><br>' +
+          'Apellido<input id="apellido" class="swal2-input"><br>' +
+          'Telefono<input id="telefono" class="swal2-input"><br>' +
+          'Username<input id="username" class="swal2-input" type ="email"><br>' +
+          'Password<input id="password" class="swal2-input" type ="password">',
 
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar ❌',
+        confirmButtonText: 'Guardar 💾',
+        focusConfirm: false,
+        customClass: {
+          validationMessage: 'my-validation-message'
+        },
+        preConfirm: async () => {
+          let documento = obtenerValorSwalPopUp("documento");
+          let clienteCrear = {
+            nombre: obtenerValorSwalPopUp("nombre"),
+            nombreFormularioCliente: nombre,
+            apellido: obtenerValorSwalPopUp("apellido"),
+            telefono: obtenerValorSwalPopUp("telefono"),
+            username: obtenerValorSwalPopUp("username"),
+            password: obtenerValorSwalPopUp("password"),
+            roleId: 2
+          }
+          
+          if ((documento.length>=6 && documento.length <=8)&& utilidades.esUnNumero(documento)) {
+
+            clienteCrear.documento= parseInt(documento);
+            options.method = 'POST';
+            options.body = JSON.stringify(clienteCrear);
+            let urlLocal = "http://localhost:8085/api/v1/cliente/";
+            let responseBackEnd = await crearCliente(urlLocal, options);
+            if (responseBackEnd)Swal.showValidationMessage(responseBackEnd);
+          } else {
+            Swal.showValidationMessage("El documento no cumple con el formato");
+          }
+        },
+      }).then((result) => {
+        if (!result.isConfirmed) {
+          Swal.fire('Se ha cancelado la operación', '', 'warning')
+        }
+      })
     }
 
     if (event.target.matches(".editar")) {
 
       let id = event.target.dataset.id
-  
+
       let documento = d.getElementById("documento_" + id).textContent;
       let nombre = d.getElementById("nombre_" + id).textContent;
       let apellido = d.getElementById("apellido_" + id).textContent;
       let telefono = d.getElementById("telefono_" + id).textContent;
-  
-  
+
+
       Swal.fire({
         title: 'Ingrese los datos a modificar : ',
         html:
@@ -38,7 +84,7 @@ function main() {
           `Nombre<input id="nombre" class="swal2-input" value = "${nombre}"><br>` +
           `Apellido<input id="apellido" class="swal2-input" value = "${apellido}"><br>` +
           `Telefono<input id="telefono" class="swal2-input" value = "${telefono}"><br>`,
-  
+
         showCancelButton: true,
         cancelButtonText: 'Cancelar ❌',
         confirmButtonText: 'Guardar 💾',
@@ -49,32 +95,32 @@ function main() {
           nombre = Swal.getPopup().querySelector(`#nombre`).value;
           apellido = Swal.getPopup().querySelector('#apellido').value;
           telefono = Swal.getPopup().querySelector(`#telefono`).value;
-  
+
           roleId = 2;
           username = "js@js.com";
           password = "123";
-  
+
           return { documento, nombre, apellido, telefono, roleId, username, password };
         }
       }).then((result) => {
         if (result.isConfirmed) {
           if (result.value) {
-  
+
             let id = event.target.dataset.id;
             options.method = 'PUT';
             options.body = JSON.stringify(result.value);
             let urlLocal = "http://localhost:8085/api/v1/cliente/";
             modificarCliente(urlLocal, id, options)
-  
+
           } else {
             Swal.fire('Se ha cancelado la operación', '', 'warning')
           }
-  
+
         } else {
           Swal.fire('Se ha cancelado la operación', '', 'warning')
         }
       });
-  
+
     }
 
     if (event.target.matches(".botonEstado")) {
@@ -93,10 +139,10 @@ function main() {
       let apellidoCliente = event.target.dataset.apellido;
       let documentoCliente = event.target.dataset.documento;
       let telefonoCliente = event.target.dataset.telefono;
-      let clienteDatos =`<p ><b> DNI:</b> ${documentoCliente}</p><br>
+      let clienteDatos = `<p ><b> DNI:</b> ${documentoCliente}</p><br>
                          <p ><b>Telefono:</b> ${telefonoCliente}</p>`;
-    
-      utilidades.modalInformativo("Cliente",nombreCliente+" "+apellidoCliente,clienteDatos);
+
+      utilidades.modalInformativo("Cliente", nombreCliente + " " + apellidoCliente, clienteDatos);
     }
 
     if (event.target.matches("#btn_next")) {
@@ -153,71 +199,23 @@ function desactivarCliente(id) {
     }
   });
 }
-/*
-d.addEventListener("click", async (e) => {
-  var btn = e.target;
 
-  if (e.target.matches(".botonEstado")) {
-    if (btn.dataset.estado == 'true') {
-      desactivarCliente(btn.dataset.id);
-    } else {
-      activarCliente(btn.dataset.id);
-    }
-  }
-});
 
 async function crearCliente(urlCliente, options) {
 
   return await obtenerJson(urlCliente, options).then(response => {
     console.log(response);
-    if(response.status>=200 && response.status <=300){
+    if (response.status >= 200 && response.status <= 300) {
 
-    let id = response.id
-    let nombre = response.nombre
-    let alta = response.alta
-
-    $template.querySelector(".documento").textContent = response.documento;
-    $template.querySelector(".documento").id = `documento_${id}`;
-    $template.querySelector(".nombre").textContent = nombre;
-    $template.querySelector(".nombre").id = `nombre_${id}`;
-    $template.querySelector(".apellido").textContent = response.apellido;
-    $template.querySelector(".apellido").id = `apellido_${id}`;
-    $template.querySelector(".telefono").textContent = response.telefono;
-    $template.querySelector(".telefono").id = `telefono_${id}`;
-    $template.querySelector(".username").textContent = response.username;
-    $template.querySelector(".username").id = `username_${id}`;
-    $template.querySelector(".password").textContent = response.password;
-    $template.querySelector(".password").id = `password_${id}`;
-
-
-    $template.querySelector(".estado").textContent = alta;
-    $template.querySelector(".estado").id = `estado_${id}`;
-    $template.querySelector(".editar").dataset.id = `${id}`;
-    $template.querySelector(".editar").id = `editar_${id}`;
-    $template.querySelector(".ver").dataset.nombre = nombre;
-    $template.querySelector(".botonEstado").id = `botonEstado_${id}`;
-    $template.querySelector(".botonEstado").dataset.nombre = nombre;
-    $template.querySelector(".botonEstado").dataset.id = id;
-    $template.querySelector(".botonEstado").dataset.estado = alta;
-    $template.querySelector(".botonEstado").classList.remove('btn-danger');
-    $template.querySelector(".nombre").classList.remove('tachado');
-    $template.querySelector(".estado").classList.remove('tachado');
-    $template.querySelector(".botonEstado").classList.add('btn-success');
-
-    let $clone = d.importNode($template, true);
-    $fragment.appendChild($clone);
-    $table.querySelector("tbody").appendChild($fragment);
-    
-    }else{
-      return Promise.reject(response);
+      utilidades.modalExito();
+    } else {
+      return Promise.reject(response.body);
 
     }
-  }).catch(function(response){
+  }).catch(function (response) {
     return response.message;
   });
-
-  // return await obtenerJson(urlCliente, options);
-}*/
+}
 
 function modificarCliente(urlCliente, id, options) {
   obtenerJson(urlCliente + id, options).then(response => {
@@ -470,8 +468,8 @@ d.addEventListener("click", async (e) => {
     })
   }
 });
+*/
 
- 
 function obtenerValorSwalPopUp(clase) {
   return Swal.getPopup().querySelector('#' + clase).value
 }
@@ -480,4 +478,5 @@ function mostrarMensajeError(responseBackEnd) {
   if (responseBackEnd) {
     return Swal.showValidationMessage(responseBackEnd);
   }
-} */
+}
+
