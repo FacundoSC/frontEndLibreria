@@ -1,5 +1,6 @@
 import { options, urlCliente, urlDesactivar, urlActivar } from "./constantes.js";
 import { obtenerJson } from "./asincronico.js";
+import * as utilidades from "./utilidades.js";
 
 let clientes;
 let current_page = 0;
@@ -92,17 +93,10 @@ function main() {
       let apellidoCliente = event.target.dataset.apellido;
       let documentoCliente = event.target.dataset.documento;
       let telefonoCliente = event.target.dataset.telefono;
-      Swal.fire({
-        icon: "info",
-        title: "cliente",
-        html: `<p class="nombreAutor">Nombre: ${nombreCliente}</p><br>
-               <p class="nombreAutor">Apellido: ${apellidoCliente}</p><br>,
-              <p class="nombreAutor">DNI: ${documentoCliente}</p><br>
-               <p class="nombreAutor">Telefono:${telefonoCliente}</p>`,
-
-
-
-      });
+      let clienteDatos =`<p ><b> DNI:</b> ${documentoCliente}</p><br>
+                         <p ><b>Telefono:</b> ${telefonoCliente}</p>`;
+    
+      utilidades.modalInformativo("Cliente",nombreCliente+" "+apellidoCliente,clienteDatos);
     }
 
     if (event.target.matches("#btn_next")) {
