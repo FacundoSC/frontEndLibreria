@@ -38,12 +38,18 @@ function main() {
 
       let nombreCliente = event.target.dataset.nombre;
       let apellidoCliente = event.target.dataset.apellido;
+      let documentoCliente = event.target.dataset.documento;
+      let telefonoCliente = event.target.dataset.telefono;
       Swal.fire({
         icon: "info",
         title: "cliente",
-        html: `<p class="nombreAutor">${nombreCliente}</p><br>
-               <p class="nombreAutor">${apellidoCliente}</p>`,
-              
+        html: `<p class="nombreAutor">Nombre: ${nombreCliente}</p><br>
+               <p class="nombreAutor">Apellido: ${apellidoCliente}</p><br>,
+              <p class="nombreAutor">DNI: ${documentoCliente}</p><br>
+               <p class="nombreAutor">Telefono: ${telefonoCliente}</p>`,
+
+
+
       });
     }
 
