@@ -76,7 +76,6 @@ function main() {
       let apellido = d.getElementById("apellido_" + id).textContent;
       let telefono = d.getElementById("telefono_" + id).textContent;
 
-
       Swal.fire({
         title: 'Ingrese los datos a modificar : ',
         html:
@@ -132,7 +131,6 @@ function main() {
       }
     }
 
-
     if (event.target.matches(".ver")) {
 
       let nombreCliente = event.target.dataset.nombre;
@@ -163,7 +161,6 @@ function main() {
     }
   });
 }
-
 
 function activarCliente(id) {
   obtenerJson(urlCliente + urlActivar + id).then(response => {
@@ -200,7 +197,6 @@ function desactivarCliente(id) {
   });
 }
 
-
 async function crearCliente(urlCliente, options) {
 
   return await obtenerJson(urlCliente, options).then(response => {
@@ -232,67 +228,6 @@ function modificarCliente(urlCliente, id, options) {
   }).catch(error => console.error(error));
 }
 
-/*
-d.addEventListener("click", async (e) => {
-  if (e.target.matches(".editar")) {
-
-    let id = e.target.dataset.id
-
-    let documento = d.getElementById("documento_" + id).textContent;
-    let nombre = d.getElementById("nombre_" + id).textContent;
-    let apellido = d.getElementById("apellido_" + id).textContent;
-    let telefono = d.getElementById("telefono_" + id).textContent;
-
-
-    Swal.fire({
-      title: 'Ingrese los datos a modificar : ',
-      html:
-        `Documento<input id="documento" class="swal2-input" value = "${documento}">` +
-        `Nombre<input id="nombre" class="swal2-input" value = "${nombre}">` +
-        `Apellido<input id="apellido" class="swal2-input" value = "${apellido}">` +
-        `Telefono<input id="telefono" class="swal2-input" value = "${telefono}">`,
-
-      showCancelButton: true,
-      cancelButtonText: 'Cancelar ❌',
-      confirmButtonText: 'Guardar 💾',
-      focusConfirm: false,
-      preConfirm: () => {
-        let documento, nombre, apellido, telefono, roleId, username, password;
-        documento = Swal.getPopup().querySelector('#documento').value;
-        nombre = Swal.getPopup().querySelector(`#nombre`).value;
-        apellido = Swal.getPopup().querySelector('#apellido').value;
-        telefono = Swal.getPopup().querySelector(`#telefono`).value;
-
-        roleId = 2;
-        username = "js@js.com";
-        password = "123";
-
-        return { documento, nombre, apellido, telefono, roleId, username, password };
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        if (result.value) {
-
-          let id = e.target.dataset.id;
-          options.method = 'PUT';
-          options.body = JSON.stringify(result.value);
-          let urlLocal = "http://localhost:8085/api/v1/cliente/";
-          modificarCliente(urlLocal, id, options)
-
-        } else {
-          Swal.fire('Se ha cancelado la operación', '', 'warning')
-        }
-
-      } else {
-        Swal.fire('Se ha cancelado la operación', '', 'warning')
-      }
-    });
-
-  }
-
-});
-
-*/
 function obtenerClientesPaginados() {
 
   obtenerJson(urlCliente + `paged?page=${current_page}&size=10`).then(response => {
@@ -340,8 +275,6 @@ function obtenerClientesPaginados() {
       $template.querySelector(".apellido").classList.remove('tachado');
       $template.querySelector(".telefono").classList.remove('tachado');
 
-      // $template.querySelector(".estado").classList.remove('tachado');
-
       $template.querySelector(".editar").removeAttribute("disabled")
       $template.querySelector(".botonEstado").dataset.id = cliente.id;
       $template.querySelector(".botonEstado").dataset.estado = cliente.alta;
@@ -357,7 +290,6 @@ function obtenerClientesPaginados() {
         $template.querySelector(".apellido").classList.add('tachado');
         $template.querySelector(".telefono").classList.add('tachado');
 
-        // $template.querySelector(".estado").classList.add('tachado');
         $template.querySelector(".editar").setAttribute("disabled", '')
       }
       let $clone = document.importNode($template, true);
@@ -366,109 +298,6 @@ function obtenerClientesPaginados() {
     $table.querySelector("tbody").appendChild($fragment);
   })
 }
-
-
-/*
-d.addEventListener("click", async (e) => {
-  if (e.target.matches("#btn_next")) {
-    if (current_page < (totalPages - 1)) {
-      current_page++;
-      $table.querySelector("tbody").innerHTML = "";
-      obtenerClientesPaginados();
-    }
-  }
-
-  if (e.target.matches("#btn_prev")) {
-    if (current_page > 0) {
-      current_page--;
-      $table.querySelector("tbody").innerHTML = "";
-      obtenerClientesPaginados();
-    }
-  }
-});
-
-
-d.addEventListener("click", async (e) => {
-  if (e.target.matches(".crear")) {
-    let nombreFormularioCliente = "";
-    Swal.fire({
-      title: 'Ingrese sus Datos de Cliente: ',
-      html:
-        'Documento<input id="documento" class="swal2-input">' +
-        'Nombre<input id="nombre" class="swal2-input">' +
-        'Apellido<input id="apellido" class="swal2-input">' +
-        'Telefono<input id="telefono" class="swal2-input">' +
-        'Username<input id="username" class="swal2-input" type ="email">' +
-        'Password<input id="password" class="swal2-input" type ="password">',
-
-      showCancelButton: true,
-      cancelButtonText: 'Cancelar ❌',
-      confirmButtonText: 'Guardar 💾',
-      focusConfirm: false,
-      customClass: {
-        validationMessage: 'my-validation-message'
-      },
-      preConfirm: async () => {
-        
-        let clienteCrear = {
-          documento: obtenerValorSwalPopUp("documento"),
-          nombre: obtenerValorSwalPopUp("nombre"),
-           nombreFormularioCliente :nombre,
-          apellido: obtenerValorSwalPopUp("apellido"),
-          telefono: obtenerValorSwalPopUp("telefono"),
-          username: obtenerValorSwalPopUp("username"),
-          password: obtenerValorSwalPopUp("password"),
-          roleId: 2
-        }
-       
-         if (!clienteCrear.documento || !clienteCrear.apellido|| !clienteCrear.nombre ||
-           !clienteCrear.telefono || !clienteCrear.username || !clienteCrear.password) {
-             Swal.showValidationMessage(
-              '<i class="fa fa-info-circle"></i> El campo es obligatorio') 
-           }
-            
-          
-        options.method = 'POST';
-        options.body = JSON.stringify(clienteCrear);
-        let urlLocal = "http://localhost:8085/api/v1/cliente/";
-         let responseBackEnd = await crearCliente(urlLocal, options);
-
-         if (!isNaN(clienteCrear.documento)) {
-          if (responseBackEnd) {
-            Swal.showValidationMessage(responseBackEnd);
-          }
-        } else {
-          if (isNaN(clienteCrear.documento)) {
-            Swal.showValidationMessage(`El documento debe ser numerico`);
-          }
-         }
-
-        let regVar=/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3,4})+$/
-
-          if (!regVar.test(crearCliente.username)){
-            Swal.showValidationMessage(
-              '<i class="fa fa-info-circle"></i> El username no es valido') 
-          }else{
-            if (responseBackEnd) {
-              Swal.showValidationMessage(responseBackEnd);
-            }
-          }
-        
-       
-        
-      },
-
-    }).then((result) => {
-      if (result.isConfirmed) {
-        
-          Swal.fire(`Se ha creado exitosamente el cliente ${nombreFormularioCliente}`, '', 'success')
-      }else{
-        Swal.fire('Se ha cancelado la operación', '', 'warning')
-      }
-    })
-  }
-});
-*/
 
 function obtenerValorSwalPopUp(clase) {
   return Swal.getPopup().querySelector('#' + clase).value
