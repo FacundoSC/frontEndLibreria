@@ -284,15 +284,15 @@ export async function modificarEntidad(url, id, options) {
 }
 
 export function avanzarPagina(url, tipo) {
-  let current_page = rescatarLS() + 1;
-  guardarLS(current_page);
+  let current_page = getNumPaginaSesionStorage() + 1;
+  setNumPaginaSesionStorage(current_page);
   $table.querySelector("tbody").innerHTML = "";
   obtenerEntidadPaginada(url, tipo);
 }
 
 export function retrocederPagina(url, tipo) {
-  let current_page = rescatarLS() - 1;
-  guardarLS(current_page);
+  let current_page = getNumPaginaSesionStorage() - 1;
+  setNumPaginaSesionStorage(current_page);
   $table.querySelector("tbody").innerHTML = "";
   obtenerEntidadPaginada(url, tipo);
 }
@@ -427,11 +427,11 @@ function modalFormulario(textoHTML, url, accion, id = undefined) {
   });
 }
 
-function guardarLS(pagina) {
+function setNumPaginaSesionStorage(pagina) {
   sessionStorage.setItem("current_page", Number(pagina));
 }
 
-function rescatarLS() {
+function getNumPaginaSesionStorage() {
   if (sessionStorage.getItem("current_page"))
     return Number(sessionStorage.getItem("current_page"));
 }
@@ -461,6 +461,6 @@ export function setearAtributosSesion(){
     sessionStorage.setItem("current_page", Number(0));
     return 0;
   } else{
-    return rescatarLS();
+    return getNumPaginaSesionStorage();
   }
 }
