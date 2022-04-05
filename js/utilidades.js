@@ -77,8 +77,8 @@ export function modalInformativo(tipo, nombre, textoHTML = "") {
 //Fin modales
 
 //Modificaciones DOM
-export function obtenerEntidadPaginada(url, tipo, current_page = 0) {
-  setearAtributosSesion()
+export function obtenerEntidadPaginada(url, tipo) {
+  let current_page = setearAtributosSesion()
  
   modalCargaDatos();
   obtenerJson(url + `paged?page=${current_page}&size=10`).then((response) => {
@@ -459,5 +459,8 @@ export function setearAtributosSesion(){
     let pagina = obtenerNombrePagina();
     sessionStorage.setItem("pagina_actual", pagina);
     sessionStorage.setItem("current_page", Number(0));
+    return 0;
+  } else{
+    return rescatarLS();
   }
 }
