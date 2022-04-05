@@ -287,14 +287,14 @@ export function avanzarPagina(url, tipo) {
   let current_page = rescatarLS() + 1;
   guardarLS(current_page);
   $table.querySelector("tbody").innerHTML = "";
-  obtenerEntidadPaginada(url, tipo, current_page);
+  obtenerEntidadPaginada(url, tipo);
 }
 
 export function retrocederPagina(url, tipo) {
   let current_page = rescatarLS() - 1;
   guardarLS(current_page);
   $table.querySelector("tbody").innerHTML = "";
-  obtenerEntidadPaginada(url, tipo, current_page);
+  obtenerEntidadPaginada(url, tipo);
 }
 //Fin modificaciones DOM
 
