@@ -1,5 +1,5 @@
 import { obtenerJson } from "./asincronico.js";
-import {options, urlDesactivar, urlActivar } from "./constantes.js";
+import { options, urlDesactivar, urlActivar } from "./constantes.js";
 
 export function modalCargaDatos() {
   Swal.fire({
@@ -39,11 +39,11 @@ export function modalConfirmacionCambioEstado(estado, index) {
 
 export function modalExito() {
   Swal.fire({
-    icon: 'success',
-    title: 'Se ha guardado correctamente!',
+    icon: "success",
+    title: "Se ha guardado correctamente!",
     showConfirmButton: false,
-    timer: 1500
-  })
+    timer: 1500,
+  });
 }
 
 export function modalError(msj) {
@@ -78,6 +78,8 @@ export function modalInformativo(tipo, nombre, textoHTML = "") {
 
 //Modificaciones DOM
 export function obtenerEntidadPaginada(url, tipo, current_page = 0) {
+  setearAtributosSesion()
+ 
   modalCargaDatos();
   obtenerJson(url + `paged?page=${current_page}&size=10`).then((response) => {
     modalMostrarResultado(response.body.content);
@@ -255,7 +257,7 @@ export function cambiarEstado(url, id) {
 export async function crearEntidad(url, options) {
   return await obtenerJson(url, options)
     .then((response) => {
-      if (response.status >= 200 && response.status <300) {
+      if (response.status >= 200 && response.status < 300) {
         modalExito();
       } else {
         return Promise.reject(response.body);
@@ -269,7 +271,7 @@ export async function crearEntidad(url, options) {
 export async function modificarEntidad(url, id, options) {
   return await obtenerJson(url + id, options)
     .then((response) => {
-      if (response.status >= 200 && response.status <300) {
+      if (response.status >= 200 && response.status < 300) {
         modificarInfo(response.body, id);
         modalExito();
       } else {
@@ -281,14 +283,16 @@ export async function modificarEntidad(url, id, options) {
     });
 }
 
-export function avanzarPagina(url, tipo){
-  current_page++;
+export function avanzarPagina(url, tipo) {
+  let current_page = rescatarLS() + 1;
+  guardarLS(current_page);
   $table.querySelector("tbody").innerHTML = "";
   obtenerEntidadPaginada(url, tipo, current_page);
 }
 
-export function retrocederPagina(url, tipo){
-  current_page--;
+export function retrocederPagina(url, tipo) {
+  let current_page = rescatarLS() - 1;
+  guardarLS(current_page);
   $table.querySelector("tbody").innerHTML = "";
   obtenerEntidadPaginada(url, tipo, current_page);
 }
@@ -330,7 +334,7 @@ function buscaTabla() {
 let $table = document.querySelector(".table");
 let $template = document.getElementById("crud-template").content;
 let $fragment = document.createDocumentFragment();
-let current_page = 0;
+// let current_page = 0;
 //FIN Variables globales para pintado
 
 //Función ACTIVAR
@@ -373,11 +377,11 @@ export function editarConForm(boton, urlEditar) {
   modalFormulario(obtenerEditables(id), urlEditar, "Modificar", id);
 }
 
-export function crearConForm(urlCrear){
+export function crearConForm(urlCrear) {
   modalFormulario(obtenerEditables(), urlCrear, "Crear");
 }
 
-function obtenerEditables(id=undefined) {
+function obtenerEditables(id = undefined) {
   let nodoHijos = document.querySelector("tr").children;
   let textoHTML = "";
   for (const hijo of nodoHijos) {
@@ -385,9 +389,9 @@ function obtenerEditables(id=undefined) {
       let forLabel = hijo.dataset.label;
       let type = hijo.dataset.type;
       let valorActual = "";
-      if(id){
+      if (id) {
         let propiedad = forLabel.toLowerCase();
-        valorActual = document.querySelector(`#${propiedad}_${id}`).textContent
+        valorActual = document.querySelector(`#${propiedad}_${id}`).textContent;
       }
       textoHTML += `<label class="label-input" for="${forLabel}">${forLabel}:</label><input id="${forLabel}" class="swal2-input" type="${type}" value="${valorActual}"><br>`;
     }
@@ -395,7 +399,7 @@ function obtenerEditables(id=undefined) {
   return textoHTML;
 }
 
-function modalFormulario(textoHTML, url, accion, id=undefined) {
+function modalFormulario(textoHTML, url, accion, id = undefined) {
   Swal.fire({
     title: accion,
     html: textoHTML,
@@ -405,20 +409,55 @@ function modalFormulario(textoHTML, url, accion, id=undefined) {
     confirmButtonText: "Guardar 💾",
     preConfirm: async (nombre) => {
       let responseBackEnd;
-      nombre = Swal.getPopup().querySelector('.swal2-input').value
+      nombre = Swal.getPopup().querySelector(".swal2-input").value;
       options.body = JSON.stringify({ nombre });
-      if(accion.toLowerCase() == "modificar"){
-        options.method = "PUT"
+      if (accion.toLowerCase() == "modificar") {
+        options.method = "PUT";
         responseBackEnd = await modificarEntidad(url, id, options);
-      } else{
-        options.method = "POST"
+      } else {
+        options.method = "POST";
         responseBackEnd = await crearEntidad(url, options);
       }
-      if(responseBackEnd) Swal.showValidationMessage(responseBackEnd);
-    }
+      if (responseBackEnd) Swal.showValidationMessage(responseBackEnd);
+    },
   }).then((result) => {
     if (!result.isConfirmed) {
       modalCancelacion();
     }
   });
+}
+
+function guardarLS(pagina) {
+  sessionStorage.setItem("current_page", Number(pagina));
+}
+
+function rescatarLS() {
+  if (sessionStorage.getItem("current_page"))
+    return Number(sessionStorage.getItem("current_page"));
+}
+
+function obtenerNombrePagina(){
+  let cabeceraMeta = document.head.children;
+  for (const elemento of cabeceraMeta) {
+    if(elemento.localName == "title"){
+      return elemento.text
+    }
+  }
+}
+
+function esMismaSesion(){
+  if(sessionStorage.getItem("pagina_actual")){
+    let paginaPrev = sessionStorage.getItem("pagina_actual")
+    let paginaActual = obtenerNombrePagina();
+    return (paginaActual == paginaPrev)
+  }
+  return false;
+}
+
+export function setearAtributosSesion(){
+  if(!esMismaSesion()){
+    let pagina = obtenerNombrePagina();
+    sessionStorage.setItem("pagina_actual", pagina);
+    sessionStorage.setItem("current_page", Number(0));
+  }
 }
