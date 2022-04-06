@@ -44,7 +44,7 @@ function main() {
             password: obtenerValorSwalPopUp("password"),
             roleId: 2
           }
-          
+         
           if ((documento.length>=6 && documento.length <=8)&& utilidades.esUnNumero(documento)) {
 
             clienteCrear.documento= parseInt(documento);
@@ -96,7 +96,7 @@ function main() {
             password: "passWord_123!",
             roleId: 2
           }
-          
+      
           if ((documento.length>=6 && documento.length <=8)&& utilidades.esUnNumero(documento)) {
 
             clienteModificar.documento= parseInt(documento);
