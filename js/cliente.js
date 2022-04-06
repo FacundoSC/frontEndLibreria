@@ -33,9 +33,6 @@ function main() {
         cancelButtonText: 'Cancelar ❌',
         confirmButtonText: 'Guardar 💾',
         focusConfirm: false,
-        customClass: {
-          validationMessage: 'my-validation-message'
-        },
         preConfirm: async () => {
           let documento = obtenerValorSwalPopUp("documento");
           let clienteCrear = {
@@ -88,38 +85,35 @@ function main() {
         cancelButtonText: 'Cancelar ❌',
         confirmButtonText: 'Guardar 💾',
         focusConfirm: false,
-        preConfirm: () => {
-          let documento, nombre, apellido, telefono, roleId, username, password;
-          documento = Swal.getPopup().querySelector('#documento').value;
-          nombre = Swal.getPopup().querySelector(`#nombre`).value;
-          apellido = Swal.getPopup().querySelector('#apellido').value;
-          telefono = Swal.getPopup().querySelector(`#telefono`).value;
-
-          roleId = 2;
-          username = "js@js.com";
-          password = "123";
-
-          return { documento, nombre, apellido, telefono, roleId, username, password };
-        }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          if (result.value) {
-
-            let id = event.target.dataset.id;
-            options.method = 'PUT';
-            options.body = JSON.stringify(result.value);
-            let urlLocal = "http://localhost:8085/api/v1/cliente/";
-            modificarCliente(urlLocal, id, options)
-
-          } else {
-            Swal.fire('Se ha cancelado la operación', '', 'warning')
+        preConfirm: async () => {
+          let documento = obtenerValorSwalPopUp("documento");
+          let clienteModificar = {
+            nombre: obtenerValorSwalPopUp("nombre"),
+            nombreFormularioCliente: nombre,
+            apellido: obtenerValorSwalPopUp("apellido"),
+            telefono: obtenerValorSwalPopUp("telefono"),
+            username: "jsjs@js.com",
+            password: "passWord_123!",
+            roleId: 2
           }
+          
+          if ((documento.length>=6 && documento.length <=8)&& utilidades.esUnNumero(documento)) {
 
-        } else {
+            clienteModificar.documento= parseInt(documento);
+            options.method = 'PUT';
+            options.body = JSON.stringify(clienteModificar);
+            let urlLocal = "http://localhost:8085/api/v1/cliente/";
+            let responseBackEnd = await modificarCliente(id, options);
+            if (responseBackEnd)Swal.showValidationMessage(responseBackEnd);
+          } else {
+            Swal.showValidationMessage("El documento no cumple con el formato");
+          }
+        },
+      }).then((result) => {
+        if (!result.isConfirmed) {
           Swal.fire('Se ha cancelado la operación', '', 'warning')
         }
       });
-
     }
 
     if (event.target.matches(".botonEstado")) {
@@ -213,25 +207,57 @@ async function crearCliente(urlCliente, options) {
   });
 }
 
-function modificarCliente(urlCliente, id, options) {
-  obtenerJson(urlCliente + id, options).then(response => {
-    console.log(response);
+async function modificarCliente(id, options) {
+  return await obtenerJson(urlCliente + id, options).then(response => {
+    console.log(response.status);
+    if (response.status >= 200 && response.status <300) {
     d.getElementById("documento_" + id).innerHTML = response.body.documento;
     d.getElementById("nombre_" + id).innerHTML = response.body.nombre;
     d.getElementById("apellido_" + id).innerHTML = response.body.apellido;
     d.getElementById("telefono_" + id).innerHTML = response.body.telefono;
-
-
+    console.log(response);
     let listadoBotones = d.getElementById(`editar_${id}`).parentElement;
     listadoBotones.children[1].dataset.nombre = response.body.nombre;
+    listadoBotones.children[2].dataset.documento= response.body.documento;
     listadoBotones.children[2].dataset.nombre = response.body.nombre;
-  }).catch(error => console.error(error));
+    listadoBotones.children[2].dataset.apellido = response.body.apellido;
+    listadoBotones.children[2].dataset.telefono = response.body.telefono;
+
+      utilidades.modalExito();
+    } else {
+      return Promise.reject(response.body);
+
+    }
+  }).catch(function (response) {
+    return response.message;
+  });
 }
 
 function obtenerClientesPaginados() {
 
+  Swal.fire({
+    title: "CARGANDO DATOS",
+    html: "<h3>Aguarde por favor</h3><p><img src='../img/nyan-cat.gif'><p>",
+    width: 500,
+    backdrop: `rgba(0,0,40,0.4)`,
+    showConfirmButton: false,
+  });
+
   obtenerJson(urlCliente + `paged?page=${current_page}&size=10`).then(response => {
     console.log(response);
+    let msj;
+      console.log(response.body.content)
+      if (response.body.content) {
+        msj = "<h3 style='margin: 0; padding: 3rem'>Petición exitosa! 🥳</h3>";
+      } else {
+        msj = "<h3 style='margin: 0; padding: 3rem'>Algo ha fallado 😭</h3>";
+      }
+      Swal.fire({
+        html: msj,
+        backdrop: `rgba(0,0,40,0.4)`,
+        showConfirmButton: false,
+        timer:1500
+    });
 
     totalPages = response.body.totalPages;
     current_page = response.body.pageable.pageNumber
