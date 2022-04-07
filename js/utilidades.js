@@ -149,14 +149,12 @@ function pintarPropiedad(entidad) {
     if (propiedad == "alta") {
       entidad[propiedad]
         ? ($template.querySelector(`.${propiedad}`).textContent = "Activado")
-        : ($template.querySelector(`.${propiedad}`).textContent =
-            "Desactivado");
+        : ($template.querySelector(`.${propiedad}`).textContent = "Desactivado");
     } else {
       $template.querySelector(`.${propiedad}`).textContent = entidad[propiedad];
     }
     $template.querySelector(`.${propiedad}`).id = `${propiedad}_${entidad.id}`;
-    $template.querySelector(`.${propiedad}`).dataset[propiedad] =
-      entidad[propiedad];
+    $template.querySelector(`.${propiedad}`).dataset[propiedad] = entidad[propiedad];
     $template.querySelector(`.${propiedad}`).classList.remove("tachado");
     if (!entidad["alta"]) {
       $template.querySelector(`.${propiedad}`).classList.add("tachado");
@@ -342,7 +340,7 @@ function activarEntidad(url, index) {
   obtenerJson(url + index)
     .then((response) => {
       if (response.status == 200) {
-        pintarCambioEstado(index, false);
+        //pintarCambioEstado(index, false);
         modalConfirmacionCambioEstado("Activado", index);
       } else {
         return Promise.reject(response);
@@ -359,7 +357,7 @@ function desactivarEntidad(url, index) {
   obtenerJson(url + index)
     .then((response) => {
       if (response.status == 200) {
-        pintarCambioEstado(index, true);
+      //pintarCambioEstado(index, true);
         modalConfirmacionCambioEstado("Desactivado", index);
       } else {
         return Promise.reject(response);
@@ -378,7 +376,7 @@ export function editarConForm(boton, urlEditar) {
 }
 
 export function crearConForm(urlCrear) {
-  modalFormulario(obtenerEditables(), urlCrear, "Crear");
+  modalFormulario(obtenerCreacion(), urlCrear, "Crear");
 }
 
 function obtenerEditables(id = undefined) {
@@ -394,6 +392,19 @@ function obtenerEditables(id = undefined) {
         valorActual = document.querySelector(`#${propiedad}_${id}`).textContent;
       }
       textoHTML += `<label class="label-input" for="${forLabel}">${forLabel}:</label><input id="${forLabel}" class="swal2-input" type="${type}" value="${valorActual}"><br>`;
+    }
+  }
+  return textoHTML;
+}
+
+function obtenerCreacion() {
+  let nodoHijos = document.querySelector("tr").children;
+  let textoHTML = "";
+  for (const hijo of nodoHijos) {
+    if (hijo.classList.contains("creacion")) {
+      let forLabel = hijo.dataset.label;
+      let type = hijo.dataset.type;
+      textoHTML += `<label class="label-input" for="${forLabel}">${forLabel}:</label><input id="${forLabel}" class="swal2-input" type="${type}" value=""><br>`;
     }
   }
   return textoHTML;
