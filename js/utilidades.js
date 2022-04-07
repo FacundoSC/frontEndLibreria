@@ -425,19 +425,29 @@ function modalFormulario(textoHTML, url, accion, id = undefined) {
     confirmButtonText: "Guardar 💾",
     preConfirm: async () => {
       let objeto = objetoAPersistir();
-      let responseBackEnd;
+      let entidad = obtenerNombrePagina().toLowerCase();
+      let responseBackEnd = validarObjeto(objeto, entidad)
 
-
-
-      options.body = JSON.stringify(objeto);
-      if (accion.toLowerCase() == "modificar") {
-        options.method = "PUT";
-        responseBackEnd = await modificarEntidad(url, id, options);
-      } else {
-        options.method = "POST";
-        responseBackEnd = await crearEntidad(url, options);
+      //esta logica deberia borrarse 
+       if(obtenerNombrePagina().toLowerCase() == "cliente"){
+        objeto = completarCliente(objeto);
       }
-      if (responseBackEnd) Swal.showValidationMessage(responseBackEnd);
+      //esta logica deberia borrarse 
+
+      if(responseBackEnd){
+        Swal.showValidationMessage(responseBackEnd)
+      } else{
+        options.body = JSON.stringify(objeto);
+        if (accion.toLowerCase() == "modificar") {
+          options.method = "PUT";
+          responseBackEnd = await modificarEntidad(url, id, options);
+        } else {
+          options.method = "POST";
+          responseBackEnd = await crearEntidad(url, options);
+        }
+        if (responseBackEnd) Swal.showValidationMessage(responseBackEnd);
+      }
+
     },
   }).then((result) => {
     if (!result.isConfirmed) {
@@ -460,6 +470,36 @@ function objetoAPersistir(){
   }
   return objeto;
 }
+
+function validarObjeto(objeto, entidad){
+  if(entidad.toLowerCase() == "cliente"){
+    return validarCliente(objeto);
+  } 
+}
+
+function validarCliente(objeto){
+  let documento = objeto.documento;
+  if((documento.length>=6 && documento.length <=8) && esUnNumero(documento)){
+    return;
+  } return "El documento no cumple con el formato";
+}
+
+//esta logica deberia borrarse 
+function completarCliente(objeto){
+  if(!objeto.username){
+    let par = {["username"]: "cliente@clientejs.com"};
+    Object.assign(objeto, par);
+  }
+  if(!objeto.password){
+    let par = {["password"]: "00000000"};
+    Object.assign(objeto, par);
+  }
+  let par = {["roleId"]: 2};
+  Object.assign(objeto, par);
+
+  return objeto;
+}
+//esta logica deberia borrarse 
 
 function setNumPaginaSesionStorage(pagina) {
   sessionStorage.setItem("current_page", Number(pagina));
