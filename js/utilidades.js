@@ -423,10 +423,13 @@ function modalFormulario(textoHTML, url, accion, id = undefined) {
     showCancelButton: true,
     cancelButtonText: "Cancelar ❌",
     confirmButtonText: "Guardar 💾",
-    preConfirm: async (nombre) => {
+    preConfirm: async () => {
+      let objeto = objetoAPersistir();
       let responseBackEnd;
-      nombre = Swal.getPopup().querySelector(".swal2-input").value;
-      options.body = JSON.stringify({ nombre });
+
+
+
+      options.body = JSON.stringify(objeto);
       if (accion.toLowerCase() == "modificar") {
         options.method = "PUT";
         responseBackEnd = await modificarEntidad(url, id, options);
@@ -441,6 +444,21 @@ function modalFormulario(textoHTML, url, accion, id = undefined) {
       modalCancelacion();
     }
   });
+}
+
+function objetoAPersistir(){
+  let modal = document.getElementById("swal2-html-container").children;
+  let llave, valor;
+  let objeto = {};
+  for (const hijo of modal) {
+      if(hijo.localName == "input"){
+        llave = hijo.id.toLocaleLowerCase();
+        valor = hijo.value;
+        let par = {[llave]: valor};
+        Object.assign(objeto, par);
+      }
+  }
+  return objeto;
 }
 
 function setNumPaginaSesionStorage(pagina) {
