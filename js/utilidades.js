@@ -464,3 +464,11 @@ export function setearAtributosSesion(){
     return getNumPaginaSesionStorage();
   }
 }
+
+export function esUnNumero(numero) {
+  if ((numero) && !isNaN(numero)) {
+    return true;
+  } else {
+    return false;
+  }
+}
