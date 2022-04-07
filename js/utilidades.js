@@ -89,22 +89,27 @@ export function obtenerEntidadPaginada(url, tipo) {
 }
 
 export function pintarCambioEstado(index, estadoAnterior) {
-  let btn = document.querySelector("#estado_" + index);
+  let btnEstado = document.querySelector("#estado_" + index);
+  let btnEditar = document.querySelector("#editar_" + index);
+  let listadoPropiedades = propiedadesAPintar();
+
   if (!estadoAnterior) {
-    btn.classList.remove("btn-danger");
-    btn.classList.add("btn-success");
-    btn.dataset.alta = "true";
-    btn.parentElement.children[0].removeAttribute("disabled");
-    btn.parentNode.parentNode.children[0].classList.remove("tachado");
-    btn.parentNode.parentNode.children[1].classList.remove("tachado");
+    btnEstado.classList.remove("btn-danger");
+    btnEstado.classList.add("btn-success");
+    btnEstado.dataset.alta = "true";
+    btnEditar.removeAttribute("disabled");
+    listadoPropiedades.forEach((propiedad) => {
+      document.getElementById(`${propiedad}_${index}`).classList.remove("tachado");
+    });
     document.getElementById("alta_" + index).innerHTML = "Activado";
   } else {
-    btn.classList.remove("btn-success");
-    btn.classList.add("btn-danger");
-    btn.dataset.alta = "false";
-    btn.parentElement.children[0].setAttribute("disabled", "");
-    btn.parentNode.parentNode.children[0].classList.add("tachado");
-    btn.parentNode.parentNode.children[1].classList.add("tachado");
+    btnEstado.classList.remove("btn-success");
+    btnEstado.classList.add("btn-danger");
+    btnEstado.dataset.alta = "false";
+    btnEditar.setAttribute("disabled", "");
+    listadoPropiedades.forEach((propiedad) => {
+      document.getElementById(`${propiedad}_${index}`).classList.add("tachado");
+    });
     document.getElementById("alta_" + index).innerHTML = "Desactivado";
   }
 }
@@ -340,7 +345,7 @@ function activarEntidad(url, index) {
   obtenerJson(url + index)
     .then((response) => {
       if (response.status == 200) {
-        //pintarCambioEstado(index, false);
+        pintarCambioEstado(index, false);
         modalConfirmacionCambioEstado("Activado", index);
       } else {
         return Promise.reject(response);
@@ -357,7 +362,7 @@ function desactivarEntidad(url, index) {
   obtenerJson(url + index)
     .then((response) => {
       if (response.status == 200) {
-      //pintarCambioEstado(index, true);
+        pintarCambioEstado(index, true);
         modalConfirmacionCambioEstado("Desactivado", index);
       } else {
         return Promise.reject(response);
