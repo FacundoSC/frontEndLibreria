@@ -1,27 +1,27 @@
-import { options, urlEditorialLocal } from "./constantes.js";
+import {urlEditorial } from "./constantes.js";
 import * as utilidades from './utilidades.js';
 
 main();
 
 function main() {
-  document.addEventListener("DOMContentLoaded", utilidades.obtenerEntidadPaginada(urlEditorialLocal, "editorial"));
+  document.addEventListener("DOMContentLoaded", utilidades.obtenerEntidadPaginada(urlEditorial, "editorial"));
 
   //funciones de click de botones
   document.addEventListener("click", async (e) => {
     //Inicio CREAR
     if (e.target.matches(".crear")) {
-      utilidades.crearConForm(urlEditorialLocal);
+      utilidades.crearConForm(urlEditorial);
     } //fin CREAR
 
     //Inicio EDITAR
     if (e.target.matches(".editar")) {
-       utilidades.editarConForm(e.target, urlEditorialLocal)
+       utilidades.editarConForm(e.target, urlEditorial)
     }
     //FIN EDITAR
 
     //Inicio cambio de estado
     if (e.target.matches(".botonEstado")) {
-      utilidades.cambiarEstado(urlEditorialLocal, e.target.dataset.id)
+      utilidades.cambiarEstado(urlEditorial, e.target.dataset.id)
     }
     //FIN cambio de estado
 
@@ -70,11 +70,11 @@ function main() {
     //Fin VER
 
     if (e.target.matches("#btn_next")) {
-      utilidades.avanzarPagina(urlEditorialLocal, "editorial");
+      utilidades.avanzarPagina(urlEditorial, "editorial");
     }
 
     if (e.target.matches("#btn_prev")) {
-      utilidades.retrocederPagina(urlEditorialLocal, "editorial");
+      utilidades.retrocederPagina(urlEditorial, "editorial");
     }
   });
   //fin funciones

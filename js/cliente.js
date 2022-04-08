@@ -1,23 +1,23 @@
-import { urlClienteLocal} from "./constantes.js";
+import { urlCliente} from "./constantes.js";
 import * as utilidades from "./utilidades.js";
 
 main();
 
 function main() {
-  document.addEventListener("DOMContentLoaded", utilidades.obtenerEntidadPaginada(urlClienteLocal, "cliente"));
+  document.addEventListener("DOMContentLoaded", utilidades.obtenerEntidadPaginada(urlCliente, "cliente"));
 
   document.addEventListener("click", async (event) => {
 
     if (event.target.matches(".crear")) {
-      utilidades.crearConForm(urlClienteLocal);
+      utilidades.crearConForm(urlCliente);
     }
 
     if (event.target.matches(".editar")) {
-      utilidades.editarConForm(event.target, urlClienteLocal);
+      utilidades.editarConForm(event.target, urlCliente);
     }
 
     if (event.target.matches(".botonEstado")) {
-      utilidades.cambiarEstado(urlClienteLocal, event.target.dataset.id)
+      utilidades.cambiarEstado(urlCliente, event.target.dataset.id)
     }
 
     if (event.target.matches(".ver")) {
@@ -30,11 +30,11 @@ function main() {
     }
 
     if (event.target.matches("#btn_next")) {
-      utilidades.avanzarPagina(urlClienteLocal, "cliente");
+      utilidades.avanzarPagina(urlCliente, "cliente");
     }
 
     if (event.target.matches("#btn_prev")) {
-      utilidades.retrocederPagina(urlClienteLocal, "cliente");
+      utilidades.retrocederPagina(urlCliente, "cliente");
     }
   });
 }

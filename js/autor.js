@@ -1,4 +1,4 @@
-import { options, urlAutorLocal } from "./constantes.js";
+import {urlAutor } from "./constantes.js";
 import * as utilidades from "./utilidades.js";
 
 main();
@@ -6,20 +6,20 @@ main();
 function main() {
   document.addEventListener(
     "DOMContentLoaded",
-    utilidades.obtenerEntidadPaginada(urlAutorLocal, "autor")
+    utilidades.obtenerEntidadPaginada(urlAutor, "autor")
   );
 
   document.addEventListener("click", async (event) => {
     if (event.target.matches(".crear")) {
-        utilidades.crearConForm(urlAutorLocal);
+        utilidades.crearConForm(urlAutor);
     }
 
     if (event.target.matches(".editar")) {
-      utilidades.editarConForm(event.target, urlAutorLocal);
+      utilidades.editarConForm(event.target, urlAutor);
     }
 
     if (event.target.matches(".botonEstado")) {
-      utilidades.cambiarEstado(urlAutorLocal, event.target.dataset.id);
+      utilidades.cambiarEstado(urlAutor, event.target.dataset.id);
     }
 
     if (event.target.matches(".ver")) {
@@ -28,11 +28,11 @@ function main() {
     }
 
     if (event.target.matches("#btn_next")) {
-      utilidades.avanzarPagina(urlAutorLocal, "autor");
+      utilidades.avanzarPagina(urlAutor, "autor");
     }
 
     if (event.target.matches("#btn_prev")) {
-      utilidades.retrocederPagina(urlAutorLocal, "autor");
+      utilidades.retrocederPagina(urlAutor, "autor");
     }
   });
 }
