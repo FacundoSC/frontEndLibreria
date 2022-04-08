@@ -161,10 +161,15 @@ function pintarResultado(response, tipo) {
 }
 
 function modificarInfo(response, id) {
-  let nombreNuevo = response.nombre;
-  document.getElementById("nombre_" + id).innerHTML = nombreNuevo;
-  document.getElementById("estado_" + id).dataset.nombre = nombreNuevo;
-  document.getElementById("ver_" + id).dataset.nombre = nombreNuevo;
+  let listadoPropiedades = propiedadesAPintar();
+
+  listadoPropiedades.forEach((propiedad) => {
+   if(propiedad != "alta"){
+      document.getElementById(`${propiedad}_${id}`).textContent = response[propiedad];
+    }
+  });
+
+  //resta ajustar dataset
 }
 
 export function cambiarEstado(url, id) {
