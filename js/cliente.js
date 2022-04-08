@@ -26,7 +26,7 @@ function main() {
       let apellidoCliente = event.target.dataset.apellido;
       let documentoCliente = event.target.dataset.documento;
       let telefonoCliente = event.target.dataset.telefono;
-      let clienteDatos = `<p><b>DNI:</b> ${documentoCliente}</p><br><p><b>Teléfono:</b>${telefonoCliente}</p>`;
+      let clienteDatos = `<p><b>DNI:</b> ${documentoCliente}</p><br><p><b>Teléfono:</b> ${telefonoCliente}</p>`;
       modalInformativo("Cliente", nombreCliente + " " + apellidoCliente, clienteDatos);
     }
 
