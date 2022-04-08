@@ -1,5 +1,6 @@
 import { urlCliente} from "./constantes.js";
 import * as utilidades from "./utilidades.js";
+import {modalInformativo} from "./modales.js";
 
 main();
 
@@ -26,7 +27,7 @@ function main() {
       let documentoCliente = event.target.dataset.documento;
       let telefonoCliente = event.target.dataset.telefono;
       let clienteDatos = `<p><b>DNI:</b> ${documentoCliente}</p><br><p><b>Teléfono:</b>${telefonoCliente}</p>`;
-      utilidades.modalInformativo("Cliente", nombreCliente + " " + apellidoCliente, clienteDatos);
+      modalInformativo("Cliente", nombreCliente + " " + apellidoCliente, clienteDatos);
     }
 
     if (event.target.matches("#btn_next")) {
