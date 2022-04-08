@@ -1,12 +1,11 @@
 import { obtenerJson } from "./asincronico.js";
-import {urlDesactivar, urlActivar } from "./constantes.js";
+import { urlDesactivar, urlActivar } from "./constantes.js";
 import * as modal from "./modales.js";
-
 
 //Modificaciones DOM
 export function obtenerEntidadPaginada(url, tipo) {
-  let current_page = setearAtributosSesion()
- 
+  let current_page = setearAtributosSesion();
+
   modal.modalCargaDatos();
   obtenerJson(url + `paged?page=${current_page}&size=10`).then((response) => {
     modal.modalMostrarResultado(response.body.content);
@@ -26,7 +25,9 @@ function pintarCambioEstado(index, estadoAnterior) {
     btnEstado.dataset.alta = "true";
     btnEditar.removeAttribute("disabled");
     listadoPropiedades.forEach((propiedad) => {
-      document.getElementById(`${propiedad}_${index}`).classList.remove("tachado");
+      document
+        .getElementById(`${propiedad}_${index}`)
+        .classList.remove("tachado");
     });
     document.getElementById("alta_" + index).innerHTML = "Activado";
   } else {
@@ -81,12 +82,14 @@ function pintarPropiedad(entidad) {
     if (propiedad == "alta") {
       entidad[propiedad]
         ? ($template.querySelector(`.${propiedad}`).textContent = "Activado")
-        : ($template.querySelector(`.${propiedad}`).textContent = "Desactivado");
+        : ($template.querySelector(`.${propiedad}`).textContent =
+            "Desactivado");
     } else {
       $template.querySelector(`.${propiedad}`).textContent = entidad[propiedad];
     }
     $template.querySelector(`.${propiedad}`).id = `${propiedad}_${entidad.id}`;
-    $template.querySelector(`.${propiedad}`).dataset[propiedad] = entidad[propiedad];
+    $template.querySelector(`.${propiedad}`).dataset[propiedad] =
+      entidad[propiedad];
     $template.querySelector(`.${propiedad}`).classList.remove("tachado");
     if (!entidad["alta"]) {
       $template.querySelector(`.${propiedad}`).classList.add("tachado");
@@ -162,14 +165,16 @@ function pintarResultado(response, tipo) {
 
 function modificarInfo(response, id) {
   let listadoPropiedades = propiedadesAPintar();
+  let botonVer = document.getElementById(`ver_${id}`);
 
   listadoPropiedades.forEach((propiedad) => {
-   if(propiedad != "alta"){
+    let tipoEntidad = typeof response[propiedad];
+
+    if (propiedad != "alta" && tipoEntidad != "object") {
       document.getElementById(`${propiedad}_${id}`).textContent = response[propiedad];
+      botonVer.dataset[propiedad] = response[propiedad];
     }
   });
-
-  //resta ajustar dataset
 }
 
 export function cambiarEstado(url, id) {
@@ -344,50 +349,51 @@ function obtenerCreacion() {
   return textoHTML;
 }
 
-export function objetoAPersistir(){
+export function objetoAPersistir() {
   let modal = document.getElementById("swal2-html-container").children;
   let llave, valor;
   let objeto = {};
   for (const hijo of modal) {
-      if(hijo.localName == "input"){
-        llave = hijo.id.toLocaleLowerCase();
-        valor = hijo.value;
-        let par = {[llave]: valor};
-        Object.assign(objeto, par);
-      }
+    if (hijo.localName == "input") {
+      llave = hijo.id.toLocaleLowerCase();
+      valor = hijo.value;
+      let par = { [llave]: valor };
+      Object.assign(objeto, par);
+    }
   }
   return objeto;
 }
 
-export function validarObjeto(objeto, entidad){
-  if(entidad.toLowerCase() == "cliente"){
+export function validarObjeto(objeto, entidad) {
+  if (entidad.toLowerCase() == "cliente") {
     return validarCliente(objeto);
-  } 
+  }
 }
 
-function validarCliente(objeto){
+function validarCliente(objeto) {
   let documento = objeto.documento;
-  if((documento.length>=6 && documento.length <=8) && esUnNumero(documento)){
+  if (documento.length >= 6 && documento.length <= 8 && esUnNumero(documento)) {
     return;
-  } return "El documento no cumple con el formato";
+  }
+  return "El documento no cumple con el formato";
 }
 
-//esta logica deberia borrarse 
-export function completarCliente(objeto){
-  if(!objeto.username){
-    let par = {["username"]: "cliente@clientejs.com"};
+//esta logica deberia borrarse
+export function completarCliente(objeto) {
+  if (!objeto.username) {
+    let par = { ["username"]: "cliente@clientejs.com" };
     Object.assign(objeto, par);
   }
-  if(!objeto.password){
-    let par = {["password"]: "00000000"};
+  if (!objeto.password) {
+    let par = { ["password"]: "00000000" };
     Object.assign(objeto, par);
   }
-  let par = {["roleId"]: 2};
+  let par = { ["roleId"]: 2 };
   Object.assign(objeto, par);
 
   return objeto;
 }
-//esta logica deberia borrarse 
+//esta logica deberia borrarse
 
 function setNumPaginaSesionStorage(pagina) {
   sessionStorage.setItem("current_page", Number(pagina));
@@ -398,37 +404,37 @@ function getNumPaginaSesionStorage() {
     return Number(sessionStorage.getItem("current_page"));
 }
 
-export function obtenerNombrePagina(){
+export function obtenerNombrePagina() {
   let cabeceraMeta = document.head.children;
   for (const elemento of cabeceraMeta) {
-    if(elemento.localName == "title"){
-      return elemento.text
+    if (elemento.localName == "title") {
+      return elemento.text;
     }
   }
 }
 
-function esMismaSesion(){
-  if(sessionStorage.getItem("pagina_actual")){
-    let paginaPrev = sessionStorage.getItem("pagina_actual")
+function esMismaSesion() {
+  if (sessionStorage.getItem("pagina_actual")) {
+    let paginaPrev = sessionStorage.getItem("pagina_actual");
     let paginaActual = obtenerNombrePagina();
-    return (paginaActual == paginaPrev)
+    return paginaActual == paginaPrev;
   }
   return false;
 }
 
-function setearAtributosSesion(){
-  if(!esMismaSesion()){
+function setearAtributosSesion() {
+  if (!esMismaSesion()) {
     let pagina = obtenerNombrePagina();
     sessionStorage.setItem("pagina_actual", pagina);
     sessionStorage.setItem("current_page", Number(0));
     return 0;
-  } else{
+  } else {
     return getNumPaginaSesionStorage();
   }
 }
 
 function esUnNumero(numero) {
-  if ((numero) && !isNaN(numero)) {
+  if (numero && !isNaN(numero)) {
     return true;
   } else {
     return false;
