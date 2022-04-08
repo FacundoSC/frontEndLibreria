@@ -305,7 +305,7 @@ export function editarConForm(boton, urlEditar) {
 }
 
 export function crearConForm(urlCrear) {
-  modalFormulario(obtenerCreacion(), urlCrear, "Crear");
+  modal.modalFormulario(obtenerCreacion(), urlCrear, "Crear");
 }
 
 function obtenerEditables(id = undefined) {
