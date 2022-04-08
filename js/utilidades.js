@@ -1,94 +1,21 @@
 import { obtenerJson } from "./asincronico.js";
-import { options, urlDesactivar, urlActivar } from "./constantes.js";
+import {urlDesactivar, urlActivar } from "./constantes.js";
+import * as modal from "./modales.js";
 
-export function modalCargaDatos() {
-  Swal.fire({
-    title: "CARGANDO DATOS",
-    html: "<h3>Aguarde por favor</h3><p><img src='../img/nyan-cat.gif'><p>",
-    width: 500,
-    backdrop: `rgba(0,0,40,0.4)`,
-    showConfirmButton: false,
-  });
-}
-
-export function modalMostrarResultado(resultado) {
-  let msj;
-  if (resultado) {
-    msj = "<h3 style='margin: 0; padding: 3rem'>Petición exitosa! 🥳</h3>";
-  } else {
-    msj = "<h3 style='margin: 0; padding: 3rem'>Algo ha fallado 😭</h3>";
-  }
-
-  Swal.fire({
-    html: msj,
-    backdrop: `rgba(0,0,40,0.4)`,
-    showConfirmButton: false,
-    width: 500,
-    timer: 1500,
-  });
-}
-
-export function modalConfirmacionCambioEstado(estado, index) {
-  let nombre = document.querySelector(`#nombre_${index}`).textContent;
-  Swal.fire(
-    `El estado de: <b>${nombre}</b> ha sido modificado a: <b>${estado}</b>.`,
-    "",
-    "success"
-  );
-}
-
-export function modalExito() {
-  Swal.fire({
-    icon: "success",
-    title: "Se ha guardado correctamente!",
-    showConfirmButton: false,
-    timer: 1500,
-  });
-}
-
-export function modalError(msj) {
-  Swal.fire(msj, "", "error");
-}
-
-async function modalPedirConfirmacion() {
-  return await Swal.fire({
-    title: "¿Deseas cambiar el estado?",
-    showDenyButton: true,
-    icon: "question",
-    confirmButtonText: "SI 😎",
-    denyButtonText: `NO 🙏`,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-  });
-}
-
-export function modalCancelacion() {
-  Swal.fire("Se ha cancelado la operación", "", "warning");
-}
-
-export function modalInformativo(tipo, nombre, textoHTML = "") {
-  Swal.fire({
-    icon: "info",
-    title: tipo,
-    html: `<p class="nombreAutor">${nombre}</p><br>
-  ${textoHTML}`,
-  });
-}
-//Fin modales
 
 //Modificaciones DOM
 export function obtenerEntidadPaginada(url, tipo) {
   let current_page = setearAtributosSesion()
  
-  modalCargaDatos();
+  modal.modalCargaDatos();
   obtenerJson(url + `paged?page=${current_page}&size=10`).then((response) => {
-    modalMostrarResultado(response.body.content);
+    modal.modalMostrarResultado(response.body.content);
     seteoPaginas(response);
     pintarResultado(response.body.content, tipo);
   });
 }
 
-export function pintarCambioEstado(index, estadoAnterior) {
+function pintarCambioEstado(index, estadoAnterior) {
   let btnEstado = document.querySelector("#estado_" + index);
   let btnEditar = document.querySelector("#editar_" + index);
   let listadoPropiedades = propiedadesAPintar();
@@ -114,7 +41,7 @@ export function pintarCambioEstado(index, estadoAnterior) {
   }
 }
 
-export function seteoPaginas(response) {
+function seteoPaginas(response) {
   let totalPages = response.body.totalPages;
   let current_page = response.body.pageable.pageNumber;
 
@@ -219,8 +146,7 @@ function pintarLibrosAsociados(editorial) {
   }
 }
 
-//Prueba pintadoGenerico
-export function pintarResultado(response, tipo) {
+function pintarResultado(response, tipo) {
   let listadoPropData = Object.keys(response[0]);
 
   response.forEach((entidad) => {
@@ -233,9 +159,8 @@ export function pintarResultado(response, tipo) {
 
   $table.querySelector("tbody").appendChild($fragment);
 }
-//FIn prueba
 
-export function modificarInfo(response, id) {
+function modificarInfo(response, id) {
   let nombreNuevo = response.nombre;
   document.getElementById("nombre_" + id).innerHTML = nombreNuevo;
   document.getElementById("estado_" + id).dataset.nombre = nombreNuevo;
@@ -243,7 +168,7 @@ export function modificarInfo(response, id) {
 }
 
 export function cambiarEstado(url, id) {
-  modalPedirConfirmacion().then((result) => {
+  modal.modalPedirConfirmacion().then((result) => {
     if (result.isConfirmed) {
       let estado = document.querySelector("#estado_" + id).dataset.alta;
       if (estado == "true") {
@@ -252,7 +177,7 @@ export function cambiarEstado(url, id) {
         activarEntidad(url + urlActivar, id);
       }
     } else if (result.isDenied) {
-      modalCancelacion();
+      modal.modalCancelacion();
     }
   });
 }
@@ -261,7 +186,7 @@ export async function crearEntidad(url, options) {
   return await obtenerJson(url, options)
     .then((response) => {
       if (response.status >= 200 && response.status < 300) {
-        modalExito();
+        modal.modalExito();
       } else {
         return Promise.reject(response.body);
       }
@@ -276,7 +201,7 @@ export async function modificarEntidad(url, id, options) {
     .then((response) => {
       if (response.status >= 200 && response.status < 300) {
         modificarInfo(response.body, id);
-        modalExito();
+        modal.modalExito();
       } else {
         return Promise.reject(response.body);
       }
@@ -299,7 +224,6 @@ export function retrocederPagina(url, tipo) {
   $table.querySelector("tbody").innerHTML = "";
   obtenerEntidadPaginada(url, tipo);
 }
-//Fin modificaciones DOM
 
 //Ocultar boton de creacion
 document.addEventListener("scroll", () => {
@@ -346,13 +270,13 @@ function activarEntidad(url, index) {
     .then((response) => {
       if (response.status == 200) {
         pintarCambioEstado(index, false);
-        modalConfirmacionCambioEstado("Activado", index);
+        modal.modalConfirmacionCambioEstado("Activado", index);
       } else {
         return Promise.reject(response);
       }
     })
     .catch((badResponse) => {
-      modalError(badResponse.message);
+      modal.modalError(badResponse.message);
     });
 }
 //Fin ACTIVAR
@@ -363,13 +287,13 @@ function desactivarEntidad(url, index) {
     .then((response) => {
       if (response.status == 200) {
         pintarCambioEstado(index, true);
-        modalConfirmacionCambioEstado("Desactivado", index);
+        modal.modalConfirmacionCambioEstado("Desactivado", index);
       } else {
         return Promise.reject(response);
       }
     })
     .catch((badResponse) => {
-      modalError(badResponse.message);
+      modal.modalError(badResponse.message);
     });
 }
 //Fin DESACTIVAR
@@ -377,7 +301,7 @@ function desactivarEntidad(url, index) {
 //prueba edicion
 export function editarConForm(boton, urlEditar) {
   const id = boton.dataset.id;
-  modalFormulario(obtenerEditables(id), urlEditar, "Modificar", id);
+  modal.modalFormulario(obtenerEditables(id), urlEditar, "Modificar", id);
 }
 
 export function crearConForm(urlCrear) {
@@ -415,48 +339,7 @@ function obtenerCreacion() {
   return textoHTML;
 }
 
-function modalFormulario(textoHTML, url, accion, id = undefined) {
-  Swal.fire({
-    title: accion,
-    html: textoHTML,
-    allowEnterKey: true,
-    showCancelButton: true,
-    cancelButtonText: "Cancelar ❌",
-    confirmButtonText: "Guardar 💾",
-    preConfirm: async () => {
-      let objeto = objetoAPersistir();
-      let entidad = obtenerNombrePagina().toLowerCase();
-      let responseBackEnd = validarObjeto(objeto, entidad)
-
-      //esta logica deberia borrarse 
-       if(obtenerNombrePagina().toLowerCase() == "cliente"){
-        objeto = completarCliente(objeto);
-      }
-      //esta logica deberia borrarse 
-
-      if(responseBackEnd){
-        Swal.showValidationMessage(responseBackEnd)
-      } else{
-        options.body = JSON.stringify(objeto);
-        if (accion.toLowerCase() == "modificar") {
-          options.method = "PUT";
-          responseBackEnd = await modificarEntidad(url, id, options);
-        } else {
-          options.method = "POST";
-          responseBackEnd = await crearEntidad(url, options);
-        }
-        if (responseBackEnd) Swal.showValidationMessage(responseBackEnd);
-      }
-
-    },
-  }).then((result) => {
-    if (!result.isConfirmed) {
-      modalCancelacion();
-    }
-  });
-}
-
-function objetoAPersistir(){
+export function objetoAPersistir(){
   let modal = document.getElementById("swal2-html-container").children;
   let llave, valor;
   let objeto = {};
@@ -471,7 +354,7 @@ function objetoAPersistir(){
   return objeto;
 }
 
-function validarObjeto(objeto, entidad){
+export function validarObjeto(objeto, entidad){
   if(entidad.toLowerCase() == "cliente"){
     return validarCliente(objeto);
   } 
@@ -485,7 +368,7 @@ function validarCliente(objeto){
 }
 
 //esta logica deberia borrarse 
-function completarCliente(objeto){
+export function completarCliente(objeto){
   if(!objeto.username){
     let par = {["username"]: "cliente@clientejs.com"};
     Object.assign(objeto, par);
@@ -510,7 +393,7 @@ function getNumPaginaSesionStorage() {
     return Number(sessionStorage.getItem("current_page"));
 }
 
-function obtenerNombrePagina(){
+export function obtenerNombrePagina(){
   let cabeceraMeta = document.head.children;
   for (const elemento of cabeceraMeta) {
     if(elemento.localName == "title"){
@@ -528,7 +411,7 @@ function esMismaSesion(){
   return false;
 }
 
-export function setearAtributosSesion(){
+function setearAtributosSesion(){
   if(!esMismaSesion()){
     let pagina = obtenerNombrePagina();
     sessionStorage.setItem("pagina_actual", pagina);
@@ -539,7 +422,7 @@ export function setearAtributosSesion(){
   }
 }
 
-export function esUnNumero(numero) {
+function esUnNumero(numero) {
   if ((numero) && !isNaN(numero)) {
     return true;
   } else {
