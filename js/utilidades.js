@@ -385,7 +385,7 @@ export function completarCliente(objeto) {
     Object.assign(objeto, par);
   }
   if (!objeto.password) {
-    let par = { ["password"]: "00000000" };
+    let par = { ["password"]: "passWord_123!" };
     Object.assign(objeto, par);
   }
   let par = { ["roleId"]: 2 };
