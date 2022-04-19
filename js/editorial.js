@@ -1,5 +1,6 @@
-import { options, urlEditorial } from "./constantes.js";
+import {urlEditorial } from "./constantes.js";
 import * as utilidades from './utilidades.js';
+import {modalInformativo} from "./modales.js";
 
 main();
 
@@ -15,7 +16,7 @@ function main() {
 
     //Inicio EDITAR
     if (e.target.matches(".editar")) {
-       utilidades.editarConForm(e.target, urlEditorial)
+      utilidades.editarConForm(e.target, urlEditorial)
     }
     //FIN EDITAR
 
@@ -65,7 +66,7 @@ function main() {
         }
       }
 
-      utilidades.modalInformativo("Editorial", nombre, textoHTML)
+      modalInformativo("Editorial", nombre, textoHTML)
     }
     //Fin VER
 
