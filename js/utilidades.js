@@ -1,113 +1,48 @@
 import { obtenerJson } from "./asincronico.js";
-import {options, urlDesactivar, urlActivar } from "./constantes.js";
-
-export function modalCargaDatos() {
-  Swal.fire({
-    title: "CARGANDO DATOS",
-    html: "<h3>Aguarde por favor</h3><p><img src='../img/nyan-cat.gif'><p>",
-    width: 500,
-    backdrop: `rgba(0,0,40,0.4)`,
-    showConfirmButton: false,
-  });
-}
-
-export function modalMostrarResultado(resultado) {
-  let msj;
-  if (resultado) {
-    msj = "<h3 style='margin: 0; padding: 3rem'>Petición exitosa! 🥳</h3>";
-  } else {
-    msj = "<h3 style='margin: 0; padding: 3rem'>Algo ha fallado 😭</h3>";
-  }
-
-  Swal.fire({
-    html: msj,
-    backdrop: `rgba(0,0,40,0.4)`,
-    showConfirmButton: false,
-    width: 500,
-    timer: 1500,
-  });
-}
-
-export function modalConfirmacionCambioEstado(estado, index) {
-  let nombre = document.querySelector(`#nombre_${index}`).textContent;
-  Swal.fire(
-    `El estado de: <b>${nombre}</b> ha sido modificado a: <b>${estado}</b>.`,
-    "",
-    "success"
-  );
-}
-
-export function modalExito() {
-  Swal.fire({
-    icon: 'success',
-    title: 'Se ha guardado correctamente!',
-    showConfirmButton: false,
-    timer: 1500
-  })
-}
-
-export function modalError(msj) {
-  Swal.fire(msj, "", "error");
-}
-
-async function modalPedirConfirmacion() {
-  return await Swal.fire({
-    title: "¿Deseas cambiar el estado?",
-    showDenyButton: true,
-    icon: "question",
-    confirmButtonText: "SI 😎",
-    denyButtonText: `NO 🙏`,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-  });
-}
-
-export function modalCancelacion() {
-  Swal.fire("Se ha cancelado la operación", "", "warning");
-}
-
-export function modalInformativo(tipo, nombre, textoHTML = "") {
-  Swal.fire({
-    icon: "info",
-    title: tipo,
-    html: `<p class="nombreAutor">${nombre}</p><br>
-  ${textoHTML}`,
-  });
-}
-//Fin modales
+import { urlDesactivar, urlActivar } from "./constantes.js";
+import * as modal from "./modales.js";
 
 //Modificaciones DOM
-export function obtenerEntidadPaginada(url, tipo, current_page = 0) {
-  modalCargaDatos();
+export function obtenerEntidadPaginada(url, tipo) {
+  let current_page = setearAtributosSesion();
+
+  modal.modalCargaDatos();
   obtenerJson(url + `paged?page=${current_page}&size=10`).then((response) => {
-    modalMostrarResultado(response.body.content);
+    modal.modalMostrarResultado(response.body.content);
     seteoPaginas(response);
     pintarResultado(response.body.content, tipo);
   });
 }
 
-export function pintarCambioEstado(index, estadoAnterior) {
-  let btn = document.querySelector("#estado_" + index);
+function pintarCambioEstado(index, estadoAnterior) {
+  let btnEstado = document.querySelector("#estado_" + index);
+  let btnEditar = document.querySelector("#editar_" + index);
+  let listadoPropiedades = propiedadesAPintar();
+
   if (!estadoAnterior) {
-    btn.classList.remove("btn-danger");
-    btn.classList.add("btn-success");
-    btn.dataset.alta = "true";
-    btn.parentElement.children[0].removeAttribute("disabled");
-    btn.parentNode.parentNode.children[0].classList.remove("tachado");
-    btn.parentNode.parentNode.children[1].classList.remove("tachado");
+    btnEstado.classList.remove("btn-danger");
+    btnEstado.classList.add("btn-success");
+    btnEstado.dataset.alta = "true";
+    btnEditar.removeAttribute("disabled");
+    listadoPropiedades.forEach((propiedad) => {
+      document
+        .getElementById(`${propiedad}_${index}`)
+        .classList.remove("tachado");
+    });
     document.getElementById("alta_" + index).innerHTML = "Activado";
   } else {
-    btn.classList.remove("btn-success");
-    btn.classList.add("btn-danger");
-    btn.dataset.alta = "false";
-    btn.parentElement.children[0].setAttribute("disabled", "");
-    btn.parentNode.parentNode.children[0].classList.add("tachado");
-    btn.parentNode.parentNode.children[1].classList.add("tachado");
+    btnEstado.classList.remove("btn-success");
+    btnEstado.classList.add("btn-danger");
+    btnEstado.dataset.alta = "false";
+    btnEditar.setAttribute("disabled", "");
+    listadoPropiedades.forEach((propiedad) => {
+      document.getElementById(`${propiedad}_${index}`).classList.add("tachado");
+    });
     document.getElementById("alta_" + index).innerHTML = "Desactivado";
   }
 }
 
-export function seteoPaginas(response) {
+function seteoPaginas(response) {
   let totalPages = response.body.totalPages;
   let current_page = response.body.pageable.pageNumber;
 
@@ -214,8 +149,7 @@ function pintarLibrosAsociados(editorial) {
   }
 }
 
-//Prueba pintadoGenerico
-export function pintarResultado(response, tipo) {
+function pintarResultado(response, tipo) {
   let listadoPropData = Object.keys(response[0]);
 
   response.forEach((entidad) => {
@@ -228,17 +162,23 @@ export function pintarResultado(response, tipo) {
 
   $table.querySelector("tbody").appendChild($fragment);
 }
-//FIn prueba
 
-export function modificarInfo(response, id) {
-  let nombreNuevo = response.nombre;
-  document.getElementById("nombre_" + id).innerHTML = nombreNuevo;
-  document.getElementById("estado_" + id).dataset.nombre = nombreNuevo;
-  document.getElementById("ver_" + id).dataset.nombre = nombreNuevo;
+function modificarInfo(response, id) {
+  let listadoPropiedades = propiedadesAPintar();
+  let botonVer = document.getElementById(`ver_${id}`);
+
+  listadoPropiedades.forEach((propiedad) => {
+    let tipoEntidad = typeof response[propiedad];
+
+    if (propiedad != "alta" && tipoEntidad != "object") {
+      document.getElementById(`${propiedad}_${id}`).textContent = response[propiedad];
+      botonVer.dataset[propiedad] = response[propiedad];
+    }
+  });
 }
 
 export function cambiarEstado(url, id) {
-  modalPedirConfirmacion().then((result) => {
+  modal.modalPedirConfirmacion().then((result) => {
     if (result.isConfirmed) {
       let estado = document.querySelector("#estado_" + id).dataset.alta;
       if (estado == "true") {
@@ -247,7 +187,7 @@ export function cambiarEstado(url, id) {
         activarEntidad(url + urlActivar, id);
       }
     } else if (result.isDenied) {
-      modalCancelacion();
+      modal.modalCancelacion();
     }
   });
 }
@@ -255,8 +195,8 @@ export function cambiarEstado(url, id) {
 export async function crearEntidad(url, options) {
   return await obtenerJson(url, options)
     .then((response) => {
-      if (response.status >= 200 && response.status <300) {
-        modalExito();
+      if (response.status >= 200 && response.status < 300) {
+        modal.modalExito();
       } else {
         return Promise.reject(response.body);
       }
@@ -269,9 +209,9 @@ export async function crearEntidad(url, options) {
 export async function modificarEntidad(url, id, options) {
   return await obtenerJson(url + id, options)
     .then((response) => {
-      if (response.status >= 200 && response.status <300) {
+      if (response.status >= 200 && response.status < 300) {
         modificarInfo(response.body, id);
-        modalExito();
+        modal.modalExito();
       } else {
         return Promise.reject(response.body);
       }
@@ -281,18 +221,19 @@ export async function modificarEntidad(url, id, options) {
     });
 }
 
-export function avanzarPagina(url, tipo){
-  current_page++;
+export function avanzarPagina(url, tipo) {
+  let current_page = getNumPaginaSesionStorage() + 1;
+  setNumPaginaSesionStorage(current_page);
   $table.querySelector("tbody").innerHTML = "";
-  obtenerEntidadPaginada(url, tipo, current_page);
+  obtenerEntidadPaginada(url, tipo);
 }
 
-export function retrocederPagina(url, tipo){
-  current_page--;
+export function retrocederPagina(url, tipo) {
+  let current_page = getNumPaginaSesionStorage() - 1;
+  setNumPaginaSesionStorage(current_page);
   $table.querySelector("tbody").innerHTML = "";
-  obtenerEntidadPaginada(url, tipo, current_page);
+  obtenerEntidadPaginada(url, tipo);
 }
-//Fin modificaciones DOM
 
 //Ocultar boton de creacion
 document.addEventListener("scroll", () => {
@@ -330,7 +271,7 @@ function buscaTabla() {
 let $table = document.querySelector(".table");
 let $template = document.getElementById("crud-template").content;
 let $fragment = document.createDocumentFragment();
-let current_page = 0;
+// let current_page = 0;
 //FIN Variables globales para pintado
 
 //Función ACTIVAR
@@ -339,13 +280,13 @@ function activarEntidad(url, index) {
     .then((response) => {
       if (response.status == 200) {
         pintarCambioEstado(index, false);
-        modalConfirmacionCambioEstado("Activado", index);
+        modal.modalConfirmacionCambioEstado("Activado", index);
       } else {
         return Promise.reject(response);
       }
     })
     .catch((badResponse) => {
-      modalError(badResponse.message);
+      modal.modalError(badResponse.message);
     });
 }
 //Fin ACTIVAR
@@ -356,13 +297,13 @@ function desactivarEntidad(url, index) {
     .then((response) => {
       if (response.status == 200) {
         pintarCambioEstado(index, true);
-        modalConfirmacionCambioEstado("Desactivado", index);
+        modal.modalConfirmacionCambioEstado("Desactivado", index);
       } else {
         return Promise.reject(response);
       }
     })
     .catch((badResponse) => {
-      modalError(badResponse.message);
+      modal.modalError(badResponse.message);
     });
 }
 //Fin DESACTIVAR
@@ -370,14 +311,14 @@ function desactivarEntidad(url, index) {
 //prueba edicion
 export function editarConForm(boton, urlEditar) {
   const id = boton.dataset.id;
-  modalFormulario(obtenerEditables(id), urlEditar, "Modificar", id);
+  modal.modalFormulario(obtenerEditables(id), urlEditar, "Modificar", id);
 }
 
-export function crearConForm(urlCrear){
-  modalFormulario(obtenerEditables(), urlCrear, "Crear");
+export function crearConForm(urlCrear) {
+  modal.modalFormulario(obtenerCreacion(), urlCrear, "Crear");
 }
 
-function obtenerEditables(id=undefined) {
+function obtenerEditables(id = undefined) {
   let nodoHijos = document.querySelector("tr").children;
   let textoHTML = "";
   for (const hijo of nodoHijos) {
@@ -385,9 +326,9 @@ function obtenerEditables(id=undefined) {
       let forLabel = hijo.dataset.label;
       let type = hijo.dataset.type;
       let valorActual = "";
-      if(id){
+      if (id) {
         let propiedad = forLabel.toLowerCase();
-        valorActual = document.querySelector(`#${propiedad}_${id}`).textContent
+        valorActual = document.querySelector(`#${propiedad}_${id}`).textContent;
       }
       textoHTML += `<label class="label-input" for="${forLabel}">${forLabel}:</label><input id="${forLabel}" class="swal2-input" type="${type}" value="${valorActual}"><br>`;
     }
@@ -395,36 +336,105 @@ function obtenerEditables(id=undefined) {
   return textoHTML;
 }
 
-function modalFormulario(textoHTML, url, accion, id=undefined) {
-  Swal.fire({
-    title: accion,
-    html: textoHTML,
-    allowEnterKey: true,
-    showCancelButton: true,
-    cancelButtonText: "Cancelar ❌",
-    confirmButtonText: "Guardar 💾",
-    preConfirm: async (nombre) => {
-      let responseBackEnd;
-      nombre = Swal.getPopup().querySelector('.swal2-input').value
-      options.body = JSON.stringify({ nombre });
-      if(accion.toLowerCase() == "modificar"){
-        options.method = "PUT"
-        responseBackEnd = await modificarEntidad(url, id, options);
-      } else{
-        options.method = "POST"
-        responseBackEnd = await crearEntidad(url, options);
-      }
-      if(responseBackEnd) Swal.showValidationMessage(responseBackEnd);
+function obtenerCreacion() {
+  let nodoHijos = document.querySelector("tr").children;
+  let textoHTML = "";
+  for (const hijo of nodoHijos) {
+    if (hijo.classList.contains("creacion")) {
+      let forLabel = hijo.dataset.label;
+      let type = hijo.dataset.type;
+      textoHTML += `<label class="label-input" for="${forLabel}">${forLabel}:</label><input id="${forLabel}" class="swal2-input" type="${type}" value=""><br>`;
     }
-  }).then((result) => {
-    if (!result.isConfirmed) {
-      modalCancelacion();
-    }
-  });
+  }
+  return textoHTML;
 }
 
-export function esUnNumero(numero) {
-  if ((numero) && !isNaN(numero)) {
+export function objetoAPersistir() {
+  let modal = document.getElementById("swal2-html-container").children;
+  let llave, valor;
+  let objeto = {};
+  for (const hijo of modal) {
+    if (hijo.localName == "input") {
+      llave = hijo.id.toLocaleLowerCase();
+      valor = hijo.value;
+      let par = { [llave]: valor };
+      Object.assign(objeto, par);
+    }
+  }
+  return objeto;
+}
+
+export function validarObjeto(objeto, entidad) {
+  if (entidad.toLowerCase() == "cliente") {
+    return validarCliente(objeto);
+  }
+}
+
+function validarCliente(objeto) {
+  let documento = objeto.documento;
+  if (documento.length >= 6 && documento.length <= 8 && esUnNumero(documento)) {
+    return;
+  }
+  return "El documento no cumple con el formato";
+}
+
+//esta logica deberia borrarse
+export function completarCliente(objeto) {
+  if (!objeto.username) {
+    let par = { ["username"]: "cliente@clientejs.com" };
+    Object.assign(objeto, par);
+  }
+  if (!objeto.password) {
+    let par = { ["password"]: "passWord_123!" };
+    Object.assign(objeto, par);
+  }
+  let par = { ["roleId"]: 2 };
+  Object.assign(objeto, par);
+
+  return objeto;
+}
+//esta logica deberia borrarse
+
+function setNumPaginaSesionStorage(pagina) {
+  sessionStorage.setItem("current_page", Number(pagina));
+}
+
+function getNumPaginaSesionStorage() {
+  if (sessionStorage.getItem("current_page"))
+    return Number(sessionStorage.getItem("current_page"));
+}
+
+export function obtenerNombrePagina() {
+  let cabeceraMeta = document.head.children;
+  for (const elemento of cabeceraMeta) {
+    if (elemento.localName == "title") {
+      return elemento.text;
+    }
+  }
+}
+
+function esMismaSesion() {
+  if (sessionStorage.getItem("pagina_actual")) {
+    let paginaPrev = sessionStorage.getItem("pagina_actual");
+    let paginaActual = obtenerNombrePagina();
+    return paginaActual == paginaPrev;
+  }
+  return false;
+}
+
+function setearAtributosSesion() {
+  if (!esMismaSesion()) {
+    let pagina = obtenerNombrePagina();
+    sessionStorage.setItem("pagina_actual", pagina);
+    sessionStorage.setItem("current_page", Number(0));
+    return 0;
+  } else {
+    return getNumPaginaSesionStorage();
+  }
+}
+
+function esUnNumero(numero) {
+  if (numero && !isNaN(numero)) {
     return true;
   } else {
     return false;

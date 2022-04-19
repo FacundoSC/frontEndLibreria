@@ -1,5 +1,6 @@
-import { options, urlAutor } from "./constantes.js";
+import {urlAutor } from "./constantes.js";
 import * as utilidades from "./utilidades.js";
+import {modalInformativo} from "./modales.js";
 
 main();
 
@@ -24,7 +25,7 @@ function main() {
 
     if (event.target.matches(".ver")) {
       let nombre = event.target.dataset.nombre;
-      utilidades.modalInformativo("Autor", nombre);
+      modalInformativo("Autor", nombre);
     }
 
     if (event.target.matches("#btn_next")) {

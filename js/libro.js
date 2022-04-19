@@ -272,6 +272,7 @@ function main() {
     });
 }
 async function obtenerLibrosPaginados() {
+    
     let $table = document.querySelector(".table");
     let $template = document.getElementById("crud-templateLibro").content;
     let $fragment = document.createDocumentFragment();
